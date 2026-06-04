@@ -1,0 +1,122 @@
+/**
+ * base.css — Design Tokens & Reset
+ * OBSChurch Broadcast Command
+ *
+ * Nguyên tắc: Tất cả màu sắc, spacing, typography
+ * đều dùng CSS custom properties.
+ * Không dùng magic numbers trong components.css.
+ */
+
+/* ── Google Fonts ──────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
+/* ── Color Tokens ──────────────────────────────────── */
+:root {
+  /* Backgrounds */
+  --color-bg            : #0a0a0a;
+  --color-surface       : #131313;
+  --color-surface-low   : #1c1b1b;
+  --color-surface-mid   : #201f1f;
+  --color-surface-high  : #2a2a2a;
+  --color-panel         : #1c1c1c;
+  --color-panel-header  : #252525;
+
+  /* Brand */
+  --color-primary       : #adc6ff;
+  --color-primary-dim   : #4d8eff;
+  --color-secondary     : #4edea3;
+  --color-tertiary      : #ffb95f;
+  --color-error         : #ffb4ab;
+  --color-error-deep    : #93000a;
+
+  /* Text */
+  --color-on-surface    : #e5e2e1;
+  --color-on-subtle     : #c2c6d6;
+  --color-outline       : #8c909f;
+  --color-divider       : #333333;
+
+  /* Overlay glow helpers */
+  --glow-primary        : rgba(77, 142, 255, 0.3);
+  --glow-secondary      : rgba(78, 222, 163, 0.3);
+  --glow-error          : rgba(255, 180, 171, 0.4);
+
+  /* ── Spacing ─────────────────────────────────────── */
+  --space-xs   : 4px;
+  --space-sm   : 8px;
+  --space-md   : 12px;
+  --space-lg   : 16px;
+  --space-xl   : 20px;
+  --space-2xl  : 24px;
+
+  /* ── Radius ──────────────────────────────────────── */
+  --radius-sm  : 4px;
+  --radius-md  : 8px;
+  --radius-lg  : 12px;
+
+  /* ── Typography ──────────────────────────────────── */
+  --font-sans  : 'Inter', system-ui, sans-serif;
+  --font-mono  : 'JetBrains Mono', 'Courier New', monospace;
+
+  --text-xs    : 10px;
+  --text-sm    : 11px;
+  --text-base  : 13px;
+  --text-md    : 14px;
+  --text-lg    : 16px;
+  --text-xl    : 20px;
+
+  /* ── Transitions ─────────────────────────────────── */
+  --transition-fast : 100ms ease;
+  --transition-base : 200ms ease;
+  --transition-slow : 350ms ease;
+
+  /* ── Sidebar ─────────────────────────────────────── */
+  --sidebar-width   : 56px;
+  --topbar-height   : 56px;
+}
+
+/* ── Reset ─────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family  : var(--font-sans);
+  font-size    : var(--text-base);
+  background   : var(--color-bg);
+  color        : var(--color-on-surface);
+  -webkit-font-smoothing: antialiased;
+  background-image:
+    radial-gradient(circle at top right, rgba(30, 41, 59, 0.08), transparent 40%),
+    radial-gradient(circle at bottom left, rgba(15, 23, 42, 0.15), transparent 40%);
+}
+
+/* ── Scrollbar ─────────────────────────────────────── */
+::-webkit-scrollbar       { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #666; }
+
+/* ── Focus ─────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ── Material Symbols ──────────────────────────────── */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  user-select: none;
+}

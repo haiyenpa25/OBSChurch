@@ -1,0 +1,100 @@
+/**
+ * animations.css — Micro-animations
+ * OBSChurch Broadcast Command
+ */
+
+/* ── Pulse dot (Live indicator) ─────────────────────── */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.8); }
+}
+
+.animate-pulse {
+  animation: pulse-dot 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ── Slide in from left (Lower Third appear) ─────────── */
+@keyframes slide-in-left {
+  from { transform: translateX(-20px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+.anim-slide-left {
+  animation: slide-in-left var(--transition-slow) ease forwards;
+}
+
+/* ── Fade in ─────────────────────────────────────────── */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.anim-fade { animation: fade-in var(--transition-base) ease forwards; }
+
+/* ── Scale in (Glassmorphism template) ───────────────── */
+@keyframes scale-in {
+  from { transform: scale(0.95) translateY(4px); opacity: 0; }
+  to   { transform: scale(1)    translateY(0);   opacity: 1; }
+}
+
+.anim-scale { animation: scale-in var(--transition-slow) ease forwards; }
+
+/* ── Glitch (SciFi template) ─────────────────────────── */
+@keyframes glitch {
+  0%  { clip-path: inset(0 0 98% 0); transform: translateX(-2px); }
+  10% { clip-path: inset(30% 0 60% 0); transform: translateX(2px); }
+  20% { clip-path: inset(70% 0 10% 0); transform: translateX(-1px); }
+  30% { clip-path: inset(10% 0 80% 0); transform: translateX(0); }
+  40%,100% { clip-path: inset(0); transform: translateX(0); }
+}
+
+.anim-glitch {
+  animation: glitch 0.4s steps(1) forwards;
+}
+
+/* ── Shimmer (loading state) ─────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ── Button press ─────────────────────────────────────── */
+.hw-btn:active .material-symbols-outlined {
+  transform: scale(0.9);
+  transition: transform var(--transition-fast);
+}
+
+/* ── Safety Cut flash ────────────────────────────────── */
+@keyframes safety-flash {
+  0%  { background: rgba(255,0,0,0); }
+  15% { background: rgba(255,0,0,0.35); }
+  40% { background: rgba(255,0,0,0.2); }
+  70% { background: rgba(255,0,0,0.35); }
+  100%{ background: rgba(255,0,0,0); }
+}
+
+.safety-flash-active {
+  animation: safety-flash 0.6s ease !important;
+}
+
+/* ── Status badge blink ──────────────────────────────── */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+.blink { animation: blink 1s step-start infinite; }
+
+/* ── Overlay slide up (Lower Third out) ──────────────── */
+@keyframes slide-out-down {
+  from { transform: translateY(0);    opacity: 1; }
+  to   { transform: translateY(12px); opacity: 0; }
+}
+
+.anim-slide-out { animation: slide-out-down var(--transition-base) ease forwards; }

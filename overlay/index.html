@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1920" />
+  <title>OBSChurch — Overlay Source</title>
+  <link rel="stylesheet" href="overlay.css" />
+  <style>
+    /* ── Template: Clean Dark ────────────────────────── */
+    .tpl-clean-dark {
+      background: linear-gradient(to right, rgba(10,10,10,0.95), rgba(10,10,10,0.75));
+      border-left: 5px solid #4d8eff;
+      padding: 20px 32px;
+      border-radius: 0 8px 8px 0;
+      backdrop-filter: blur(12px);
+    }
+    .tpl-clean-dark .lt-primary   { color: #ffffff; }
+    .tpl-clean-dark .lt-secondary { color: #adc6ff; text-transform: uppercase; letter-spacing: 0.08em; font-size: 20px; }
+
+    /* ── Template: Vintage ───────────────────────────── */
+    .tpl-vintage {
+      background: linear-gradient(to right, rgba(60,30,5,0.92), rgba(40,20,3,0.7));
+      border-left: 5px solid #ffb95f;
+      border-top: 1px solid rgba(255,185,95,0.3);
+      padding: 20px 32px;
+      border-radius: 0 8px 8px 0;
+    }
+    .tpl-vintage .lt-primary   { color: #ffddb8; font-style: italic; }
+    .tpl-vintage .lt-secondary { color: #ffb95f; font-size: 19px; }
+
+    /* ── Template: SciFi ─────────────────────────────── */
+    .tpl-scifi {
+      background: linear-gradient(to right, rgba(0,20,40,0.95), rgba(0,15,30,0.8));
+      border-left: 5px solid #4edea3;
+      padding: 20px 32px;
+      clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+    }
+    .tpl-scifi .lt-primary   { color: #4edea3; font-family: 'JetBrains Mono', monospace; letter-spacing: -0.02em; }
+    .tpl-scifi .lt-secondary { color: rgba(78,222,163,0.7); font-family: 'JetBrains Mono', monospace; font-size: 18px; }
+    .tpl-scifi::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, rgba(78,222,163,0.03) 0px, rgba(78,222,163,0.03) 1px, transparent 1px, transparent 4px);
+      pointer-events: none;
+    }
+
+    /* ── Template: Glassmorphism ─────────────────────── */
+    .tpl-glassmorphism {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      backdrop-filter: blur(20px);
+      padding: 22px 32px;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    .tpl-glassmorphism .lt-primary   { color: #ffffff; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+    .tpl-glassmorphism .lt-secondary { color: rgba(255,255,255,0.7); font-size: 20px; }
+  </style>
+</head>
+<body>
+  <div id="overlay-root">
+    <!-- Lower Third Container -->
+    <div id="lower-third" class="lower-third">
+      <span class="lt-primary"  id="lt-primary">—</span>
+      <span class="lt-secondary" id="lt-secondary"></span>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * OBS Browser Source — Overlay Renderer
+     *
+     * Lắng nghe WS messages từ server và cập nhật DOM overlay.
+     * Không import module vì OBS đôi khi giới hạn ES module.
+     */
+
+    // ─── Constants ────────────────────────────────────
+    const WS_URL       = 'ws://localhost:3000';
+    const RECONNECT_MS = 3000;
+    const TEMPLATE_MAP = Object.freeze({
+      'clean-dark'   : 'tpl-clean-dark',
+      'vintage'      : 'tpl-vintage',
+      'scifi'        : 'tpl-scifi',
+      'glassmorphism': 'tpl-glassmorphism',
+    });
+
+    // ─── DOM refs ─────────────────────────────────────
+    const lowerThird  = document.getElementById('lower-third');
+    const ltPrimary   = document.getElementById('lt-primary');
+    const ltSecondary = document.getElementById('lt-secondary');
+
+    // ─── WebSocket ────────────────────────────────────
+    let ws;
+
+    function connect() {
+      ws = new WebSocket(WS_URL);
+      ws.addEventListener('open',    onOpen);
+      ws.addEventListener('message', onMessage);
+      ws.addEventListener('close',   () => setTimeout(connect, RECONNECT_MS));
+      ws.addEventListener('error',   () => ws.close());
+    }
+
+    function onOpen() {
+      console.log('[Overlay] WS connected');
+    }
+
+    function onMessage(event) {
+      try {
+        const msg = JSON.parse(event.data);
+        dispatch(msg);
+      } catch(e) {
+        console.error('[Overlay] Parse error:', e);
+      }
+    }
+
+    // ─── Dispatcher (Polymorphic via map) ─────────────
+    const handlers = {
+      OVERLAY_SHOW : (p) => showOverlay(p),
+      OVERLAY_HIDE : ()  => hideOverlay(),
+      OVERLAY_TRANS: (p) => triggerTransition(p.effect),
+      CLEAR_ALL    : ()  => hideOverlay(),
+      SAFETY_CUT   : ()  => hideOverlay(true),
+      STATE_SYNC   : (p) => { if (p.overlayVisible) showOverlay(p.currentPayload); },
+    };
+
+    function dispatch(msg) {
+      const handler = handlers[msg.type];
+      if (handler) handler(msg.payload ?? {});
+      else console.warn('[Overlay] Unknown message:', msg.type);
+    }
+
+    // ─── Overlay Actions ──────────────────────────────
+    function showOverlay(payload) {
+      const templateClass = TEMPLATE_MAP[payload.templateId] ?? TEMPLATE_MAP['clean-dark'];
+
+      // Reset template classes
+      Object.values(TEMPLATE_MAP).forEach((c) => lowerThird.classList.remove(c));
+      lowerThird.classList.add(templateClass);
+
+      // Cập nhật nội dung
+      ltPrimary.textContent   = _getPrimaryText(payload);
+      ltSecondary.textContent = _getSecondaryText(payload);
+
+      // Animate in
+      lowerThird.classList.remove('is-hiding');
+      lowerThird.classList.add('is-visible');
+    }
+
+    function hideOverlay(immediate = false) {
+      if (immediate) {
+        lowerThird.classList.remove('is-visible', 'is-hiding');
+        return;
+      }
+      lowerThird.classList.add('is-hiding');
+      lowerThird.addEventListener('transitionend', () => {
+        lowerThird.classList.remove('is-visible', 'is-hiding');
+      }, { once: true });
+    }
+
+    function triggerTransition(effect) {
+      lowerThird.classList.add('is-hiding');
+      setTimeout(() => {
+        lowerThird.classList.remove('is-hiding');
+        lowerThird.classList.add('is-visible');
+      }, 350);
+    }
+
+    // ─── Text Helpers ─────────────────────────────────
+    function _getPrimaryText(p) {
+      return p.songName || p.speakerName || p.announcement || p.scriptureRef || '—';
+    }
+
+    function _getSecondaryText(p) {
+      if (p.scriptureRef) {
+        return p.scriptureVerse ? `${p.scriptureRef}:${p.scriptureVerse}` : p.scriptureRef;
+      }
+      return p.speakerName || p.announcement || '';
+    }
+
+    // ─── Start ────────────────────────────────────────
+    connect();
+  </script>
+</body>
+</html>

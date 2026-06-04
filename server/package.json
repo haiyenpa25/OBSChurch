@@ -1,0 +1,16 @@
+{
+  "name": "obsChurch-ws-server",
+  "version": "1.0.0",
+  "description": "WebSocket server for OBSChurch Broadcast Command",
+  "main": "ws-server.js",
+  "scripts": {
+    "start": "node ws-server.js",
+    "dev": "node --watch ws-server.js"
+  },
+  "dependencies": {
+    "ws": "^8.17.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
