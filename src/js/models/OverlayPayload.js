@@ -26,6 +26,17 @@ export class OverlayPayload extends BaseModel {
     this.scriptureVerse = data.scriptureVerse ?? '';
     this.speakerName    = data.speakerName    ?? '';
     this.announcement   = data.announcement   ?? '';
+    
+    // Layout fields
+    this.camX           = data.camX           ?? 5;
+    this.camY           = data.camY           ?? 5;
+    this.camW           = data.camW           ?? 25;
+    this.camH           = data.camH           ?? 25;
+    this.camR           = data.camR           ?? 8;
+    this.textX          = data.textX          ?? 5;
+    this.textY          = data.textY          ?? 80;
+    this.customCss      = data.customCss      ?? '';
+    
     this.timestamp      = Date.now();
   }
 
@@ -38,6 +49,14 @@ export class OverlayPayload extends BaseModel {
       scriptureVerse: this.scriptureVerse,
       speakerName   : this.speakerName,
       announcement  : this.announcement,
+      camX          : this.camX,
+      camY          : this.camY,
+      camW          : this.camW,
+      camH          : this.camH,
+      camR          : this.camR,
+      textX         : this.textX,
+      textY         : this.textY,
+      customCss     : this.customCss,
       timestamp     : this.timestamp,
     };
   }

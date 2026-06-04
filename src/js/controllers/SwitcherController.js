@@ -125,8 +125,8 @@ export class SwitcherController extends BaseController {
   /** Flash button khi nhấn phím tắt */
   _flashButton(btnEl) {
     if (!btnEl) return;
-    btnEl.classList.add('hw-btn--flash');
-    setTimeout(() => btnEl.classList.remove('hw-btn--flash'), 300);
+    btnEl.classList.add('flashing');
+    setTimeout(() => btnEl.classList.remove('flashing'), 300);
   }
 }
 

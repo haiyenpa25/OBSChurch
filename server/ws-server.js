@@ -23,6 +23,7 @@ const path = require('path');
 const PORT         = 3000;
 const PING_MS      = 20_000;
 const SCENES_PATH  = path.join(__dirname, 'data', 'scenes.json');
+const LAYOUTS_PATH = path.join(__dirname, 'data', 'layouts.json');
 
 // ─── Bootstrap ───────────────────────────────────────
 const httpServer = http.createServer(_handleHttpRequest);
@@ -39,10 +40,23 @@ const appState = {
 function _handleHttpRequest(req, res) {
   _setCorsHeaders(res);
 
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204).end();
+    return;
+  }
+
   if (req.url === '/api/scenes' && req.method === 'GET') {
-    const data = fs.readFileSync(SCENES_PATH, 'utf8');
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(data);
+    _handleGetScenes(res);
+    return;
+  }
+
+  if (req.url === '/api/layouts' && req.method === 'GET') {
+    _handleGetLayouts(res);
+    return;
+  }
+
+  if (req.url === '/api/layouts' && req.method === 'POST') {
+    _handleSaveLayouts(req, res);
     return;
   }
 
@@ -55,9 +69,51 @@ function _handleHttpRequest(req, res) {
   res.writeHead(404).end('Not Found');
 }
 
+function _handleGetScenes(res) {
+  fs.readFile(SCENES_PATH, 'utf8', (err, data) => {
+    if (err) {
+      res.writeHead(500).end('Internal Server Error');
+      return;
+    }
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(data);
+  });
+}
+
+function _handleGetLayouts(res) {
+  fs.readFile(LAYOUTS_PATH, 'utf8', (err, data) => {
+    if (err) {
+      res.writeHead(500).end('Internal Server Error');
+      return;
+    }
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(data);
+  });
+}
+
+function _handleSaveLayouts(req, res) {
+  let body = '';
+  req.on('data', (chunk) => body += chunk);
+  req.on('end', () => {
+    try {
+      const parsed = JSON.parse(body);
+      fs.writeFile(LAYOUTS_PATH, JSON.stringify(parsed, null, 2), 'utf8', (err) => {
+        if (err) {
+          res.writeHead(500).end('Internal Server Error');
+          return;
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true }));
+      });
+    } catch (e) {
+      res.writeHead(400).end('Invalid JSON');
+    }
+  });
+}
+
 function _setCorsHeaders(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 }
 

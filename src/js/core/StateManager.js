@@ -17,22 +17,42 @@ const STATE_EVENTS = Object.freeze({
   FORM_UPDATED   : 'state:form_updated',
   OVERLAY_CHANGED: 'state:overlay_changed',
   WS_STATUS      : 'state:ws_status',
+  OBS_STATUS     : 'state:obs_status',
 });
+
+const _savedObs = (() => {
+  try { return JSON.parse(localStorage.getItem('obs_ws_config') || '{}'); } catch(_) { return {}; }
+})();
 
 /** @type {AppState} */
 const _state = {
   scenes        : [],
+  layouts       : {}, // cache loaded layouts from server
   activeSceneId : null,
   activeItemId  : null,
   overlayVisible: false,
   wsConnected   : false,
+  obsConnected  : false,
+  obsConfig: {
+    host: _savedObs.host || 'localhost',
+    port: Number(_savedObs.port) || 4455,
+    password: _savedObs.password || '',
+  },
   form: {
     templateId   : 'clean-dark',
     songName     : '',
     scriptureRef : '',
     scriptureVerse: '',
     speakerName  : '',
-    announcement : '',
+    announcement  : '',
+    camX          : 5,
+    camY          : 5,
+    camW          : 25,
+    camH          : 25,
+    camR          : 8,
+    textX         : 5,
+    textY         : 80,
+    customCss     : '',
   },
 };
 
@@ -41,6 +61,21 @@ const StateManager = (() => {
   /** Lấy bản sao state (immutable read). */
   function getState() {
     return structuredClone(_state);
+  }
+
+  /** Cache all template layouts */
+  function setLayouts(layouts) {
+    _state.layouts = layouts;
+  }
+
+  function getLayouts() {
+    return _state.layouts;
+  }
+
+  function getLayoutForTemplate(templateId) {
+    return _state.layouts[templateId] ?? {
+      camX: 5, camY: 5, camW: 25, camH: 25, camR: 8, textX: 5, textY: 80, customCss: ''
+    };
   }
 
   /** Lấy scene đang active. @returns {Scene|null} */
@@ -81,6 +116,19 @@ const StateManager = (() => {
   function updateForm(field, value) {
     if (!(field in _state.form)) return;
     _state.form[field] = value;
+    if (field === 'templateId') {
+      const layout = getLayoutForTemplate(value);
+      Object.assign(_state.form, {
+        camX      : layout.camX,
+        camY      : layout.camY,
+        camW      : layout.camW,
+        camH      : layout.camH,
+        camR      : layout.camR,
+        textX     : layout.textX,
+        textY     : layout.textY,
+        customCss : layout.customCss,
+      });
+    }
     EventBus.emit(STATE_EVENTS.FORM_UPDATED, { field, value });
   }
 
@@ -102,12 +150,35 @@ const StateManager = (() => {
     EventBus.emit(STATE_EVENTS.OVERLAY_CHANGED, { visible });
   }
 
+  function getObsConfig() {
+    return _state.obsConfig;
+  }
+
+  function setObsConfig(config) {
+    Object.assign(_state.obsConfig, config);
+    localStorage.setItem('obs_ws_config', JSON.stringify(_state.obsConfig));
+  }
+
+  function setObsStatus(connected) {
+    _state.obsConnected = connected;
+    EventBus.emit(STATE_EVENTS.OBS_STATUS, { connected });
+  }
+
   // ── Private ──────────────────────────────────────
   /** Tự động điền form khi chọn item. */
   function _autoFillForm(item) {
+    const layout = getLayoutForTemplate(item.templateId);
     const updates = {
       templateId: item.templateId,
       songName  : item.type === 'music' ? item.label : '',
+      camX      : layout.camX,
+      camY      : layout.camY,
+      camW      : layout.camW,
+      camH      : layout.camH,
+      camR      : layout.camR,
+      textX     : layout.textX,
+      textY     : layout.textY,
+      customCss : layout.customCss,
     };
     setForm(updates);
   }
@@ -131,6 +202,8 @@ const StateManager = (() => {
     getState, getActiveScene, getActiveItem,
     setScenes, setActiveScene, setActiveItem,
     updateForm, setForm, setWsStatus, setOverlayVisible,
+    getObsConfig, setObsConfig, setObsStatus,
+    setLayouts, getLayouts, getLayoutForTemplate,
     on, off,
     EVENTS: STATE_EVENTS,
   };

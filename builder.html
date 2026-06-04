@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="OBSChurch Layout Builder — Thiết kế giao diện overlay chuyên nghiệp" />
+  <title>Layout Builder — OBSChurch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <style>
+    /* ══════════════════════════════════════════════════════
+       DESIGN TOKENS
+    ══════════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --font-sans: 'Inter', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --bg-base:    #060610;
+      --bg-surface: #0c0c1a;
+      --bg-card:    #111122;
+      --bg-elevated:#181830;
+      --border:     rgba(255,255,255,0.08);
+      --border-dim: rgba(255,255,255,0.04);
+      --purple:  #a855f7;
+      --purple-dim:rgba(168,85,247,0.15);
+      --blue:    #4d8eff;
+      --blue-dim:rgba(77,142,255,0.15);
+      --green:   #4edea3;
+      --green-dim:rgba(78,222,163,0.15);
+      --amber:   #fbbf24;
+      --red:     #ef4444;
+      --cyan:    #06b6d4;
+      --text-1: #f0f0ff;
+      --text-2: #9090b0;
+      --text-3: #505070;
+      --text-4: #303050;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg-base);
+      font-family: var(--font-sans);
+      color: var(--text-1);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       LAYOUT
+    ══════════════════════════════════════════════════════ */
+    #app {
+      display: grid;
+      grid-template-rows: 52px 1fr;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── TOPBAR ── */
+    #topbar {
+      background: rgba(6,6,16,0.95);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      gap: 12px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+    }
+    .brand-logo {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--purple), #7e22ce);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      box-shadow: 0 0 16px rgba(168,85,247,0.4);
+    }
+    .brand-name {
+      font-size: 14px; font-weight: 800; color: var(--text-1);
+      letter-spacing: 0.05em;
+    }
+    .brand-name em { color: var(--purple); font-style: normal; }
+
+    .topbar-mid { flex: 1; display: flex; justify-content: center; gap: 6px; }
+    .tpl-tab {
+      display: flex; align-items: center; gap: 5px;
+      height: 28px; padding: 0 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-2);
+      font-size: 11px; font-weight: 500;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .tpl-tab:hover { background: rgba(255,255,255,0.06); color: var(--text-1); }
+    .tpl-tab.active {
+      background: var(--purple-dim);
+      border-color: rgba(168,85,247,0.4);
+      color: var(--text-1);
+    }
+    .tpl-tab-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+    .topbar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .tb-btn {
+      display: flex; align-items: center; gap: 6px;
+      height: 30px; padding: 0 12px;
+      border-radius: 6px; border: 1px solid var(--border);
+      background: transparent; color: var(--text-2);
+      font-size: 11px; cursor: pointer; transition: all 0.15s;
+      text-decoration: none; white-space: nowrap;
+    }
+    .tb-btn:hover { background: rgba(255,255,255,0.07); color: var(--text-1); }
+    .tb-btn .material-symbols-outlined { font-size: 14px; }
+    .tb-btn.primary {
+      background: linear-gradient(135deg, var(--purple), #7e22ce);
+      border-color: transparent; color: #fff;
+      box-shadow: 0 0 14px rgba(168,85,247,0.35);
+    }
+    .tb-btn.primary:hover { box-shadow: 0 0 22px rgba(168,85,247,0.55); }
+
+    /* ── WORKSPACE ── */
+    #workspace {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      overflow: hidden;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       LEFT — SETTINGS PANEL
+    ══════════════════════════════════════════════════════ */
+    #settings-panel {
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .settings-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .settings-scroll::-webkit-scrollbar { width: 4px; }
+    .settings-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .form-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .form-section-hdr {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-elevated);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .form-section-icon {
+      width: 20px; height: 20px;
+      border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; flex-shrink: 0;
+    }
+    .form-section-icon.purple { background: var(--purple-dim); color: var(--purple); }
+    .form-section-icon.blue   { background: var(--blue-dim);   color: var(--blue); }
+    .form-section-icon.green  { background: var(--green-dim);  color: var(--green); }
+    .form-section-title {
+      font-size: 10px; font-weight: 700; color: var(--text-2);
+      text-transform: uppercase; letter-spacing: 0.1em; flex: 1;
+    }
+    .form-section-body { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+
+    .field-group { display: flex; flex-direction: column; gap: 5px; }
+    .field-row   { display: flex; gap: 10px; }
+    .field-row > * { flex: 1; }
+    .field-label {
+      font-size: 9px; font-family: var(--font-mono);
+      color: var(--text-3); text-transform: uppercase; letter-spacing: 0.08em;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .field-val { color: var(--purple); font-weight: 700; }
+    .field-input {
+      background: var(--bg-base); border: 1px solid var(--border);
+      color: var(--text-1); font-size: 12px; font-family: var(--font-sans);
+      padding: 7px 10px; border-radius: 6px; width: 100%;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .field-input:focus { outline: none; border-color: var(--purple); box-shadow: 0 0 0 2px rgba(168,85,247,0.2); }
+    .field-input::placeholder { color: var(--text-4); }
+    input[type="range"].field-input {
+      padding: 0; height: 6px; cursor: pointer;
+      accent-color: var(--purple);
+    }
+    textarea.field-input { resize: vertical; min-height: 80px; font-family: var(--font-mono); font-size: 11px; line-height: 1.5; }
+
+    /* Slider with live value */
+    .slider-row {
+      display: flex; gap: 8px; align-items: center;
+    }
+    .slider-row input[type="range"] { flex: 1; }
+    .slider-num {
+      width: 42px; text-align: right;
+      font-size: 11px; font-family: var(--font-mono);
+      color: var(--purple); font-weight: 700; flex-shrink: 0;
+    }
+
+    /* Settings footer */
+    .settings-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-surface);
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .footer-btn {
+      flex: 1; height: 40px;
+      border-radius: 8px; border: 1px solid var(--border);
+      background: var(--bg-elevated); color: var(--text-2);
+      font-size: 12px; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all 0.15s;
+    }
+    .footer-btn:hover { background: rgba(255,255,255,0.08); color: var(--text-1); }
+    .footer-btn .material-symbols-outlined { font-size: 15px; }
+    .footer-btn.primary {
+      background: linear-gradient(135deg, var(--purple), #7e22ce);
+      border-color: transparent; color: #fff;
+      box-shadow: 0 4px 14px rgba(168,85,247,0.3);
+    }
+    .footer-btn.primary:hover { box-shadow: 0 4px 20px rgba(168,85,247,0.5); }
+    .footer-btn.live {
+      background: var(--green-dim);
+      border-color: rgba(78,222,163,0.3); color: var(--green);
+    }
+    .footer-btn.live:hover { background: rgba(78,222,163,0.25); }
+
+    /* ══════════════════════════════════════════════════════
+       RIGHT — CANVAS PREVIEW
+    ══════════════════════════════════════════════════════ */
+    #preview-panel {
+      background: #030308;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Subtle bg pattern */
+    #preview-panel::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(168,85,247,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(168,85,247,0.02) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    #canvas-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 960px;
+      aspect-ratio: 16/9;
+    }
+
+    /* Resolution label */
+    .canvas-res-label {
+      position: absolute;
+      top: -24px; left: 0;
+      font-size: 9px; font-family: var(--font-mono);
+      color: var(--text-3);
+      letter-spacing: 0.08em;
+    }
+
+    /* Canvas viewport */
+    #canvas {
+      width: 100%;
+      height: 100%;
+      background: #0f0f18;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.03),
+        0 20px 60px rgba(0,0,0,0.8),
+        0 0 80px rgba(168,85,247,0.08);
+    }
+    .canvas-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 30% 70%, rgba(30,10,60,0.5) 0%, rgba(5,5,15,1) 70%);
+    }
+    .canvas-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+      background-size: 5% 8.889%;
+    }
+    .canvas-safe {
+      position: absolute; inset: 5%;
+      border: 1px solid rgba(255,255,255,0.04);
+      pointer-events: none;
+    }
+    .canvas-safe::before {
+      content: 'SAFE AREA · 90%';
+      position: absolute; top: 6px; left: 8px;
+      font-size: 8px; font-family: var(--font-mono);
+      color: rgba(255,255,255,0.12); letter-spacing: 0.06em;
+    }
+
+    /* ── Camera Frame ── */
+    #canvas-cam {
+      position: absolute;
+      border: 2px solid #00f5ff;
+      background: rgba(0,245,255,0.06);
+      box-shadow: 0 0 18px rgba(0,245,255,0.35), inset 0 0 10px rgba(0,245,255,0.05);
+      cursor: move;
+      user-select: none;
+      transition: box-shadow 0.15s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #canvas-cam:hover {
+      box-shadow: 0 0 28px rgba(0,245,255,0.55), inset 0 0 15px rgba(0,245,255,0.1);
+    }
+    #canvas-cam::after {
+      content: '📹 CAM';
+      font-size: 9px; font-weight: 700;
+      font-family: var(--font-mono);
+      color: rgba(0,245,255,0.8);
+      letter-spacing: 0.1em;
+      pointer-events: none;
+    }
+    #canvas-cam.dragging { box-shadow: 0 0 40px rgba(0,245,255,0.7), inset 0 0 20px rgba(0,245,255,0.15); }
+
+    /* Corner resize handles */
+    .resize-handle {
+      position: absolute;
+      width: 10px; height: 10px;
+      background: #00f5ff;
+      border-radius: 2px;
+      opacity: 0.7;
+      transition: opacity 0.15s, transform 0.15s;
+    }
+    .resize-handle:hover { opacity: 1; transform: scale(1.3); }
+    .resize-handle.tl { top: -4px; left: -4px; cursor: nw-resize; }
+    .resize-handle.tr { top: -4px; right: -4px; cursor: ne-resize; }
+    .resize-handle.bl { bottom: -4px; left: -4px; cursor: sw-resize; }
+    .resize-handle.br { bottom: -4px; right: -4px; cursor: se-resize; }
+
+    /* ── Lower Third ── */
+    #canvas-text {
+      position: absolute;
+      cursor: move;
+      user-select: none;
+      min-width: 200px;
+    }
+    #canvas-text-inner {
+      border-left: 4px solid var(--purple);
+      background: linear-gradient(to right, rgba(15,15,25,0.95), rgba(15,15,25,0.7));
+      border-radius: 0 6px 6px 0;
+      padding: 8px 14px;
+      backdrop-filter: blur(8px);
+    }
+    .ct-primary { font-size: 14px; font-weight: 700; color: #fff; display: block; }
+    .ct-secondary { font-size: 9px; color: var(--purple); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-top: 3px; }
+
+    /* Text drag indicator */
+    #canvas-text::before {
+      content: '⠿ TEXT';
+      position: absolute;
+      top: -18px; left: 0;
+      font-size: 8px;
+      font-family: var(--font-mono);
+      color: rgba(168,85,247,0.6);
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    /* Position readout overlay */
+    #pos-readout {
+      position: absolute;
+      bottom: 8px; right: 8px;
+      background: rgba(0,0,0,0.7);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 4px 8px;
+      font-size: 9px;
+      font-family: var(--font-mono);
+      color: var(--text-3);
+      pointer-events: none;
+    }
+    #pos-readout span { color: var(--text-2); }
+
+    /* Template indicator strips */
+    .tpl-strip {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--purple);
+      opacity: 0.5;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       TOAST
+    ══════════════════════════════════════════════════════ */
+    #toast-box {
+      position: fixed; bottom: 20px; right: 20px;
+      display: flex; flex-direction: column; gap: 6px;
+      z-index: 9999; pointer-events: none;
+    }
+    .toast {
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 14px;
+      font-size: 12px; font-family: var(--font-mono); color: var(--text-2);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      opacity: 0; transform: translateY(10px);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { border-color: rgba(78,222,163,0.35); color: var(--green); }
+    .toast.error   { border-color: rgba(239,68,68,0.4);  color: var(--red); }
+    .toast.info    { border-color: rgba(77,142,255,0.35); color: var(--blue); }
+  </style>
+</head>
+<body>
+<div id="toast-box"></div>
+
+<div id="app">
+  <!-- ═══ TOPBAR ═══ -->
+  <div id="topbar">
+    <div class="brand">
+      <div class="brand-logo">🎨</div>
+      <div class="brand-name">LAYOUT <em>BUILDER</em></div>
+    </div>
+
+    <!-- Template Tabs -->
+    <div class="topbar-mid" id="template-tabs">
+      <button class="tpl-tab active" data-tpl="clean-dark">
+        <span class="tpl-tab-dot" style="background:#4d8eff"></span>Clean Dark
+      </button>
+      <button class="tpl-tab" data-tpl="vintage">
+        <span class="tpl-tab-dot" style="background:#fbbf24"></span>Vintage
+      </button>
+      <button class="tpl-tab" data-tpl="scifi">
+        <span class="tpl-tab-dot" style="background:#4edea3"></span>SciFi
+      </button>
+      <button class="tpl-tab" data-tpl="glassmorphism">
+        <span class="tpl-tab-dot" style="background:rgba(255,255,255,0.6)"></span>Glass
+      </button>
+      <button class="tpl-tab" data-tpl="sermon-topic">
+        <span class="tpl-tab-dot" style="background:#a855f7"></span>Topic
+      </button>
+      <button class="tpl-tab" data-tpl="scripture-fullscreen">
+        <span class="tpl-tab-dot" style="background:#06b6d4"></span>Scripture
+      </button>
+    </div>
+
+    <div class="topbar-right">
+      <a href="index.html" class="tb-btn">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Service Runner
+      </a>
+    </div>
+  </div>
+
+  <!-- ═══ WORKSPACE ═══ -->
+  <div id="workspace">
+
+    <!-- ═══ LEFT: Settings ═══ -->
+    <div id="settings-panel">
+      <div class="settings-scroll">
+
+        <!-- Camera Position -->
+        <div class="form-section">
+          <div class="form-section-hdr">
+            <div class="form-section-icon blue">
+              <span class="material-symbols-outlined" style="font-size:12px">videocam</span>
+            </div>
+            <span class="form-section-title">Vị Trí Camera Overlay</span>
+            <button class="tb-btn" id="btn-reset-cam" style="height:22px;padding:0 8px;font-size:9px">Reset</button>
+          </div>
+          <div class="form-section-body">
+            <div class="field-row">
+              <div class="field-group">
+                <label class="field-label">X — Trái/Phải <span class="field-val" id="v-camX">5%</span></label>
+                <div class="slider-row">
+                  <input type="range" class="field-input" id="s-camX" min="0" max="80" value="5" />
+                  <span class="slider-num" id="n-camX">5%</span>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Y — Trên/Dưới <span class="field-val" id="v-camY">5%</span></label>
+                <div class="slider-row">
+                  <input type="range" class="field-input" id="s-camY" min="0" max="80" value="5" />
+                  <span class="slider-num" id="n-camY">5%</span>
+                </div>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field-group">
+                <label class="field-label">Rộng <span class="field-val" id="v-camW">25%</span></label>
+                <div class="slider-row">
+                  <input type="range" class="field-input" id="s-camW" min="0" max="80" value="25" />
+                  <span class="slider-num" id="n-camW">25%</span>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Cao <span class="field-val" id="v-camH">25%</span></label>
+                <div class="slider-row">
+                  <input type="range" class="field-input" id="s-camH" min="0" max="80" value="25" />
+                  <span class="slider-num" id="n-camH">25%</span>
+                </div>
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Bo Góc Camera <span class="field-val" id="v-camR">8px</span></label>
+              <div class="slider-row">
+                <input type="range" class="field-input" id="s-camR" min="0" max="60" value="8" />
+                <span class="slider-num" id="n-camR">8px</span>
+              </div>
+            </div>
+            <p style="font-size:10px;color:var(--text-3);font-family:var(--font-mono)">
+              💡 Kéo khung Cam trên canvas để định vị trực tiếp
+            </p>
+          </div>
+        </div>
+
+        <!-- Text Position -->
+        <div class="form-section">
+          <div class="form-section-hdr">
+            <div class="form-section-icon purple">
+              <span class="material-symbols-outlined" style="font-size:12px">text_fields</span>
+            </div>
+            <span class="form-section-title">Vị Trí Lower Third</span>
+          </div>
+          <div class="form-section-body">
+            <div class="field-row">
+              <div class="field-group">
+                <label class="field-label">X <span class="field-val" id="v-textX">5%</span></label>
+                <div class="slider-row">
+                  <input type="range" class="field-input" id="s-textX" min="0" max="80" value="5" />
+                  <span class="slider-num" id="n-textX">5%</span>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Y <span class="field-val" id="v-textY">80%</span></label>
+                <div class="slider-row">
+                  <input type="range" class="field-input" id="s-textY" min="5" max="90" value="80" />
+                  <span class="slider-num" id="n-textY">80%</span>
+                </div>
+              </div>
+            </div>
+            <p style="font-size:10px;color:var(--text-3);font-family:var(--font-mono)">
+              💡 Kéo khung Text trên canvas để định vị trực tiếp
+            </p>
+          </div>
+        </div>
+
+        <!-- Preview content -->
+        <div class="form-section">
+          <div class="form-section-hdr">
+            <div class="form-section-icon green">
+              <span class="material-symbols-outlined" style="font-size:12px">preview</span>
+            </div>
+            <span class="form-section-title">Nội Dung Xem Trước</span>
+          </div>
+          <div class="form-section-body">
+            <div class="field-group">
+              <label class="field-label">Dòng chính (Primary)</label>
+              <input class="field-input" id="preview-text-primary" type="text" value="Tên Bài Giảng / Ca Khúc" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Dòng phụ (Secondary)</label>
+              <input class="field-input" id="preview-text-secondary" type="text" value="Mục Sư Nguyễn Văn A" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom CSS -->
+        <div class="form-section">
+          <div class="form-section-hdr">
+            <div class="form-section-icon purple">
+              <span class="material-symbols-outlined" style="font-size:12px">code</span>
+            </div>
+            <span class="form-section-title">Custom CSS</span>
+            <span style="font-size:9px;color:var(--text-3);font-family:var(--font-mono)">ADVANCED</span>
+          </div>
+          <div class="form-section-body">
+            <div class="field-group">
+              <label class="field-label">CSS Tùy Biến Overlay</label>
+              <textarea class="field-input" id="s-customCss" placeholder="/* Ví dụ */
+.lower-third {
+  border-left-color: magenta;
+}
+.cam-frame {
+  border-color: gold;
+}"></textarea>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer Actions -->
+      <div class="settings-footer">
+        <button class="footer-btn live" id="btn-test-live">
+          <span class="material-symbols-outlined">send</span>
+          Test Live
+        </button>
+        <button class="footer-btn primary" id="btn-save-layout">
+          <span class="material-symbols-outlined">save</span>
+          Lưu Layout
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══ RIGHT: Canvas Preview ═══ -->
+    <div id="preview-panel">
+      <div id="canvas-wrap">
+        <div class="canvas-res-label">1920 × 1080 — OVERLAY CANVAS PREVIEW</div>
+        <div id="canvas">
+          <div class="canvas-bg"></div>
+          <div class="canvas-grid"></div>
+          <div class="canvas-safe"></div>
+
+          <!-- Camera Frame (draggable) -->
+          <div id="canvas-cam">
+            <span class="resize-handle tl"></span>
+            <span class="resize-handle tr"></span>
+            <span class="resize-handle bl"></span>
+            <span class="resize-handle br"></span>
+          </div>
+
+          <!-- Lower Third (draggable) -->
+          <div id="canvas-text">
+            <div id="canvas-text-inner">
+              <span class="ct-primary" id="ct-primary">Tên Bài Giảng / Ca Khúc</span>
+              <span class="ct-secondary" id="ct-secondary">Mục Sư Nguyễn Văn A</span>
+            </div>
+          </div>
+
+          <!-- Position readout -->
+          <div id="pos-readout">
+            Cam: <span id="pr-cam">5%, 5%, 25%, 25%</span> · Text: <span id="pr-text">5%, 80%</span>
+          </div>
+
+          <!-- Template color strip -->
+          <div class="tpl-strip" id="tpl-strip"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end workspace -->
+</div><!-- end app -->
+
+<script>
+/* ═════════════════════════════════════════════════════════════════════
+   OBSChurch Layout Builder
+   ═════════════════════════════════════════════════════════════════════ */
+
+const API_URL = 'http://localhost:3000/api/layouts';
+const WS_URL  = 'ws://localhost:3000';
+
+// ── State ──────────────────────────────────────────────────────────
+const state = {
+  activeTpl: 'clean-dark',
+  layouts: {},
+  ws: null,
+};
+
+const TEMPLATE_META = {
+  'clean-dark':          { color: '#4d8eff',   border: '#4d8eff',   bg: 'rgba(10,10,10,0.95)', name: 'Clean Dark' },
+  'vintage':             { color: '#fbbf24',   border: '#ffb95f',   bg: 'rgba(60,30,5,0.92)',  name: 'Vintage' },
+  'scifi':               { color: '#4edea3',   border: '#4edea3',   bg: 'rgba(0,20,40,0.95)',  name: 'SciFi' },
+  'glassmorphism':       { color: 'rgba(255,255,255,0.7)', border: 'rgba(255,255,255,0.3)', bg: 'rgba(255,255,255,0.08)', name: 'Glass' },
+  'sermon-topic':        { color: '#a855f7',   border: '#a855f7',   bg: 'rgba(30,10,60,0.95)', name: 'Topic' },
+  'scripture-fullscreen':{ color: '#06b6d4',   border: 'rgba(255,255,255,0.2)', bg: 'rgba(255,255,255,0.03)', name: 'Scripture' },
+};
+
+const $ = id => document.getElementById(id);
+
+// ── Boot ───────────────────────────────────────────────────────────
+(async function init() {
+  connectWS();
+  await loadLayouts();
+  bindSliders();
+  bindTemplateTabs();
+  initDragCam();
+  initDragText();
+  bindPreviewText();
+  applyTemplate('clean-dark');
+})();
+
+// ── WebSocket ──────────────────────────────────────────────────────
+function connectWS() {
+  try {
+    state.ws = new WebSocket(WS_URL);
+    state.ws.onclose = () => setTimeout(connectWS, 3000);
+  } catch(_) {}
+}
+
+function send(msg) {
+  if (state.ws && state.ws.readyState === 1) state.ws.send(JSON.stringify(msg));
+}
+
+// ── Load / Save Layouts ────────────────────────────────────────────
+async function loadLayouts() {
+  try {
+    const r = await fetch(API_URL);
+    if (!r.ok) throw new Error();
+    state.layouts = await r.json();
+    applyLayoutToSliders(state.activeTpl);
+  } catch(_) {
+    toast('Không thể tải layout từ server', 'error');
+  }
+}
+
+async function saveLayouts() {
+  // Sync current sliders to layout
+  syncSlidersToLayout();
+  try {
+    const r = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state.layouts),
+    });
+    if (!r.ok) throw new Error();
+    toast('Đã lưu layout thành công ✓', 'success');
+  } catch(_) {
+    toast('Lỗi lưu layout lên server!', 'error');
+  }
+}
+
+function syncSlidersToLayout() {
+  if (!state.layouts[state.activeTpl]) state.layouts[state.activeTpl] = {};
+  state.layouts[state.activeTpl] = {
+    camX: parseInt($('s-camX').value),
+    camY: parseInt($('s-camY').value),
+    camW: parseInt($('s-camW').value),
+    camH: parseInt($('s-camH').value),
+    camR: parseInt($('s-camR').value),
+    textX: parseInt($('s-textX').value),
+    textY: parseInt($('s-textY').value),
+    customCss: $('s-customCss').value,
+  };
+}
+
+function applyLayoutToSliders(tplId) {
+  const cfg = state.layouts[tplId] || { camX:5, camY:5, camW:25, camH:25, camR:8, textX:5, textY:80, customCss:'' };
+  $('s-camX').value  = cfg.camX;  $('s-camY').value  = cfg.camY;
+  $('s-camW').value  = cfg.camW;  $('s-camH').value  = cfg.camH;
+  $('s-camR').value  = cfg.camR;
+  $('s-textX').value = cfg.textX; $('s-textY').value = cfg.textY;
+  $('s-customCss').value = cfg.customCss || '';
+  updateAllLabels();
+  updateCanvas();
+}
+
+// ── Sliders ────────────────────────────────────────────────────────
+const SLIDERS = [
+  { id: 's-camX',  vId: 'v-camX',  nId: 'n-camX',  unit: '%' },
+  { id: 's-camY',  vId: 'v-camY',  nId: 'n-camY',  unit: '%' },
+  { id: 's-camW',  vId: 'v-camW',  nId: 'n-camW',  unit: '%' },
+  { id: 's-camH',  vId: 'v-camH',  nId: 'n-camH',  unit: '%' },
+  { id: 's-camR',  vId: 'v-camR',  nId: 'n-camR',  unit: 'px' },
+  { id: 's-textX', vId: 'v-textX', nId: 'n-textX', unit: '%' },
+  { id: 's-textY', vId: 'v-textY', nId: 'n-textY', unit: '%' },
+];
+
+function bindSliders() {
+  SLIDERS.forEach(({ id }) => {
+    $(id).addEventListener('input', () => {
+      updateAllLabels();
+      updateCanvas();
+    });
+  });
+  $('s-customCss').addEventListener('input', updateCanvas);
+}
+
+function updateAllLabels() {
+  SLIDERS.forEach(({ id, vId, nId, unit }) => {
+    const v = $(id).value + unit;
+    $(vId).textContent = v;
+    $(nId).textContent = v;
+  });
+  updatePosReadout();
+}
+
+function updatePosReadout() {
+  $('pr-cam').textContent  = `${$('s-camX').value}%, ${$('s-camY').value}%, ${$('s-camW').value}%, ${$('s-camH').value}%`;
+  $('pr-text').textContent = `${$('s-textX').value}%, ${$('s-textY').value}%`;
+}
+
+// ── Template Tabs ──────────────────────────────────────────────────
+function bindTemplateTabs() {
+  document.querySelectorAll('.tpl-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      syncSlidersToLayout(); // save current before switching
+      const tpl = tab.dataset.tpl;
+      document.querySelectorAll('.tpl-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      state.activeTpl = tpl;
+      applyLayoutToSliders(tpl);
+      applyTemplate(tpl);
+    });
+  });
+}
+
+function applyTemplate(tplId) {
+  const meta = TEMPLATE_META[tplId] || TEMPLATE_META['clean-dark'];
+  // Update canvas text frame style
+  const inner = $('canvas-text-inner');
+  inner.style.borderLeftColor = meta.border;
+  inner.style.background = `linear-gradient(to right, ${meta.bg}, ${meta.bg.replace('0.95', '0.6').replace('0.92','0.55').replace('0.08','0.03')})`;
+  // Color strip
+  $('tpl-strip').style.background = meta.color;
+}
+
+// ── Canvas Update ──────────────────────────────────────────────────
+function updateCanvas() {
+  const canvas = $('canvas');
+  const W = canvas.offsetWidth;
+  const H = canvas.offsetHeight;
+
+  const cam = $('canvas-cam');
+  const camX = parseInt($('s-camX').value);
+  const camY = parseInt($('s-camY').value);
+  const camW = parseInt($('s-camW').value);
+  const camH = parseInt($('s-camH').value);
+  const camR = parseInt($('s-camR').value);
+
+  if (camW > 0 && camH > 0) {
+    cam.style.display = '';
+    cam.style.left   = (camX / 100 * W) + 'px';
+    cam.style.top    = (camY / 100 * H) + 'px';
+    cam.style.width  = (camW / 100 * W) + 'px';
+    cam.style.height = (camH / 100 * H) + 'px';
+    cam.style.borderRadius = camR + 'px';
+  } else {
+    cam.style.display = 'none';
+  }
+
+  const txt = $('canvas-text');
+  const textX = parseInt($('s-textX').value);
+  const textY = parseInt($('s-textY').value);
+  txt.style.left = (textX / 100 * W) + 'px';
+  txt.style.top  = (textY / 100 * H) + 'px';
+  txt.style.width = '50%';
+
+  updatePosReadout();
+}
+
+// ── Drag Camera ────────────────────────────────────────────────────
+function initDragCam() {
+  const cam = $('canvas-cam');
+  const canvas = $('canvas');
+  let dragging = false, startX, startY, startLeft, startTop;
+  let resizing = false, resizeHandle = null, startW, startH;
+
+  cam.addEventListener('mousedown', (e) => {
+    if (e.target.classList.contains('resize-handle')) {
+      resizing = true;
+      resizeHandle = e.target;
+      startX = e.clientX; startY = e.clientY;
+      startW = cam.offsetWidth; startH = cam.offsetHeight;
+      startLeft = cam.offsetLeft; startTop = cam.offsetTop;
+    } else {
+      dragging = true;
+      startX = e.clientX; startY = e.clientY;
+      startLeft = cam.offsetLeft; startTop = cam.offsetTop;
+      cam.classList.add('dragging');
+    }
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (dragging) {
+      const W = canvas.offsetWidth, H = canvas.offsetHeight;
+      let nx = startLeft + (e.clientX - startX);
+      let ny = startTop  + (e.clientY - startY);
+      nx = Math.max(0, Math.min(W - cam.offsetWidth,  nx));
+      ny = Math.max(0, Math.min(H - cam.offsetHeight, ny));
+      cam.style.left = nx + 'px';
+      cam.style.top  = ny + 'px';
+      // Update sliders
+      $('s-camX').value = Math.round(nx / W * 100);
+      $('s-camY').value = Math.round(ny / H * 100);
+      updateAllLabels();
+    } else if (resizing) {
+      const W = canvas.offsetWidth, H = canvas.offsetHeight;
+      const dx = e.clientX - startX, dy = e.clientY - startY;
+      let nw = startW, nh = startH, nl = startLeft, nt = startTop;
+      if (resizeHandle.classList.contains('br')) { nw = Math.max(40, startW + dx); nh = Math.max(30, startH + dy); }
+      else if (resizeHandle.classList.contains('bl')) { nw = Math.max(40, startW - dx); nh = Math.max(30, startH + dy); nl = startLeft + (startW - nw); }
+      else if (resizeHandle.classList.contains('tr')) { nw = Math.max(40, startW + dx); nh = Math.max(30, startH - dy); nt = startTop + (startH - nh); }
+      else if (resizeHandle.classList.contains('tl')) { nw = Math.max(40, startW - dx); nh = Math.max(30, startH - dy); nl = startLeft + (startW - nw); nt = startTop + (startH - nh); }
+      cam.style.left   = nl + 'px'; cam.style.top    = nt + 'px';
+      cam.style.width  = nw + 'px'; cam.style.height = nh + 'px';
+      $('s-camX').value = Math.round(nl / W * 100);
+      $('s-camY').value = Math.round(nt / H * 100);
+      $('s-camW').value = Math.round(nw / W * 100);
+      $('s-camH').value = Math.round(nh / H * 100);
+      updateAllLabels();
+    }
+  });
+
+  document.addEventListener('mouseup', () => {
+    dragging = false; resizing = false; resizeHandle = null;
+    cam.classList.remove('dragging');
+  });
+}
+
+// ── Drag Text ──────────────────────────────────────────────────────
+function initDragText() {
+  const txt = $('canvas-text');
+  const canvas = $('canvas');
+  let dragging = false, startX, startY, startLeft, startTop;
+
+  txt.addEventListener('mousedown', (e) => {
+    dragging = true;
+    startX = e.clientX; startY = e.clientY;
+    startLeft = txt.offsetLeft; startTop = txt.offsetTop;
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    const W = canvas.offsetWidth, H = canvas.offsetHeight;
+    let nx = startLeft + (e.clientX - startX);
+    let ny = startTop  + (e.clientY - startY);
+    nx = Math.max(0, Math.min(W - txt.offsetWidth,  nx));
+    ny = Math.max(0, Math.min(H - txt.offsetHeight, ny));
+    txt.style.left = nx + 'px';
+    txt.style.top  = ny + 'px';
+    $('s-textX').value = Math.round(nx / W * 100);
+    $('s-textY').value = Math.round(ny / H * 100);
+    updateAllLabels();
+  });
+
+  document.addEventListener('mouseup', () => { dragging = false; });
+}
+
+// ── Preview text sync ──────────────────────────────────────────────
+function bindPreviewText() {
+  $('preview-text-primary').addEventListener('input', () => {
+    $('ct-primary').textContent = $('preview-text-primary').value || '—';
+  });
+  $('preview-text-secondary').addEventListener('input', () => {
+    $('ct-secondary').textContent = $('preview-text-secondary').value || '';
+  });
+}
+
+// ── Reset Camera ───────────────────────────────────────────────────
+$('btn-reset-cam').addEventListener('click', () => {
+  $('s-camX').value = 5; $('s-camY').value = 5;
+  $('s-camW').value = 25; $('s-camH').value = 25; $('s-camR').value = 8;
+  updateAllLabels(); updateCanvas();
+  toast('Đã reset vị trí Camera', 'info');
+});
+
+// ── Test Live ──────────────────────────────────────────────────────
+$('btn-test-live').addEventListener('click', () => {
+  syncSlidersToLayout();
+  const layout = state.layouts[state.activeTpl] || {};
+  send({
+    type: 'OVERLAY_SHOW',
+    payload: {
+      templateId:     state.activeTpl,
+      songName:       $('preview-text-primary').value || 'Demo Live Test',
+      speakerName:    $('preview-text-secondary').value || '',
+      announcement:   '',
+      scriptureRef:   '',
+      scriptureVerse: '',
+      ...layout,
+    }
+  });
+  toast('Đã đẩy layout test lên Overlay live ✓', 'success');
+});
+
+// ── Save ───────────────────────────────────────────────────────────
+$('btn-save-layout').addEventListener('click', saveLayouts);
+
+// ── Resize observer ────────────────────────────────────────────────
+new ResizeObserver(() => updateCanvas()).observe($('canvas'));
+
+// ── Toast ──────────────────────────────────────────────────────────
+function toast(msg, type = 'info') {
+  const box = $('toast-box');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  box.appendChild(t);
+  requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('show')));
+  setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => t.remove(), 250);
+  }, 2500);
+}
+</script>
+</body>
+</html>

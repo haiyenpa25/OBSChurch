@@ -15,8 +15,8 @@ const TYPE_ICON = Object.freeze({
 
 export default class ItemView {
   constructor(rootEl) {
-    this._listEl  = document.getElementById('item-list');
-    this._subEl   = document.getElementById('items-scene-sub');
+    this._listEl  = rootEl ? rootEl.querySelector('#item-list') : document.getElementById('item-list');
+    this._subEl   = rootEl ? rootEl.querySelector('#items-scene-sub') : document.getElementById('items-scene-sub');
   }
 
   render({ items, activeItemId, overlayVisible, sceneLabel, totalItems }) {

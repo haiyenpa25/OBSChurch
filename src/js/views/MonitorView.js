@@ -5,14 +5,18 @@
 
 export default class MonitorView {
   constructor(rootEl) {
-    this._overlayEl     = document.getElementById('preview-overlay');
-    this._primaryEl     = document.getElementById('preview-primary');
-    this._secondaryEl   = document.getElementById('preview-secondary');
+    const root = rootEl ?? document;
+    this._overlayEl     = root.querySelector('#preview-overlay');
+    this._primaryEl     = root.querySelector('#preview-primary');
+    this._secondaryEl   = root.querySelector('#preview-secondary');
+    this._timecodeEl    = root.querySelector('#panel-pgm #timecode');
+    this._camFrameEl    = root.querySelector('#preview-cam-frame');
+
+    // TopBar elements (nằm ngoài rootEl)
     this._wsStatusDot   = document.getElementById('ws-status-dot');
     this._wsStatusLabel = document.getElementById('ws-status-label');
     this._sessionEl     = document.getElementById('topbar-session');
-    // Timecode — id "timecode" có 2 nơi (topbar + pgm), lấy phần pgm
-    this._timecodeEl    = document.querySelector('#panel-pgm #timecode');
+
     this._startClock();
   }
 
@@ -25,11 +29,60 @@ export default class MonitorView {
     if (this._primaryEl)   this._primaryEl.textContent   = primary   || '—';
     if (this._secondaryEl) this._secondaryEl.textContent = secondary || '';
 
+    // Đồng bộ class template phong cách
+    const CLASSES = ['tpl-clean-dark', 'tpl-vintage', 'tpl-scifi', 'tpl-glassmorphism', 'tpl-sermon-topic', 'tpl-scripture-fullscreen'];
+    CLASSES.forEach((c) => this._overlayEl.classList.remove(c));
+    this._overlayEl.classList.add(`tpl-${payload.templateId}`);
+
+    // Cập nhật vị trí & kích thước khung Camera ảo trên Preview
+    if (this._camFrameEl) {
+      this._camFrameEl.style.left         = `${payload.camX}%`;
+      this._camFrameEl.style.top          = `${payload.camY}%`;
+      this._camFrameEl.style.width        = `${payload.camW}%`;
+      this._camFrameEl.style.height       = `${payload.camH}%`;
+      this._camFrameEl.style.borderRadius = `${payload.camR}px`;
+      this._camFrameEl.style.display      = (payload.camW > 0 && payload.camH > 0) ? '' : 'none';
+    }
+
+    // Cập nhật vị trí khung Chữ (trừ khi là template Kinh Thánh toàn màn hình)
+    if (payload.templateId !== 'scripture-fullscreen') {
+      this._overlayEl.style.left   = `${payload.textX}%`;
+      this._overlayEl.style.top    = `${payload.textY}%`;
+      this._overlayEl.style.bottom = 'auto';
+      this._overlayEl.style.right  = 'auto';
+    } else {
+      this._overlayEl.style.left   = '';
+      this._overlayEl.style.top    = '';
+      this._overlayEl.style.bottom = '';
+      this._overlayEl.style.right  = '';
+    }
+
     const hasContent = primary && primary !== '—';
     if (hasContent) {
       this._overlayEl.classList.add('visible');
     } else {
       this._overlayEl.classList.remove('visible');
+    }
+  }
+
+  /** Trạng thái kết nối OBS Studio */
+  updateObsStatus(connected) {
+    const dot   = document.getElementById('obs-status-dot');
+    const label = document.getElementById('obs-status-label');
+    if (!dot || !label) return;
+
+    if (connected) {
+      dot.style.background = '#4edea3';
+      dot.style.boxShadow  = '0 0 6px rgba(78,222,163,0.6)';
+      dot.className        = 'status-dot animate-pulse';
+      label.textContent    = 'OBS Connected';
+      label.style.color    = '#4edea3';
+    } else {
+      dot.style.background = '#666';
+      dot.style.boxShadow  = 'none';
+      dot.className        = 'status-dot';
+      label.textContent    = 'OBS Offline';
+      label.style.color    = '#666';
     }
   }
 

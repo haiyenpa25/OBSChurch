@@ -8,26 +8,31 @@
 
 import StateManager              from './core/StateManager.js';
 import WSClient                  from './core/WSClient.js';
+import OBSClient                 from './core/OBSClient.js';
 import EventBus                  from './core/EventBus.js';
 import { Scene                 } from './models/Scene.js';
 import { SceneController       } from './controllers/SceneController.js';
 import { ItemController        } from './controllers/ItemController.js';
 import { InputController       } from './controllers/InputController.js';
 import { SwitcherController    } from './controllers/SwitcherController.js';
+import { ServiceRunnerController } from './controllers/ServiceRunnerController.js';
 import MonitorView               from './views/MonitorView.js';
 
 // ─── Constants ───────────────────────────────────────
-const API_SCENES_URL = 'http://localhost:3000/api/scenes';
+const API_SCENES_URL  = 'http://localhost:3000/api/scenes';
+const API_LAYOUTS_URL = 'http://localhost:3000/api/layouts';
 
 // ─── Bootstrap ───────────────────────────────────────
 async function main() {
   // 1. MonitorView SINGLETON — tạo trước, inject vào controllers
   const monitorView = new MonitorView(document.querySelector('#col-monitor'));
 
-  // 2. Kết nối WebSocket
+  // 2. Kết nối WebSocket & OBS
   WSClient.connect();
+  OBSClient.connect();
 
-  // 3. Load scenes data
+  // 3. Load layouts & scenes data
+  await _loadLayouts();
   await _loadScenes();
 
   // 4. Khởi tạo controllers theo thứ tự DI
@@ -37,12 +42,13 @@ async function main() {
     itemCtrl,
     new InputController(monitorView),        // inject MonitorView
     new SwitcherController(itemCtrl),        // inject ItemController
-    // PanelCollapseController handled by inline script in index.html
+    new ServiceRunnerController(),           // Service Timeline Runner
   ];
   controllers.forEach((ctrl) => ctrl.init());
 
   // 5. Wiring global events
   _wireGlobalEvents(monitorView);
+  _setupSidebarNavigation();
 
   // 6. Restore session
   _restoreSession();
@@ -50,7 +56,27 @@ async function main() {
   console.log('[App] OBSChurch v2 initialized ✓');
 }
 
+
 // ── Private ──────────────────────────────────────────
+async function _loadLayouts() {
+  try {
+    const res = await fetch(API_LAYOUTS_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const layouts = await res.json();
+    StateManager.setLayouts(layouts);
+  } catch (err) {
+    console.warn('[App] Server không có layouts — dùng mặc định:', err.message);
+    StateManager.setLayouts({
+      'clean-dark': { camX: 5, camY: 5, camW: 25, camH: 25, camR: 8, textX: 5, textY: 80, customCss: '' },
+      'vintage': { camX: 5, camY: 5, camW: 30, camH: 30, camR: 4, textX: 5, textY: 85, customCss: '' },
+      'scifi': { camX: 70, camY: 5, camW: 25, camH: 25, camR: 0, textX: 5, textY: 80, customCss: '' },
+      'glassmorphism': { camX: 5, camY: 5, camW: 25, camH: 25, camR: 12, textX: 5, textY: 80, customCss: '' },
+      'sermon-topic': { camX: 0, camY: 0, camW: 0, camH: 0, camR: 0, textX: 25, textY: 45, customCss: '' },
+      'scripture-fullscreen': { camX: 0, camY: 0, camW: 0, camH: 0, camR: 0, textX: 0, textY: 0, customCss: '' }
+    });
+  }
+}
+
 async function _loadScenes() {
   try {
     const res  = await fetch(API_SCENES_URL);
@@ -90,6 +116,11 @@ function _wireGlobalEvents(monitorView) {
     monitorView.updateWsStatus(connected);
   });
 
+  // OBS status → TopBar
+  StateManager.on(StateManager.EVENTS.OBS_STATUS, ({ connected }) => {
+    monitorView.updateObsStatus(connected);
+  });
+
   // Overlay state → Preview
   StateManager.on(StateManager.EVENTS.OVERLAY_CHANGED, ({ visible }) => {
     monitorView.setOverlayVisible(visible);
@@ -119,5 +150,32 @@ function _restoreSession() {
   } catch (_) { /* ignore */ }
 }
 
+function _setupSidebarNavigation() {
+  const btnRunner   = document.getElementById('sb-btn-runner');
+  const btnAdvanced = document.getElementById('sb-btn-advanced');
+  const colTimeline = document.getElementById('col-timeline');
+  const colScenes   = document.getElementById('col-scenes');
+  const colItems    = document.getElementById('col-items');
+
+  if (!btnRunner || !btnAdvanced || !colTimeline || !colScenes || !colItems) return;
+
+  btnRunner.addEventListener('click', () => {
+    btnRunner.classList.add('active');
+    btnAdvanced.classList.remove('active');
+    colTimeline.classList.remove('hidden');
+    colScenes.classList.add('hidden');
+    colItems.classList.add('hidden');
+  });
+
+  btnAdvanced.addEventListener('click', () => {
+    btnAdvanced.classList.add('active');
+    btnRunner.classList.remove('active');
+    colTimeline.classList.add('hidden');
+    colScenes.classList.remove('hidden');
+    colItems.classList.remove('hidden');
+  });
+}
+
 // ─── Entry Point ─────────────────────────────────────
 document.addEventListener('DOMContentLoaded', main);
+

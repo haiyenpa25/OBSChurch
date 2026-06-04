@@ -9,6 +9,7 @@
 import { BaseController  } from './BaseController.js';
 import StateManager        from '../core/StateManager.js';
 import WSClient            from '../core/WSClient.js';
+import OBSClient           from '../core/OBSClient.js';
 import InputView           from '../views/InputView.js';
 import { OverlayPayload  } from '../models/OverlayPayload.js';
 
@@ -51,6 +52,31 @@ export class InputController extends BaseController {
       this._view.showAllFields();
     });
 
+    // Click card template -> select template
+    this._delegate(this._rootEl, 'click', '.tpl-card', (e, card) => {
+      this._view.selectTemplateCard(card.dataset.templateId);
+    });
+
+    // OBS Settings Modal Handlers
+    const openModal = () => {
+      this._view.setObsConfigValues(StateManager.getObsConfig());
+      this._view.toggleObsModal(true);
+    };
+    
+    this._on(document.getElementById('obs-status-pill'), 'click', openModal);
+    this._on(document.querySelector('#sidebar [title="Settings"]'), 'click', openModal);
+    this._on(document.getElementById('btn-obs-settings-close'), 'click', () => {
+      this._view.toggleObsModal(false);
+    });
+    
+    this._on(document.getElementById('btn-obs-settings-save'), 'click', () => {
+      const config = this._view.getObsConfigValues();
+      StateManager.setObsConfig(config);
+      this._view.toggleObsModal(false);
+      OBSClient.disconnect();
+      OBSClient.connect();
+    });
+
     this._syncFormUI();
     this._isActive = true;
   }
@@ -80,6 +106,13 @@ export class InputController extends BaseController {
     this._view.clearError();
     this._view.flashSuccess('Đã Push to PGM ✓');
     this._monitorView?.setOverlayVisible(true);
+
+    // Đồng bộ camera vật lý trên OBS Studio
+    const state = StateManager.getState();
+    const scene = StateManager.getActiveScene();
+    if (state.obsConnected && scene) {
+      OBSClient.syncCameraTransform(scene.label, 'Camera', formData);
+    }
   }
 
   /** Lưu session vào localStorage. */

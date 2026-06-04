@@ -56,10 +56,56 @@
     }
     .tpl-glassmorphism .lt-primary   { color: #ffffff; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
     .tpl-glassmorphism .lt-secondary { color: rgba(255,255,255,0.7); font-size: 20px; }
+
+    /* ── Template: Sermon Topic ──────────────────────── */
+    .tpl-sermon-topic {
+      background: linear-gradient(135deg, rgba(30,10,60,0.95) 0%, rgba(15,10,35,0.85) 100%);
+      border: 1px solid rgba(168,85,247,0.3);
+      border-left: 6px solid #a855f7;
+      padding: 24px 40px;
+      border-radius: 8px;
+      backdrop-filter: blur(12px);
+      text-align: center;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .tpl-sermon-topic .lt-primary { color: #f3e8ff; font-size: 46px; font-weight: 800; letter-spacing: 0.02em; }
+    .tpl-sermon-topic .lt-secondary { color: #d8b4fe; font-size: 20px; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 8px; }
+
+    /* ── Template: Scripture Fullscreen ────────────────── */
+    .tpl-scripture-fullscreen {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-top: 1px solid rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(25px);
+      padding: 40px 48px;
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+      text-align: justify;
+    }
+    .tpl-scripture-fullscreen .lt-primary {
+      color: #ffffff;
+      font-size: 38px;
+      font-weight: 500;
+      line-height: 1.6;
+      font-family: 'Noto Sans', sans-serif;
+    }
+    .tpl-scripture-fullscreen .lt-secondary {
+      color: #06b6d4;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-top: 16px;
+      display: block;
+      text-align: right;
+    }
   </style>
 </head>
 <body>
   <div id="overlay-root">
+    <!-- Camera Frame -->
+    <div id="cam-frame" class="cam-frame"></div>
     <!-- Lower Third Container -->
     <div id="lower-third" class="lower-third">
       <span class="lt-primary"  id="lt-primary">—</span>
@@ -79,19 +125,23 @@
     const WS_URL       = 'ws://localhost:3000';
     const RECONNECT_MS = 3000;
     const TEMPLATE_MAP = Object.freeze({
-      'clean-dark'   : 'tpl-clean-dark',
-      'vintage'      : 'tpl-vintage',
-      'scifi'        : 'tpl-scifi',
-      'glassmorphism': 'tpl-glassmorphism',
+      'clean-dark'          : 'tpl-clean-dark',
+      'vintage'             : 'tpl-vintage',
+      'scifi'               : 'tpl-scifi',
+      'glassmorphism'       : 'tpl-glassmorphism',
+      'sermon-topic'        : 'tpl-sermon-topic',
+      'scripture-fullscreen': 'tpl-scripture-fullscreen',
     });
 
     // ─── DOM refs ─────────────────────────────────────
     const lowerThird  = document.getElementById('lower-third');
+    const camFrame    = document.getElementById('cam-frame');
     const ltPrimary   = document.getElementById('lt-primary');
     const ltSecondary = document.getElementById('lt-secondary');
 
     // ─── WebSocket ────────────────────────────────────
     let ws;
+    let lastPayload = null;
 
     function connect() {
       ws = new WebSocket(WS_URL);
@@ -132,6 +182,7 @@
 
     // ─── Overlay Actions ──────────────────────────────
     function showOverlay(payload) {
+      lastPayload = payload;
       const templateClass = TEMPLATE_MAP[payload.templateId] ?? TEMPLATE_MAP['clean-dark'];
 
       // Reset template classes
@@ -142,6 +193,42 @@
       ltPrimary.textContent   = _getPrimaryText(payload);
       ltSecondary.textContent = _getSecondaryText(payload);
 
+      // Cập nhật vị trí & kích thước khung camera ảo
+      if (camFrame) {
+        if (payload.camW > 0 && payload.camH > 0) {
+          camFrame.style.left         = `${payload.camX}%`;
+          camFrame.style.top          = `${payload.camY}%`;
+          camFrame.style.width        = `${payload.camW}%`;
+          camFrame.style.height       = `${payload.camH}%`;
+          camFrame.style.borderRadius = `${payload.camR}px`;
+          camFrame.classList.add('is-visible');
+        } else {
+          camFrame.classList.remove('is-visible');
+        }
+      }
+
+      // Cập nhật vị trí khung Chữ (trừ khi là template Kinh Thánh toàn màn hình)
+      if (payload.templateId !== 'scripture-fullscreen') {
+        lowerThird.style.left   = `${payload.textX}%`;
+        lowerThird.style.top    = `${payload.textY}%`;
+        lowerThird.style.bottom = 'auto';
+        lowerThird.style.right  = 'auto';
+      } else {
+        lowerThird.style.left   = '';
+        lowerThird.style.top    = '';
+        lowerThird.style.bottom = '';
+        lowerThird.style.right  = '';
+      }
+
+      // Inject Custom CSS
+      let styleTag = document.getElementById('obs-custom-style');
+      if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = 'obs-custom-style';
+        document.head.appendChild(styleTag);
+      }
+      styleTag.textContent = payload.customCss || '';
+
       // Animate in
       lowerThird.classList.remove('is-hiding');
       lowerThird.classList.add('is-visible');
@@ -150,9 +237,11 @@
     function hideOverlay(immediate = false) {
       if (immediate) {
         lowerThird.classList.remove('is-visible', 'is-hiding');
+        if (camFrame) camFrame.classList.remove('is-visible');
         return;
       }
       lowerThird.classList.add('is-hiding');
+      if (camFrame) camFrame.classList.remove('is-visible');
       lowerThird.addEventListener('transitionend', () => {
         lowerThird.classList.remove('is-visible', 'is-hiding');
       }, { once: true });
@@ -160,11 +249,16 @@
 
     function triggerTransition(effect) {
       lowerThird.classList.add('is-hiding');
+      if (camFrame) camFrame.classList.remove('is-visible');
       setTimeout(() => {
         lowerThird.classList.remove('is-hiding');
         lowerThird.classList.add('is-visible');
+        if (camFrame && lastPayload && lastPayload.camW > 0 && lastPayload.camH > 0) {
+          camFrame.classList.add('is-visible');
+        }
       }, 350);
     }
+
 
     // ─── Text Helpers ─────────────────────────────────
     function _getPrimaryText(p) {
@@ -175,7 +269,7 @@
       if (p.scriptureRef) {
         return p.scriptureVerse ? `${p.scriptureRef}:${p.scriptureVerse}` : p.scriptureRef;
       }
-      return p.speakerName || p.announcement || '';
+      return p.speakerName || '';
     }
 
     // ─── Start ────────────────────────────────────────

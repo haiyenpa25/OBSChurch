@@ -5,7 +5,7 @@
 
 export default class SceneView {
   constructor(rootEl) {
-    this._listEl = document.getElementById('scene-list');
+    this._listEl = rootEl ? rootEl.querySelector('#scene-list') : document.getElementById('scene-list');
   }
 
   render({ scenes, activeSceneId, overlayVisible }) {

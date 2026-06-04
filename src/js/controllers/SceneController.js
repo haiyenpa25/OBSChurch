@@ -6,6 +6,7 @@
 import { BaseController } from './BaseController.js';
 import StateManager       from '../core/StateManager.js';
 import WSClient           from '../core/WSClient.js';
+import OBSClient          from '../core/OBSClient.js';
 import SceneView          from '../views/SceneView.js';
 
 export class SceneController extends BaseController {
@@ -21,14 +22,10 @@ export class SceneController extends BaseController {
     // Re-render khi overlay state đổi (hiện dot ON AIR)
     StateManager.on(StateManager.EVENTS.OVERLAY_CHANGED, () => this._render());
 
-    // Event delegation trên toàn body — vì list re-render
-    const listEl = document.getElementById('scene-list');
-    if (listEl) {
-      listEl.addEventListener('click', (e) => {
-        const btn = e.target.closest('[data-scene-id]');
-        if (btn) this._handleSceneClick(btn.dataset.sceneId);
-      });
-    }
+    // Event delegation qua BaseController utility
+    this._delegate(this._rootEl, 'click', '[data-scene-id]', (e, target) => {
+      this._handleSceneClick(target.dataset.sceneId);
+    });
 
     // Render lần đầu
     this._render();
@@ -40,6 +37,13 @@ export class SceneController extends BaseController {
     if (!sceneId || sceneId === StateManager.getState().activeSceneId) return;
     StateManager.setActiveScene(sceneId);
     WSClient.changeScene(sceneId);
+    
+    // Đồng bộ sang OBS Studio
+    const scene = StateManager.getActiveScene();
+    if (scene && StateManager.getState().obsConnected) {
+      OBSClient.sendRequest('SetCurrentProgramScene', { sceneName: scene.label })
+        .catch((err) => console.warn('[OBS] SetScene error:', err));
+    }
   }
 
   _render() {
