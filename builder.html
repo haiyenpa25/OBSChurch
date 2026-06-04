@@ -3,1011 +3,1709 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="OBSChurch Layout Builder — Thiết kế giao diện overlay chuyên nghiệp" />
-  <title>Layout Builder — OBSChurch</title>
+  <title>Layout Studio — OBSChurch</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
   <style>
-    /* ══════════════════════════════════════════════════════
-       DESIGN TOKENS
-    ══════════════════════════════════════════════════════ */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --font-sans: 'Inter', system-ui, sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
-      --bg-base:    #060610;
-      --bg-surface: #0c0c1a;
-      --bg-card:    #111122;
-      --bg-elevated:#181830;
-      --border:     rgba(255,255,255,0.08);
-      --border-dim: rgba(255,255,255,0.04);
-      --purple:  #a855f7;
-      --purple-dim:rgba(168,85,247,0.15);
-      --blue:    #4d8eff;
-      --blue-dim:rgba(77,142,255,0.15);
-      --green:   #4edea3;
-      --green-dim:rgba(78,222,163,0.15);
-      --amber:   #fbbf24;
-      --red:     #ef4444;
-      --cyan:    #06b6d4;
-      --text-1: #f0f0ff;
-      --text-2: #9090b0;
-      --text-3: #505070;
-      --text-4: #303050;
+    /* ══ TOKENS ══════════════════════════════════════════════════ */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --f:  'Inter',system-ui,sans-serif;
+      --fm: 'JetBrains Mono',monospace;
+      --b0: #04040c;--b1: #08081a;--b2: #0e0e22;--b3: #141430;--b4: #1a1a3a;
+      --bd: rgba(255,255,255,0.08);--bdd: rgba(255,255,255,0.04);
+      --p: #a855f7;--pd: rgba(168,85,247,0.15);--pp: rgba(168,85,247,0.3);
+      --b: #4d8eff;--bd2: rgba(77,142,255,0.15);
+      --g: #4edea3;--gd: rgba(78,222,163,0.15);
+      --a: #fbbf24;--ad: rgba(251,191,36,0.15);
+      --r: #ef4444;--rd: rgba(239,68,68,0.15);
+      --c: #00f5ff;--cd: rgba(0,245,255,0.12);
+      --t1: #f0f0ff;--t2: #9090b0;--t3: #505070;--t4: #2a2a48;
     }
+    html,body{height:100%;overflow:hidden;background:var(--b0);font-family:var(--f);color:var(--t1);-webkit-font-smoothing:antialiased}
+    button{font-family:var(--f);cursor:pointer}
 
-    html, body {
-      height: 100%;
-      overflow: hidden;
-      background: var(--bg-base);
-      font-family: var(--font-sans);
-      color: var(--text-1);
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ══════════════════════════════════════════════════════
-       LAYOUT
-    ══════════════════════════════════════════════════════ */
-    #app {
-      display: grid;
-      grid-template-rows: 52px 1fr;
-      height: 100vh;
-      overflow: hidden;
-    }
+    /* ══ SHELL ═══════════════════════════════════════════════════ */
+    #app{display:grid;grid-template-rows:52px 1fr;height:100vh;overflow:hidden}
 
     /* ── TOPBAR ── */
-    #topbar {
-      background: rgba(6,6,16,0.95);
-      border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(20px);
-      display: flex;
-      align-items: center;
-      padding: 0 18px;
-      gap: 12px;
+    #topbar{
+      background:rgba(4,4,12,0.97);border-bottom:1px solid var(--bd);
+      backdrop-filter:blur(20px);display:flex;align-items:center;
+      padding:0 14px;gap:10px;z-index:200;
     }
-    .brand {
-      display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+    .brand{display:flex;align-items:center;gap:8px;flex-shrink:0}
+    .brand-logo{
+      width:32px;height:32px;
+      background:linear-gradient(135deg,var(--p),#6d28d9);
+      border-radius:8px;display:flex;align-items:center;justify-content:center;
+      font-size:16px;box-shadow:0 0 14px rgba(168,85,247,0.45);
     }
-    .brand-logo {
-      width: 32px; height: 32px;
-      background: linear-gradient(135deg, var(--purple), #7e22ce);
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px;
-      box-shadow: 0 0 16px rgba(168,85,247,0.4);
-    }
-    .brand-name {
-      font-size: 14px; font-weight: 800; color: var(--text-1);
-      letter-spacing: 0.05em;
-    }
-    .brand-name em { color: var(--purple); font-style: normal; }
+    .brand-name{font-size:13px;font-weight:800;letter-spacing:0.05em}
+    .brand-name em{color:var(--p);font-style:normal}
 
-    .topbar-mid { flex: 1; display: flex; justify-content: center; gap: 6px; }
-    .tpl-tab {
-      display: flex; align-items: center; gap: 5px;
-      height: 28px; padding: 0 12px;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text-2);
-      font-size: 11px; font-weight: 500;
-      cursor: pointer; transition: all 0.15s;
-    }
-    .tpl-tab:hover { background: rgba(255,255,255,0.06); color: var(--text-1); }
-    .tpl-tab.active {
-      background: var(--purple-dim);
-      border-color: rgba(168,85,247,0.4);
-      color: var(--text-1);
-    }
-    .tpl-tab-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .topbar-center{flex:1;display:flex;align-items:center;justify-content:center;gap:6px}
 
-    .topbar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-    .tb-btn {
-      display: flex; align-items: center; gap: 6px;
-      height: 30px; padding: 0 12px;
-      border-radius: 6px; border: 1px solid var(--border);
-      background: transparent; color: var(--text-2);
-      font-size: 11px; cursor: pointer; transition: all 0.15s;
-      text-decoration: none; white-space: nowrap;
+    /* Scene assignment */
+    .scene-select{
+      height:28px;padding:0 10px;border-radius:6px;
+      border:1px solid var(--bd);background:var(--b2);
+      color:var(--t1);font-size:11px;font-family:var(--fm);
+      cursor:pointer;
     }
-    .tb-btn:hover { background: rgba(255,255,255,0.07); color: var(--text-1); }
-    .tb-btn .material-symbols-outlined { font-size: 14px; }
-    .tb-btn.primary {
-      background: linear-gradient(135deg, var(--purple), #7e22ce);
-      border-color: transparent; color: #fff;
-      box-shadow: 0 0 14px rgba(168,85,247,0.35);
-    }
-    .tb-btn.primary:hover { box-shadow: 0 0 22px rgba(168,85,247,0.55); }
+    .scene-select:focus{outline:none;border-color:var(--p)}
 
-    /* ── WORKSPACE ── */
-    #workspace {
-      display: grid;
-      grid-template-columns: 380px 1fr;
-      overflow: hidden;
+    .topbar-sep{width:1px;height:20px;background:var(--bd)}
+
+    .topbar-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+    .tb-btn{
+      display:flex;align-items:center;gap:5px;
+      height:28px;padding:0 10px;border-radius:6px;
+      border:1px solid var(--bd);background:transparent;
+      color:var(--t2);font-size:11px;transition:all 0.15s;
+      text-decoration:none;white-space:nowrap;
+    }
+    .tb-btn:hover{background:rgba(255,255,255,0.07);color:var(--t1)}
+    .tb-btn .ms{font-size:14px;font-family:'Material Symbols Outlined'}
+    .tb-btn.green{background:var(--gd);border-color:rgba(78,222,163,0.3);color:var(--g)}
+    .tb-btn.green:hover{background:rgba(78,222,163,0.25)}
+    .tb-btn.purple{background:linear-gradient(135deg,var(--p),#6d28d9);border-color:transparent;color:#fff;box-shadow:0 0 12px rgba(168,85,247,0.35)}
+    .tb-btn.purple:hover{box-shadow:0 0 20px rgba(168,85,247,0.55)}
+
+    /* History btns */
+    .hbtn{
+      width:28px;height:28px;border-radius:6px;border:1px solid var(--bd);
+      background:transparent;color:var(--t3);font-size:13px;
+      display:flex;align-items:center;justify-content:center;
+      transition:all 0.15s;
+    }
+    .hbtn:hover:not(:disabled){background:rgba(255,255,255,0.08);color:var(--t1)}
+    .hbtn:disabled{opacity:0.3;cursor:default}
+    .hbtn .ms{font-size:16px;font-family:'Material Symbols Outlined'}
+
+    /* ══ WORKSPACE ════════════════════════════════════════════════ */
+    #workspace{display:grid;grid-template-columns:300px 1fr 260px;overflow:hidden}
+
+    /* ══ LEFT — LAYERS + PROPS ════════════════════════════════════ */
+    #panel-left{
+      background:var(--b1);border-right:1px solid var(--bd);
+      display:flex;flex-direction:column;overflow:hidden;
     }
 
-    /* ══════════════════════════════════════════════════════
-       LEFT — SETTINGS PANEL
-    ══════════════════════════════════════════════════════ */
-    #settings-panel {
-      background: var(--bg-surface);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
+    /* Panel tabs */
+    .panel-tabs{
+      display:flex;border-bottom:1px solid var(--bd);flex-shrink:0;
     }
-    .settings-scroll {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
+    .panel-tab{
+      flex:1;height:34px;border:none;background:transparent;
+      color:var(--t3);font-size:10px;font-weight:600;
+      text-transform:uppercase;letter-spacing:0.08em;
+      cursor:pointer;transition:all 0.15s;
+      border-bottom:2px solid transparent;
     }
-    .settings-scroll::-webkit-scrollbar { width: 4px; }
-    .settings-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .panel-tab:hover{color:var(--t2)}
+    .panel-tab.active{color:var(--p);border-bottom-color:var(--p)}
 
-    .form-section {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    .form-section-hdr {
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg-elevated);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .form-section-icon {
-      width: 20px; height: 20px;
-      border-radius: 5px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px; flex-shrink: 0;
-    }
-    .form-section-icon.purple { background: var(--purple-dim); color: var(--purple); }
-    .form-section-icon.blue   { background: var(--blue-dim);   color: var(--blue); }
-    .form-section-icon.green  { background: var(--green-dim);  color: var(--green); }
-    .form-section-title {
-      font-size: 10px; font-weight: 700; color: var(--text-2);
-      text-transform: uppercase; letter-spacing: 0.1em; flex: 1;
-    }
-    .form-section-body { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+    .panel-body{flex:1;overflow-y:auto;padding:10px}
+    .panel-body::-webkit-scrollbar{width:3px}
+    .panel-body::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
 
-    .field-group { display: flex; flex-direction: column; gap: 5px; }
-    .field-row   { display: flex; gap: 10px; }
-    .field-row > * { flex: 1; }
-    .field-label {
-      font-size: 9px; font-family: var(--font-mono);
-      color: var(--text-3); text-transform: uppercase; letter-spacing: 0.08em;
-      display: flex; justify-content: space-between; align-items: center;
+    /* ── Layer Panel ── */
+    .layer-section-hdr{
+      font-size:9px;font-family:var(--fm);color:var(--t3);
+      text-transform:uppercase;letter-spacing:0.1em;
+      padding:6px 4px 4px;display:flex;justify-content:space-between;align-items:center;
     }
-    .field-val { color: var(--purple); font-weight: 700; }
-    .field-input {
-      background: var(--bg-base); border: 1px solid var(--border);
-      color: var(--text-1); font-size: 12px; font-family: var(--font-sans);
-      padding: 7px 10px; border-radius: 6px; width: 100%;
-      transition: border-color 0.15s, box-shadow 0.15s;
+    .add-layer-btn{
+      height:20px;padding:0 8px;border-radius:4px;border:1px solid var(--bd);
+      background:transparent;color:var(--t3);font-size:9px;font-family:var(--fm);
+      cursor:pointer;transition:all 0.12s;display:flex;align-items:center;gap:3px;
     }
-    .field-input:focus { outline: none; border-color: var(--purple); box-shadow: 0 0 0 2px rgba(168,85,247,0.2); }
-    .field-input::placeholder { color: var(--text-4); }
-    input[type="range"].field-input {
-      padding: 0; height: 6px; cursor: pointer;
-      accent-color: var(--purple);
-    }
-    textarea.field-input { resize: vertical; min-height: 80px; font-family: var(--font-mono); font-size: 11px; line-height: 1.5; }
+    .add-layer-btn:hover{background:rgba(255,255,255,0.07);color:var(--t1)}
+    .add-layer-btn .ms{font-size:12px;font-family:'Material Symbols Outlined'}
 
-    /* Slider with live value */
-    .slider-row {
-      display: flex; gap: 8px; align-items: center;
+    .layer-list{display:flex;flex-direction:column;gap:2px;margin-bottom:12px}
+    .layer-item{
+      display:flex;align-items:center;gap:6px;
+      padding:6px 8px;border-radius:6px;border:1px solid transparent;
+      cursor:pointer;transition:all 0.12s;
     }
-    .slider-row input[type="range"] { flex: 1; }
-    .slider-num {
-      width: 42px; text-align: right;
-      font-size: 11px; font-family: var(--font-mono);
-      color: var(--purple); font-weight: 700; flex-shrink: 0;
+    .layer-item:hover{background:rgba(255,255,255,0.04)}
+    .layer-item.selected{background:var(--pd);border-color:rgba(168,85,247,0.25)}
+    .layer-item.cam-item.selected{background:var(--cd);border-color:rgba(0,245,255,0.25)}
+    .layer-thumb{
+      width:20px;height:20px;border-radius:4px;flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;font-size:11px;
     }
+    .layer-thumb.cam{background:var(--cd);border:1px solid rgba(0,245,255,0.3)}
+    .layer-thumb.text{background:var(--pd);border:1px solid var(--pp)}
+    .layer-thumb.ticker{background:var(--ad);border:1px solid rgba(251,191,36,0.3)}
+    .layer-thumb.logo{background:var(--gd);border:1px solid rgba(78,222,163,0.3)}
+    .layer-name{flex:1;font-size:11px;color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .layer-item.selected .layer-name{color:var(--t1);font-weight:600}
+    .layer-controls{display:flex;gap:3px;flex-shrink:0}
+    .layer-ctrl{
+      width:18px;height:18px;border-radius:3px;border:none;background:transparent;
+      color:var(--t4);font-size:10px;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      transition:color 0.12s;
+    }
+    .layer-ctrl .ms{font-size:13px;font-family:'Material Symbols Outlined'}
+    .layer-ctrl:hover{color:var(--t2)}
+    .layer-ctrl.active{color:var(--g)}
+    .layer-ctrl.locked{color:var(--a)}
+    .layer-ctrl.del:hover{color:var(--r)}
 
-    /* Settings footer */
-    .settings-footer {
-      padding: 12px 16px;
-      border-top: 1px solid var(--border);
-      background: var(--bg-surface);
-      display: flex;
-      gap: 8px;
-      flex-shrink: 0;
+    /* ── Properties Section ── */
+    .prop-section{
+      background:var(--b2);border:1px solid var(--bd);
+      border-radius:8px;overflow:hidden;margin-bottom:8px;
     }
-    .footer-btn {
-      flex: 1; height: 40px;
-      border-radius: 8px; border: 1px solid var(--border);
-      background: var(--bg-elevated); color: var(--text-2);
-      font-size: 12px; font-weight: 600; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 6px;
-      transition: all 0.15s;
+    .prop-hdr{
+      padding:8px 10px;border-bottom:1px solid var(--bd);
+      background:var(--b3);display:flex;align-items:center;gap:6px;
     }
-    .footer-btn:hover { background: rgba(255,255,255,0.08); color: var(--text-1); }
-    .footer-btn .material-symbols-outlined { font-size: 15px; }
-    .footer-btn.primary {
-      background: linear-gradient(135deg, var(--purple), #7e22ce);
-      border-color: transparent; color: #fff;
-      box-shadow: 0 4px 14px rgba(168,85,247,0.3);
+    .prop-hdr-icon{
+      width:18px;height:18px;border-radius:4px;
+      display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;
     }
-    .footer-btn.primary:hover { box-shadow: 0 4px 20px rgba(168,85,247,0.5); }
-    .footer-btn.live {
-      background: var(--green-dim);
-      border-color: rgba(78,222,163,0.3); color: var(--green);
-    }
-    .footer-btn.live:hover { background: rgba(78,222,163,0.25); }
+    .prop-hdr-icon.c{background:var(--cd);color:var(--c)}
+    .prop-hdr-icon.p{background:var(--pd);color:var(--p)}
+    .prop-hdr-icon.g{background:var(--gd);color:var(--g)}
+    .prop-hdr-icon.a{background:var(--ad);color:var(--a)}
+    .prop-hdr-title{font-size:9px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:0.1em;flex:1}
+    .prop-body{padding:10px;display:flex;flex-direction:column;gap:8px}
 
-    /* ══════════════════════════════════════════════════════
-       RIGHT — CANVAS PREVIEW
-    ══════════════════════════════════════════════════════ */
-    #preview-panel {
-      background: #030308;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 32px;
-      position: relative;
-      overflow: hidden;
+    .fld{display:flex;flex-direction:column;gap:4px}
+    .frow{display:flex;gap:8px}
+    .frow>.fld{flex:1}
+    .flbl{
+      font-size:8px;font-family:var(--fm);color:var(--t3);
+      text-transform:uppercase;letter-spacing:0.08em;
+      display:flex;justify-content:space-between;align-items:center;
     }
-
-    /* Subtle bg pattern */
-    #preview-panel::before {
-      content: '';
-      position: absolute; inset: 0;
-      background-image:
-        linear-gradient(rgba(168,85,247,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(168,85,247,0.02) 1px, transparent 1px);
-      background-size: 40px 40px;
+    .flbl-val{color:var(--p);font-weight:700}
+    .finput{
+      background:var(--b0);border:1px solid var(--bd);
+      color:var(--t1);font-size:11px;padding:5px 8px;border-radius:5px;
+      width:100%;transition:border-color 0.15s;
     }
-
-    #canvas-wrap {
-      position: relative;
-      width: 100%;
-      max-width: 960px;
-      aspect-ratio: 16/9;
+    .finput:focus{outline:none;border-color:var(--p)}
+    .finput::placeholder{color:var(--t4)}
+    input[type=range].finput{
+      padding:0;height:5px;accent-color:var(--p);cursor:pointer;
     }
+    textarea.finput{resize:vertical;min-height:60px;font-family:var(--fm);font-size:10px;line-height:1.5}
 
-    /* Resolution label */
-    .canvas-res-label {
-      position: absolute;
-      top: -24px; left: 0;
-      font-size: 9px; font-family: var(--font-mono);
-      color: var(--text-3);
-      letter-spacing: 0.08em;
+    .srow{display:flex;gap:6px;align-items:center}
+    .srow input[type=range]{flex:1}
+    .snum{width:36px;text-align:right;font-size:10px;font-family:var(--fm);color:var(--p);font-weight:700;flex-shrink:0}
+
+    .checkbox-row{display:flex;align-items:center;gap:6px;cursor:pointer}
+    .checkbox-row input{accent-color:var(--p)}
+    .checkbox-row span{font-size:10px;color:var(--t2)}
+
+    /* Animation picker */
+    .anim-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+    .anim-btn{
+      height:28px;border-radius:5px;border:1px solid var(--bd);
+      background:var(--b3);color:var(--t3);font-size:9px;font-family:var(--fm);
+      cursor:pointer;transition:all 0.12s;
+    }
+    .anim-btn:hover{background:rgba(255,255,255,0.07);color:var(--t1)}
+    .anim-btn.active{background:var(--pd);border-color:var(--pp);color:var(--t1)}
+
+    /* Preset list */
+    .preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+    .preset-card{
+      background:var(--b2);border:1px solid var(--bd);border-radius:8px;
+      padding:10px 8px;cursor:pointer;transition:all 0.15s;text-align:center;
+    }
+    .preset-card:hover{background:var(--b3);border-color:rgba(255,255,255,0.14);transform:translateY(-1px)}
+    .preset-card.active{border-color:var(--pp);background:var(--pd)}
+    .preset-icon{font-size:22px;display:block;margin-bottom:4px}
+    .preset-name{font-size:10px;font-weight:600;color:var(--t2);display:block}
+    .preset-desc{font-size:8px;color:var(--t3);font-family:var(--fm);display:block;margin-top:2px}
+
+    /* ══ CENTER — CANVAS ════════════════════════════════════════ */
+    #panel-center{
+      background:#020208;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;padding:28px;
+      position:relative;overflow:hidden;gap:12px;
+    }
+    #panel-center::before{
+      content:'';position:absolute;inset:0;
+      background-image:linear-gradient(rgba(168,85,247,0.02) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(168,85,247,0.02) 1px,transparent 1px);
+      background-size:40px 40px;
     }
 
-    /* Canvas viewport */
-    #canvas {
-      width: 100%;
-      height: 100%;
-      background: #0f0f18;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      position: relative;
-      overflow: hidden;
-      box-shadow:
-        0 0 0 1px rgba(255,255,255,0.03),
-        0 20px 60px rgba(0,0,0,0.8),
-        0 0 80px rgba(168,85,247,0.08);
+    /* Toolbar above canvas */
+    #canvas-toolbar{
+      display:flex;gap:6px;align-items:center;z-index:10;flex-shrink:0;
     }
-    .canvas-bg {
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse at 30% 70%, rgba(30,10,60,0.5) 0%, rgba(5,5,15,1) 70%);
+    .ct-btn{
+      height:26px;padding:0 10px;border-radius:5px;border:1px solid var(--bd);
+      background:var(--b2);color:var(--t2);font-size:10px;font-family:var(--fm);
+      display:flex;align-items:center;gap:5px;cursor:pointer;transition:all 0.12s;
     }
-    .canvas-grid {
-      position: absolute; inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
-      background-size: 5% 8.889%;
+    .ct-btn:hover{background:var(--b3);color:var(--t1)}
+    .ct-btn.active{background:var(--pd);border-color:var(--pp);color:var(--t1)}
+    .ct-btn .ms{font-size:13px;font-family:'Material Symbols Outlined'}
+    .ct-sep{width:1px;height:18px;background:var(--bd)}
+
+    #canvas-wrap{
+      position:relative;width:100%;max-width:880px;aspect-ratio:16/9;z-index:5;flex-shrink:0;
     }
-    .canvas-safe {
-      position: absolute; inset: 5%;
-      border: 1px solid rgba(255,255,255,0.04);
-      pointer-events: none;
+    .canvas-label{
+      position:absolute;top:-22px;left:0;font-size:8px;font-family:var(--fm);
+      color:var(--t3);letter-spacing:0.08em;
     }
-    .canvas-safe::before {
-      content: 'SAFE AREA · 90%';
-      position: absolute; top: 6px; left: 8px;
-      font-size: 8px; font-family: var(--font-mono);
-      color: rgba(255,255,255,0.12); letter-spacing: 0.06em;
+    .canvas-label span{color:var(--t2)}
+
+    #canvas{
+      width:100%;height:100%;background:#0a0a16;
+      border:1px solid var(--bd);border-radius:6px;position:relative;overflow:hidden;
+      box-shadow:0 0 0 1px rgba(255,255,255,0.03),0 16px 50px rgba(0,0,0,0.9),0 0 60px rgba(168,85,247,0.07);
+    }
+    .c-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 35% 65%,rgba(30,10,60,0.4) 0%,rgba(4,4,12,1) 65%)}
+    .c-grid{
+      position:absolute;inset:0;pointer-events:none;
+      background-image:linear-gradient(rgba(255,255,255,0.01) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,0.01) 1px,transparent 1px);
+      background-size:5% 8.889%;
+    }
+    .c-grid.snap-active{
+      background-image:linear-gradient(rgba(168,85,247,0.07) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(168,85,247,0.07) 1px,transparent 1px);
+    }
+    .c-safe{position:absolute;inset:5%;border:1px solid rgba(255,255,255,0.04);pointer-events:none}
+    .c-safe::before{
+      content:'SAFE AREA';position:absolute;top:5px;left:6px;
+      font-size:7px;font-family:var(--fm);color:rgba(255,255,255,0.1);letter-spacing:0.06em;
     }
 
-    /* ── Camera Frame ── */
-    #canvas-cam {
-      position: absolute;
-      border: 2px solid #00f5ff;
-      background: rgba(0,245,255,0.06);
-      box-shadow: 0 0 18px rgba(0,245,255,0.35), inset 0 0 10px rgba(0,245,255,0.05);
-      cursor: move;
-      user-select: none;
-      transition: box-shadow 0.15s;
-      display: flex; align-items: center; justify-content: center;
+    /* ── Canvas elements ── */
+    .c-el{
+      position:absolute;cursor:move;user-select:none;
+      outline:none;transition:box-shadow 0.12s;
     }
-    #canvas-cam:hover {
-      box-shadow: 0 0 28px rgba(0,245,255,0.55), inset 0 0 15px rgba(0,245,255,0.1);
-    }
-    #canvas-cam::after {
-      content: '📹 CAM';
-      font-size: 9px; font-weight: 700;
-      font-family: var(--font-mono);
-      color: rgba(0,245,255,0.8);
-      letter-spacing: 0.1em;
-      pointer-events: none;
-    }
-    #canvas-cam.dragging { box-shadow: 0 0 40px rgba(0,245,255,0.7), inset 0 0 20px rgba(0,245,255,0.15); }
+    .c-el:not(.locked):hover{z-index:10}
+    .c-el.selected{z-index:20}
 
-    /* Corner resize handles */
-    .resize-handle {
-      position: absolute;
-      width: 10px; height: 10px;
-      background: #00f5ff;
-      border-radius: 2px;
-      opacity: 0.7;
-      transition: opacity 0.15s, transform 0.15s;
+    /* Cam */
+    .c-cam{
+      border:2px solid var(--c);background:var(--cd);
+      box-shadow:0 0 16px rgba(0,245,255,0.3),inset 0 0 8px rgba(0,245,255,0.04);
+      border-radius:8px;display:flex;align-items:center;justify-content:center;
     }
-    .resize-handle:hover { opacity: 1; transform: scale(1.3); }
-    .resize-handle.tl { top: -4px; left: -4px; cursor: nw-resize; }
-    .resize-handle.tr { top: -4px; right: -4px; cursor: ne-resize; }
-    .resize-handle.bl { bottom: -4px; left: -4px; cursor: sw-resize; }
-    .resize-handle.br { bottom: -4px; right: -4px; cursor: se-resize; }
-
-    /* ── Lower Third ── */
-    #canvas-text {
-      position: absolute;
-      cursor: move;
-      user-select: none;
-      min-width: 200px;
-    }
-    #canvas-text-inner {
-      border-left: 4px solid var(--purple);
-      background: linear-gradient(to right, rgba(15,15,25,0.95), rgba(15,15,25,0.7));
-      border-radius: 0 6px 6px 0;
-      padding: 8px 14px;
-      backdrop-filter: blur(8px);
-    }
-    .ct-primary { font-size: 14px; font-weight: 700; color: #fff; display: block; }
-    .ct-secondary { font-size: 9px; color: var(--purple); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-top: 3px; }
-
-    /* Text drag indicator */
-    #canvas-text::before {
-      content: '⠿ TEXT';
-      position: absolute;
-      top: -18px; left: 0;
-      font-size: 8px;
-      font-family: var(--font-mono);
-      color: rgba(168,85,247,0.6);
-      letter-spacing: 0.08em;
-      white-space: nowrap;
-      pointer-events: none;
+    .c-cam.selected{box-shadow:0 0 28px rgba(0,245,255,0.55),0 0 0 2px var(--c),inset 0 0 16px rgba(0,245,255,0.08)}
+    .c-cam-label{
+      font-size:8px;font-family:var(--fm);font-weight:700;
+      color:rgba(0,245,255,0.7);letter-spacing:0.1em;pointer-events:none;
     }
 
-    /* Position readout overlay */
-    #pos-readout {
-      position: absolute;
-      bottom: 8px; right: 8px;
-      background: rgba(0,0,0,0.7);
-      border: 1px solid var(--border);
-      border-radius: 5px;
-      padding: 4px 8px;
-      font-size: 9px;
-      font-family: var(--font-mono);
-      color: var(--text-3);
-      pointer-events: none;
+    /* Text lower-third */
+    .c-text{min-width:160px}
+    .c-text-inner{
+      border-left:3px solid var(--p);
+      background:linear-gradient(to right,rgba(10,10,20,0.95),rgba(10,10,20,0.65));
+      border-radius:0 5px 5px 0;padding:6px 10px;
     }
-    #pos-readout span { color: var(--text-2); }
+    .c-text-primary{font-size:12px;font-weight:700;color:#fff;display:block;white-space:nowrap}
+    .c-text-secondary{font-size:8px;color:var(--p);font-family:var(--fm);text-transform:uppercase;letter-spacing:0.08em;display:block;margin-top:2px;white-space:nowrap}
+    .c-text.selected .c-text-inner{box-shadow:0 0 0 2px var(--p)}
 
-    /* Template indicator strips */
-    .tpl-strip {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 3px;
-      background: var(--purple);
-      opacity: 0.5;
+    /* Ticker */
+    .c-ticker{
+      left:0!important;right:0!important;width:100%!important;
+      background:rgba(20,5,40,0.92);border-top:2px solid var(--p);
+      border-bottom:2px solid var(--p);
+      display:flex;align-items:center;overflow:hidden;height:28px;
+    }
+    .c-ticker.selected{box-shadow:0 0 0 2px var(--p)}
+    .ticker-label{
+      background:var(--p);color:#fff;font-size:8px;font-weight:700;
+      font-family:var(--fm);padding:0 8px;height:100%;display:flex;align-items:center;
+      flex-shrink:0;white-space:nowrap;
+    }
+    .ticker-scroll{
+      flex:1;overflow:hidden;position:relative;height:100%;display:flex;align-items:center;
+    }
+    .ticker-text{
+      font-size:9px;color:#fff;font-family:var(--fm);white-space:nowrap;
+      animation:ticker-run 18s linear infinite;
+      padding-left:20px;
+    }
+    @keyframes ticker-run{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+
+    /* Logo */
+    .c-logo{
+      background:rgba(255,255,255,0.05);border:1px dashed rgba(78,222,163,0.4);
+      border-radius:4px;display:flex;align-items:center;justify-content:center;
+    }
+    .c-logo.selected{box-shadow:0 0 0 2px var(--g)}
+    .c-logo-text{font-size:10px;color:rgba(78,222,163,0.6);font-family:var(--fm)}
+
+    /* Selection outline label */
+    .c-el-label{
+      position:absolute;top:-18px;left:0;
+      font-size:7px;font-family:var(--fm);
+      background:rgba(0,0,0,0.7);padding:2px 5px;border-radius:3px;
+      pointer-events:none;white-space:nowrap;letter-spacing:0.06em;
     }
 
-    /* ══════════════════════════════════════════════════════
-       TOAST
-    ══════════════════════════════════════════════════════ */
-    #toast-box {
-      position: fixed; bottom: 20px; right: 20px;
-      display: flex; flex-direction: column; gap: 6px;
-      z-index: 9999; pointer-events: none;
+    /* Resize handles */
+    .rh{
+      position:absolute;width:9px;height:9px;border-radius:2px;
+      opacity:0;transition:opacity 0.15s;
     }
-    .toast {
-      background: var(--bg-elevated); border: 1px solid var(--border);
-      border-radius: 8px; padding: 10px 14px;
-      font-size: 12px; font-family: var(--font-mono); color: var(--text-2);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-      opacity: 0; transform: translateY(10px);
-      transition: opacity 0.2s, transform 0.2s;
+    .c-el.selected .rh{opacity:0.9}
+    .rh:hover{opacity:1;transform:scale(1.2)}
+    .rh.cam{background:var(--c)}
+    .rh.text{background:var(--p)}
+    .rh.logo{background:var(--g)}
+    .rh.tl{top:-4px;left:-4px;cursor:nw-resize}
+    .rh.tr{top:-4px;right:-4px;cursor:ne-resize}
+    .rh.bl{bottom:-4px;left:-4px;cursor:sw-resize}
+    .rh.br{bottom:-4px;right:-4px;cursor:se-resize}
+
+    /* Pos readout */
+    #pos-readout{
+      position:absolute;bottom:7px;right:7px;
+      background:rgba(0,0,0,0.75);border:1px solid var(--bd);
+      border-radius:4px;padding:3px 7px;font-size:8px;font-family:var(--fm);
+      color:var(--t3);pointer-events:none;z-index:30;
     }
-    .toast.show { opacity: 1; transform: translateY(0); }
-    .toast.success { border-color: rgba(78,222,163,0.35); color: var(--green); }
-    .toast.error   { border-color: rgba(239,68,68,0.4);  color: var(--red); }
-    .toast.info    { border-color: rgba(77,142,255,0.35); color: var(--blue); }
+    #pos-readout span{color:var(--t2)}
+
+    /* Tpl strip */
+    .tpl-strip{position:absolute;bottom:0;left:0;right:0;height:2px;opacity:0.6}
+
+    /* ══ RIGHT — SCENE + EXPORT ══════════════════════════════════ */
+    #panel-right{
+      background:var(--b1);border-left:1px solid var(--bd);
+      display:flex;flex-direction:column;overflow:hidden;
+    }
+    .rpanel-body{flex:1;overflow-y:auto;padding:10px}
+    .rpanel-body::-webkit-scrollbar{width:3px}
+    .rpanel-body::-webkit-scrollbar-thumb{background:var(--bd)}
+
+    .rsection{background:var(--b2);border:1px solid var(--bd);border-radius:8px;overflow:hidden;margin-bottom:8px}
+    .rsection-hdr{
+      padding:8px 10px;border-bottom:1px solid var(--bd);background:var(--b3);
+      display:flex;align-items:center;gap:6px;
+    }
+    .rsection-title{font-size:9px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:0.1em;flex:1}
+    .rsection-body{padding:10px;display:flex;flex-direction:column;gap:8px}
+
+    /* Scene tree */
+    .scene-tree{display:flex;flex-direction:column;gap:3px}
+    .scene-grp-lbl{
+      font-size:9px;font-family:var(--fm);color:var(--t3);
+      text-transform:uppercase;letter-spacing:0.08em;padding:3px 4px 2px;
+    }
+    .scene-assign-item{
+      display:flex;align-items:center;gap:6px;
+      padding:5px 8px;border-radius:5px;cursor:pointer;
+      border:1px solid transparent;transition:all 0.12s;
+    }
+    .scene-assign-item:hover{background:rgba(255,255,255,0.04)}
+    .scene-assign-item.assigned{background:var(--pd);border-color:rgba(168,85,247,0.2)}
+    .sai-dot{width:6px;height:6px;border-radius:50%;background:var(--t4);flex-shrink:0}
+    .scene-assign-item.assigned .sai-dot{background:var(--p);box-shadow:0 0 6px var(--p)}
+    .sai-name{font-size:10px;color:var(--t2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .scene-assign-item.assigned .sai-name{color:var(--t1);font-weight:600}
+    .sai-badge{font-size:8px;font-family:var(--fm);color:var(--t4);flex-shrink:0}
+    .scene-assign-item.assigned .sai-badge{color:var(--p)}
+
+    /* Export area */
+    .export-box{
+      background:var(--b0);border:1px solid var(--bd);border-radius:5px;
+      padding:8px;font-size:9px;font-family:var(--fm);color:var(--t3);
+      max-height:140px;overflow-y:auto;white-space:pre;
+    }
+
+    /* Footer */
+    #panel-footer{
+      padding:10px 14px;border-top:1px solid var(--bd);
+      background:var(--b1);display:flex;gap:8px;flex-shrink:0;
+    }
+    .foot-btn{
+      flex:1;height:38px;border-radius:7px;border:1px solid var(--bd);
+      background:var(--b3);color:var(--t2);font-size:11px;font-weight:600;
+      display:flex;align-items:center;justify-content:center;gap:6px;
+      cursor:pointer;transition:all 0.15s;
+    }
+    .foot-btn:hover{background:rgba(255,255,255,0.08);color:var(--t1)}
+    .foot-btn .ms{font-size:15px;font-family:'Material Symbols Outlined'}
+    .foot-btn.live{background:var(--gd);border-color:rgba(78,222,163,0.3);color:var(--g)}
+    .foot-btn.live:hover{background:rgba(78,222,163,0.25)}
+    .foot-btn.save{background:linear-gradient(135deg,var(--p),#6d28d9);border-color:transparent;color:#fff;box-shadow:0 4px 12px rgba(168,85,247,0.3)}
+    .foot-btn.save:hover{box-shadow:0 4px 20px rgba(168,85,247,0.5)}
+
+    /* ══ MODALS / OVERLAYS ════════════════════════════════════════ */
+    /* Template Gallery */
+    #tpl-gallery{
+      position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);
+      z-index:9000;display:flex;align-items:center;justify-content:center;
+      opacity:0;pointer-events:none;transition:opacity 0.2s;
+    }
+    #tpl-gallery.open{opacity:1;pointer-events:all}
+    .tpl-gallery-box{
+      background:var(--b2);border:1px solid var(--bd);border-radius:14px;
+      width:720px;max-height:80vh;overflow:hidden;
+      box-shadow:0 20px 60px rgba(0,0,0,0.8);
+      transform:translateY(10px);transition:transform 0.2s;
+    }
+    #tpl-gallery.open .tpl-gallery-box{transform:translateY(0)}
+    .tgl-hdr{
+      padding:14px 18px;border-bottom:1px solid var(--bd);
+      display:flex;align-items:center;justify-content:space-between;
+    }
+    .tgl-title{font-size:13px;font-weight:700}
+    .tgl-close{background:none;border:none;color:var(--t3);cursor:pointer;font-size:18px;line-height:1}
+    .tgl-grid{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+      padding:16px;overflow-y:auto;max-height:calc(80vh - 60px);
+    }
+    .tgl-card{
+      background:var(--b1);border:1px solid var(--bd);border-radius:10px;
+      overflow:hidden;cursor:pointer;transition:all 0.15s;
+    }
+    .tgl-card:hover{transform:translateY(-2px);border-color:rgba(255,255,255,0.15);box-shadow:0 8px 24px rgba(0,0,0,0.5)}
+    .tgl-card.active{border-color:var(--p);box-shadow:0 0 0 2px rgba(168,85,247,0.3)}
+    .tgl-preview{
+      width:100%;aspect-ratio:16/9;position:relative;overflow:hidden;
+      background:#0a0a16;
+    }
+    .tgl-preview-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 30% 60%,rgba(20,8,40,0.6) 0%,#040410 70%)}
+    .tgl-preview-lt{
+      position:absolute;bottom:15%;left:8%;right:20%;
+      border-left:3px solid #4d8eff;background:rgba(10,10,20,0.9);
+      border-radius:0 4px 4px 0;padding:5px 8px;
+    }
+    .tgl-lt-p{font-size:8px;font-weight:700;color:#fff;display:block}
+    .tgl-lt-s{font-size:6px;color:#4d8eff;font-family:var(--fm);display:block;margin-top:2px;text-transform:uppercase}
+    .tgl-meta{padding:10px 12px}
+    .tgl-name{font-size:11px;font-weight:700;display:block;margin-bottom:2px}
+    .tgl-desc{font-size:9px;color:var(--t3);font-family:var(--fm)}
+
+    /* Toast */
+    #toast-box{position:fixed;bottom:18px;right:18px;display:flex;flex-direction:column;gap:5px;z-index:9999;pointer-events:none}
+    .toast{
+      background:var(--b3);border:1px solid var(--bd);border-radius:7px;
+      padding:9px 13px;font-size:11px;font-family:var(--fm);color:var(--t2);
+      box-shadow:0 8px 24px rgba(0,0,0,0.7);opacity:0;transform:translateY(8px);
+      transition:opacity 0.2s,transform 0.2s;
+    }
+    .toast.show{opacity:1;transform:translateY(0)}
+    .toast.ok{border-color:rgba(78,222,163,0.35);color:var(--g)}
+    .toast.err{border-color:rgba(239,68,68,0.4);color:var(--r)}
+    .toast.inf{border-color:rgba(77,142,255,0.35);color:var(--b)}
+    .toast.warn{border-color:rgba(251,191,36,0.35);color:var(--a)}
   </style>
 </head>
 <body>
 <div id="toast-box"></div>
 
+<!-- Template Gallery Modal -->
+<div id="tpl-gallery">
+  <div class="tpl-gallery-box">
+    <div class="tgl-hdr">
+      <span class="tgl-title">🎨 Thư Viện Template</span>
+      <button class="tgl-close" id="btn-tgl-close">✕</button>
+    </div>
+    <div class="tgl-grid" id="tgl-grid">
+      <!-- rendered by JS -->
+    </div>
+  </div>
+</div>
+
 <div id="app">
-  <!-- ═══ TOPBAR ═══ -->
+  <!-- ══ TOPBAR ══ -->
   <div id="topbar">
     <div class="brand">
       <div class="brand-logo">🎨</div>
-      <div class="brand-name">LAYOUT <em>BUILDER</em></div>
+      <div class="brand-name">LAYOUT <em>STUDIO</em></div>
     </div>
+    <div class="topbar-sep"></div>
 
-    <!-- Template Tabs -->
-    <div class="topbar-mid" id="template-tabs">
-      <button class="tpl-tab active" data-tpl="clean-dark">
-        <span class="tpl-tab-dot" style="background:#4d8eff"></span>Clean Dark
+    <div class="topbar-center">
+      <!-- Template button -->
+      <button class="tb-btn" id="btn-open-gallery">
+        <span class="ms">auto_awesome</span>
+        Templates
+        <span id="active-tpl-badge" style="background:rgba(168,85,247,0.2);border:1px solid rgba(168,85,247,0.4);border-radius:10px;padding:1px 6px;font-size:9px;color:var(--p)">Clean Dark</span>
       </button>
-      <button class="tpl-tab" data-tpl="vintage">
-        <span class="tpl-tab-dot" style="background:#fbbf24"></span>Vintage
+
+      <div class="topbar-sep"></div>
+
+      <!-- Undo/Redo -->
+      <button class="hbtn" id="btn-undo" title="Undo (Ctrl+Z)" disabled>
+        <span class="ms">undo</span>
       </button>
-      <button class="tpl-tab" data-tpl="scifi">
-        <span class="tpl-tab-dot" style="background:#4edea3"></span>SciFi
+      <button class="hbtn" id="btn-redo" title="Redo (Ctrl+Y)" disabled>
+        <span class="ms">redo</span>
       </button>
-      <button class="tpl-tab" data-tpl="glassmorphism">
-        <span class="tpl-tab-dot" style="background:rgba(255,255,255,0.6)"></span>Glass
+
+      <div class="topbar-sep"></div>
+
+      <!-- Add element buttons -->
+      <button class="tb-btn" id="btn-add-cam">
+        <span class="ms">videocam</span>Thêm Cam
       </button>
-      <button class="tpl-tab" data-tpl="sermon-topic">
-        <span class="tpl-tab-dot" style="background:#a855f7"></span>Topic
+      <button class="tb-btn" id="btn-add-ticker">
+        <span class="ms">horizontal_rule</span>Ticker
       </button>
-      <button class="tpl-tab" data-tpl="scripture-fullscreen">
-        <span class="tpl-tab-dot" style="background:#06b6d4"></span>Scripture
+      <button class="tb-btn" id="btn-add-logo">
+        <span class="ms">shield</span>Logo
+      </button>
+
+      <div class="topbar-sep"></div>
+
+      <!-- Snap toggle -->
+      <button class="tb-btn active" id="btn-snap" title="Snap to Grid">
+        <span class="ms">grid_4x4</span>Snap
       </button>
     </div>
 
     <div class="topbar-right">
       <a href="index.html" class="tb-btn">
-        <span class="material-symbols-outlined">arrow_back</span>
+        <span class="ms">arrow_back</span>
         Service Runner
       </a>
     </div>
   </div>
 
-  <!-- ═══ WORKSPACE ═══ -->
+  <!-- ══ WORKSPACE ══ -->
   <div id="workspace">
 
-    <!-- ═══ LEFT: Settings ═══ -->
-    <div id="settings-panel">
-      <div class="settings-scroll">
-
-        <!-- Camera Position -->
-        <div class="form-section">
-          <div class="form-section-hdr">
-            <div class="form-section-icon blue">
-              <span class="material-symbols-outlined" style="font-size:12px">videocam</span>
-            </div>
-            <span class="form-section-title">Vị Trí Camera Overlay</span>
-            <button class="tb-btn" id="btn-reset-cam" style="height:22px;padding:0 8px;font-size:9px">Reset</button>
-          </div>
-          <div class="form-section-body">
-            <div class="field-row">
-              <div class="field-group">
-                <label class="field-label">X — Trái/Phải <span class="field-val" id="v-camX">5%</span></label>
-                <div class="slider-row">
-                  <input type="range" class="field-input" id="s-camX" min="0" max="80" value="5" />
-                  <span class="slider-num" id="n-camX">5%</span>
-                </div>
-              </div>
-              <div class="field-group">
-                <label class="field-label">Y — Trên/Dưới <span class="field-val" id="v-camY">5%</span></label>
-                <div class="slider-row">
-                  <input type="range" class="field-input" id="s-camY" min="0" max="80" value="5" />
-                  <span class="slider-num" id="n-camY">5%</span>
-                </div>
-              </div>
-            </div>
-            <div class="field-row">
-              <div class="field-group">
-                <label class="field-label">Rộng <span class="field-val" id="v-camW">25%</span></label>
-                <div class="slider-row">
-                  <input type="range" class="field-input" id="s-camW" min="0" max="80" value="25" />
-                  <span class="slider-num" id="n-camW">25%</span>
-                </div>
-              </div>
-              <div class="field-group">
-                <label class="field-label">Cao <span class="field-val" id="v-camH">25%</span></label>
-                <div class="slider-row">
-                  <input type="range" class="field-input" id="s-camH" min="0" max="80" value="25" />
-                  <span class="slider-num" id="n-camH">25%</span>
-                </div>
-              </div>
-            </div>
-            <div class="field-group">
-              <label class="field-label">Bo Góc Camera <span class="field-val" id="v-camR">8px</span></label>
-              <div class="slider-row">
-                <input type="range" class="field-input" id="s-camR" min="0" max="60" value="8" />
-                <span class="slider-num" id="n-camR">8px</span>
-              </div>
-            </div>
-            <p style="font-size:10px;color:var(--text-3);font-family:var(--font-mono)">
-              💡 Kéo khung Cam trên canvas để định vị trực tiếp
-            </p>
-          </div>
-        </div>
-
-        <!-- Text Position -->
-        <div class="form-section">
-          <div class="form-section-hdr">
-            <div class="form-section-icon purple">
-              <span class="material-symbols-outlined" style="font-size:12px">text_fields</span>
-            </div>
-            <span class="form-section-title">Vị Trí Lower Third</span>
-          </div>
-          <div class="form-section-body">
-            <div class="field-row">
-              <div class="field-group">
-                <label class="field-label">X <span class="field-val" id="v-textX">5%</span></label>
-                <div class="slider-row">
-                  <input type="range" class="field-input" id="s-textX" min="0" max="80" value="5" />
-                  <span class="slider-num" id="n-textX">5%</span>
-                </div>
-              </div>
-              <div class="field-group">
-                <label class="field-label">Y <span class="field-val" id="v-textY">80%</span></label>
-                <div class="slider-row">
-                  <input type="range" class="field-input" id="s-textY" min="5" max="90" value="80" />
-                  <span class="slider-num" id="n-textY">80%</span>
-                </div>
-              </div>
-            </div>
-            <p style="font-size:10px;color:var(--text-3);font-family:var(--font-mono)">
-              💡 Kéo khung Text trên canvas để định vị trực tiếp
-            </p>
-          </div>
-        </div>
-
-        <!-- Preview content -->
-        <div class="form-section">
-          <div class="form-section-hdr">
-            <div class="form-section-icon green">
-              <span class="material-symbols-outlined" style="font-size:12px">preview</span>
-            </div>
-            <span class="form-section-title">Nội Dung Xem Trước</span>
-          </div>
-          <div class="form-section-body">
-            <div class="field-group">
-              <label class="field-label">Dòng chính (Primary)</label>
-              <input class="field-input" id="preview-text-primary" type="text" value="Tên Bài Giảng / Ca Khúc" />
-            </div>
-            <div class="field-group">
-              <label class="field-label">Dòng phụ (Secondary)</label>
-              <input class="field-input" id="preview-text-secondary" type="text" value="Mục Sư Nguyễn Văn A" />
-            </div>
-          </div>
-        </div>
-
-        <!-- Custom CSS -->
-        <div class="form-section">
-          <div class="form-section-hdr">
-            <div class="form-section-icon purple">
-              <span class="material-symbols-outlined" style="font-size:12px">code</span>
-            </div>
-            <span class="form-section-title">Custom CSS</span>
-            <span style="font-size:9px;color:var(--text-3);font-family:var(--font-mono)">ADVANCED</span>
-          </div>
-          <div class="form-section-body">
-            <div class="field-group">
-              <label class="field-label">CSS Tùy Biến Overlay</label>
-              <textarea class="field-input" id="s-customCss" placeholder="/* Ví dụ */
-.lower-third {
-  border-left-color: magenta;
-}
-.cam-frame {
-  border-color: gold;
-}"></textarea>
-            </div>
-          </div>
-        </div>
-
+    <!-- ══ LEFT: Layers + Properties ══ -->
+    <div id="panel-left">
+      <div class="panel-tabs">
+        <button class="panel-tab active" data-tab="layers">Layers</button>
+        <button class="panel-tab" data-tab="presets">Presets</button>
+        <button class="panel-tab" data-tab="css">CSS</button>
       </div>
 
-      <!-- Footer Actions -->
-      <div class="settings-footer">
-        <button class="footer-btn live" id="btn-test-live">
-          <span class="material-symbols-outlined">send</span>
-          Test Live
-        </button>
-        <button class="footer-btn primary" id="btn-save-layout">
-          <span class="material-symbols-outlined">save</span>
-          Lưu Layout
-        </button>
+      <!-- LAYERS TAB -->
+      <div class="panel-body" id="tab-layers">
+        <div class="layer-section-hdr">
+          Các thành phần
+          <button class="add-layer-btn" id="btn-add-text">
+            <span class="ms">add</span>Lower Third
+          </button>
+        </div>
+        <div class="layer-list" id="layer-list">
+          <!-- rendered -->
+        </div>
+
+        <!-- Selected element properties -->
+        <div id="el-props">
+          <!-- rendered when element selected -->
+          <div style="text-align:center;padding:20px;color:var(--t4);font-size:10px;font-family:var(--fm)">
+            Chọn một layer để chỉnh sửa
+          </div>
+        </div>
+      </div>
+
+      <!-- PRESETS TAB -->
+      <div class="panel-body" id="tab-presets" style="display:none">
+        <div class="layer-section-hdr">Preset Layout</div>
+        <div class="preset-grid" id="preset-grid">
+          <!-- rendered -->
+        </div>
+      </div>
+
+      <!-- CSS TAB -->
+      <div class="panel-body" id="tab-css" style="display:none">
+        <div class="prop-section">
+          <div class="prop-hdr">
+            <div class="prop-hdr-icon p"><span class="ms" style="font-size:11px;font-family:'Material Symbols Outlined'">code</span></div>
+            <span class="prop-hdr-title">Custom CSS</span>
+            <span style="font-size:8px;color:var(--t3);font-family:var(--fm)">ADVANCED</span>
+          </div>
+          <div class="prop-body">
+            <div class="fld">
+              <label class="flbl">CSS tùy biến cho overlay</label>
+              <textarea class="finput" id="s-customCss" rows="12" placeholder="/* Ví dụ */
+.lower-third { border-left-color: gold; }
+.cam-frame { border-color: magenta; border-radius: 50%; }
+.ticker-bg { background: #001a33; }"></textarea>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- ═══ RIGHT: Canvas Preview ═══ -->
-    <div id="preview-panel">
+    <!-- ══ CENTER: Canvas ══ -->
+    <div id="panel-center">
+      <!-- Canvas toolbar -->
+      <div id="canvas-toolbar">
+        <button class="ct-btn" id="btn-preview-anim">
+          <span class="ms">play_circle</span>Preview Anim
+        </button>
+        <div class="ct-sep"></div>
+        <span style="font-size:9px;font-family:var(--fm);color:var(--t3)" id="cursor-pos">—</span>
+      </div>
+
       <div id="canvas-wrap">
-        <div class="canvas-res-label">1920 × 1080 — OVERLAY CANVAS PREVIEW</div>
+        <div class="canvas-label">1920 × 1080 · <span id="lbl-tpl">Clean Dark</span> · <span style="color:var(--g)">Live Canvas</span></div>
         <div id="canvas">
-          <div class="canvas-bg"></div>
-          <div class="canvas-grid"></div>
-          <div class="canvas-safe"></div>
-
-          <!-- Camera Frame (draggable) -->
-          <div id="canvas-cam">
-            <span class="resize-handle tl"></span>
-            <span class="resize-handle tr"></span>
-            <span class="resize-handle bl"></span>
-            <span class="resize-handle br"></span>
-          </div>
-
-          <!-- Lower Third (draggable) -->
-          <div id="canvas-text">
-            <div id="canvas-text-inner">
-              <span class="ct-primary" id="ct-primary">Tên Bài Giảng / Ca Khúc</span>
-              <span class="ct-secondary" id="ct-secondary">Mục Sư Nguyễn Văn A</span>
-            </div>
-          </div>
-
-          <!-- Position readout -->
-          <div id="pos-readout">
-            Cam: <span id="pr-cam">5%, 5%, 25%, 25%</span> · Text: <span id="pr-text">5%, 80%</span>
-          </div>
-
-          <!-- Template color strip -->
+          <div class="c-bg"></div>
+          <div class="c-grid" id="c-grid"></div>
+          <div class="c-safe"></div>
+          <div id="pos-readout">— <span id="pr-text">hover canvas</span></div>
           <div class="tpl-strip" id="tpl-strip"></div>
         </div>
       </div>
     </div>
 
-  </div><!-- end workspace -->
-</div><!-- end app -->
+    <!-- ══ RIGHT: Scene Assign + Export ══ -->
+    <div id="panel-right">
+      <div class="rpanel-body">
+
+        <!-- Scene Assignment -->
+        <div class="rsection">
+          <div class="rsection-hdr">
+            <div class="prop-hdr-icon p"><span class="ms" style="font-size:11px;font-family:'Material Symbols Outlined'">link</span></div>
+            <span class="rsection-title">Gắn vào Cảnh</span>
+            <button class="tb-btn" id="btn-assign-all" style="height:20px;padding:0 7px;font-size:8px">Áp all</button>
+          </div>
+          <div class="rsection-body">
+            <p style="font-size:9px;color:var(--t3);font-family:var(--fm)">
+              Chọn cảnh để áp dụng layout này:
+            </p>
+            <div class="scene-tree" id="scene-tree">
+              <!-- rendered -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Animation Config -->
+        <div class="rsection">
+          <div class="rsection-hdr">
+            <div class="prop-hdr-icon a"><span class="ms" style="font-size:11px;font-family:'Material Symbols Outlined'">animation</span></div>
+            <span class="rsection-title">Animation In</span>
+          </div>
+          <div class="rsection-body">
+            <div class="anim-grid" id="anim-grid">
+              <!-- rendered -->
+            </div>
+            <div class="fld">
+              <label class="flbl">Thời gian (ms) <span class="flbl-val" id="v-animDur">600ms</span></label>
+              <div class="srow">
+                <input type="range" class="finput" id="s-animDur" min="100" max="2000" step="50" value="600" />
+                <span class="snum" id="n-animDur">600</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- OBS Export -->
+        <div class="rsection">
+          <div class="rsection-hdr">
+            <div class="prop-hdr-icon g"><span class="ms" style="font-size:11px;font-family:'Material Symbols Outlined'">download</span></div>
+            <span class="rsection-title">Export OBS</span>
+          </div>
+          <div class="rsection-body">
+            <p style="font-size:9px;color:var(--t3);font-family:var(--fm)">
+              Xuất file JSON để import vào OBS Studio (File → Scene Collection → Import)
+            </p>
+            <div class="export-box" id="export-preview">
+              { "preview": "click Generate để xem" }
+            </div>
+            <button class="tb-btn" id="btn-gen-obs" style="width:100%;justify-content:center;height:28px">
+              <span class="ms">data_object</span>Generate JSON
+            </button>
+            <button class="tb-btn green" id="btn-dl-obs" style="width:100%;justify-content:center;height:28px">
+              <span class="ms">download</span>Download OBS JSON
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div id="panel-footer">
+        <button class="foot-btn live" id="btn-test-live">
+          <span class="ms">send</span>Test Live
+        </button>
+        <button class="foot-btn save" id="btn-save-layout">
+          <span class="ms">save</span>Lưu Layout
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <script>
-/* ═════════════════════════════════════════════════════════════════════
-   OBSChurch Layout Builder
-   ═════════════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════
+   OBSChurch — Layout Studio v2
+   Advanced features: Multi-layer, Snap, Undo/Redo, Presets,
+   Scene Assignment, Animation Config, OBS Export
+ ═══════════════════════════════════════════════════════════════════ */
+const API_LAYOUTS = 'http://localhost:3000/api/layouts';
+const API_SCENES  = 'http://localhost:3000/api/scenes';
+const WS_URL      = 'ws://localhost:3000';
 
-const API_URL = 'http://localhost:3000/api/layouts';
-const WS_URL  = 'ws://localhost:3000';
-
-// ── State ──────────────────────────────────────────────────────────
-const state = {
-  activeTpl: 'clean-dark',
-  layouts: {},
-  ws: null,
-};
-
-const TEMPLATE_META = {
-  'clean-dark':          { color: '#4d8eff',   border: '#4d8eff',   bg: 'rgba(10,10,10,0.95)', name: 'Clean Dark' },
-  'vintage':             { color: '#fbbf24',   border: '#ffb95f',   bg: 'rgba(60,30,5,0.92)',  name: 'Vintage' },
-  'scifi':               { color: '#4edea3',   border: '#4edea3',   bg: 'rgba(0,20,40,0.95)',  name: 'SciFi' },
-  'glassmorphism':       { color: 'rgba(255,255,255,0.7)', border: 'rgba(255,255,255,0.3)', bg: 'rgba(255,255,255,0.08)', name: 'Glass' },
-  'sermon-topic':        { color: '#a855f7',   border: '#a855f7',   bg: 'rgba(30,10,60,0.95)', name: 'Topic' },
-  'scripture-fullscreen':{ color: '#06b6d4',   border: 'rgba(255,255,255,0.2)', bg: 'rgba(255,255,255,0.03)', name: 'Scripture' },
-};
-
+// ── Utils ──────────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
+const ms = name => { const s = document.createElement('span'); s.className = 'ms'; s.style.fontFamily = "'Material Symbols Outlined'"; s.textContent = name; return s; }
 
-// ── Boot ───────────────────────────────────────────────────────────
+// ── App State ──────────────────────────────────────────────────────
+const S = {
+  ws: null,
+  activeTpl: 'clean-dark',
+  layouts: {},       // { tplId: { elements:[], animIn:'slide', animDur:600, customCss:'' } }
+  scenes: [],
+  assignedScenes: new Set(),
+  elements: [],      // [{ id, type, x, y, w, h, r, label, opacity, blur, visible, locked, animEl }]
+  selectedId: null,
+  snapEnabled: true,
+  snapSize: 5,       // % grid
+  history: [],
+  histIdx: -1,
+  maxHistory: 30,
+  dragging: null,    // { elId, startX, startY, startElX, startElY }
+  resizing: null,    // { elId, handle, startX, startY, ... }
+  activeAnim: 'slide',
+};
+
+let elIdCounter = 0;
+const genId = () => 'el-' + (++elIdCounter);
+
+// ── Template Meta ──────────────────────────────────────────────────
+const TPL_META = {
+  'clean-dark':           { name:'Clean Dark',   color:'#4d8eff', borderColor:'#4d8eff', desc:'Classic — Sắc tối chuyên nghiệp' },
+  'vintage':              { name:'Vintage',       color:'#fbbf24', borderColor:'#ffb95f', desc:'Ấm áp — Retro & Sang trọng' },
+  'scifi':                { name:'SciFi',          color:'#4edea3', borderColor:'#4edea3', desc:'Công nghệ — Xanh neon hiện đại' },
+  'glassmorphism':        { name:'Glass',          color:'#ffffff', borderColor:'rgba(255,255,255,0.4)', desc:'Kính mờ — Tinh tế & Hiện đại' },
+  'sermon-topic':         { name:'Sermon Topic',  color:'#a855f7', borderColor:'#a855f7', desc:'Tím đậm — Dành cho bài giảng' },
+  'scripture-fullscreen': { name:'Scripture',      color:'#06b6d4', borderColor:'rgba(255,255,255,0.2)', desc:'Kinh Thánh — Fullscreen sáng' },
+};
+
+// ── Preset Library ─────────────────────────────────────────────────
+const PRESETS = [
+  {
+    id: 'worship', icon: '🎵', name: 'Thờ Phượng', desc: 'Cam lớn + Lower Third',
+    elements: [
+      { type:'cam', x:2, y:2, w:50, h:56, r:6, label:'CAM CHÍNH', opacity:100, blur:0, visible:true, locked:false },
+      { type:'text', x:4, y:72, w:55, h:12, r:0, label:'Lower Third', opacity:100, blur:8, visible:true, locked:false },
+    ]
+  },
+  {
+    id: 'sermon', icon: '📖', name: 'Giảng Luận', desc: 'Cam nhỏ + Topic full',
+    elements: [
+      { type:'cam', x:72, y:4, w:25, h:28, r:4, label:'CAM DIỄN GIẢ', opacity:100, blur:0, visible:true, locked:false },
+      { type:'text', x:4, y:68, w:65, h:20, r:0, label:'Lower Third', opacity:100, blur:8, visible:true, locked:false },
+    ]
+  },
+  {
+    id: 'duet', icon: '👥', name: 'Song Ca', desc: '2 Cam side-by-side',
+    elements: [
+      { type:'cam', x:2, y:10, w:46, h:80, r:4, label:'CAM 1', opacity:100, blur:0, visible:true, locked:false },
+      { type:'cam', x:52, y:10, w:46, h:80, r:4, label:'CAM 2', opacity:100, blur:0, visible:true, locked:false },
+      { type:'text', x:10, y:78, w:80, h:12, r:0, label:'Lower Third', opacity:95, blur:6, visible:true, locked:false },
+    ]
+  },
+  {
+    id: 'prayer', icon: '🙏', name: 'Cầu Nguyện', desc: 'Fullscreen text chỉ',
+    elements: [
+      { type:'text', x:10, y:35, w:80, h:20, r:6, label:'Chủ Đề Cầu Nguyện', opacity:95, blur:10, visible:true, locked:false },
+    ]
+  },
+  {
+    id: 'announcement', icon: '📢', name: 'Thông Báo', desc: 'Ticker + Cam nhỏ',
+    elements: [
+      { type:'cam', x:70, y:5, w:28, h:31, r:4, label:'CAM', opacity:100, blur:0, visible:true, locked:false },
+      { type:'ticker', x:0, y:88, w:100, h:8, r:0, label:'📢 THÔNG BÁO NHÂN SỰ • TÊN BÀI HÁT • GIỜ NHÓM TUẦN SAU • ', opacity:95, blur:0, visible:true, locked:false },
+      { type:'text', x:4, y:72, w:60, h:14, r:0, label:'Lower Third', opacity:95, blur:6, visible:true, locked:false },
+    ]
+  },
+  {
+    id: 'clean', icon: '✨', name: 'Tối Giản', desc: 'Fullscreen cam',
+    elements: [
+      { type:'cam', x:0, y:0, w:100, h:100, r:0, label:'FULLSCREEN CAM', opacity:100, blur:0, visible:true, locked:false },
+      { type:'text', x:5, y:80, w:50, h:12, r:0, label:'Lower Third', opacity:95, blur:8, visible:true, locked:false },
+    ]
+  },
+];
+
+const ANIMS = [
+  { id:'none',     label:'None' },
+  { id:'slide',    label:'Slide ←' },
+  { id:'fade',     label:'Fade' },
+  { id:'scale',    label:'Scale ↗' },
+  { id:'type',     label:'Typewriter' },
+  { id:'drop',     label:'Drop ↓' },
+];
+
+// ── Boot ──────────────────────────────────────────────────────────
 (async function init() {
   connectWS();
+  renderTemplateGallery();
+  renderPresets();
+  renderAnimPicker();
   await loadLayouts();
-  bindSliders();
-  bindTemplateTabs();
-  initDragCam();
-  initDragText();
-  bindPreviewText();
-  applyTemplate('clean-dark');
+  await loadScenes();
+  applyPreset(PRESETS[0], false);
+  pushHistory();
+  bindAll();
+  new ResizeObserver(renderCanvas).observe($('canvas'));
 })();
 
-// ── WebSocket ──────────────────────────────────────────────────────
+// ── WS ────────────────────────────────────────────────────────────
 function connectWS() {
   try {
-    state.ws = new WebSocket(WS_URL);
-    state.ws.onclose = () => setTimeout(connectWS, 3000);
+    S.ws = new WebSocket(WS_URL);
+    S.ws.onclose = () => setTimeout(connectWS, 3000);
+  } catch(_) {}
+}
+function wsSend(msg) {
+  if (S.ws && S.ws.readyState === 1) S.ws.send(JSON.stringify(msg));
+}
+
+// ── Load / Save ───────────────────────────────────────────────────
+async function loadLayouts() {
+  try {
+    const r = await fetch(API_LAYOUTS);
+    if (!r.ok) throw new Error();
+    const data = await r.json();
+    S.layouts = data;
+    // Apply saved layout for current template
+    if (data[S.activeTpl]?.elements?.length) {
+      S.elements = JSON.parse(JSON.stringify(data[S.activeTpl].elements));
+      elIdCounter = S.elements.length;
+      S.elements.forEach((e, i) => { if (!e.id) e.id = 'el-' + (i+1); });
+      if (data[S.activeTpl].animIn) S.activeAnim = data[S.activeTpl].animIn;
+      if (data[S.activeTpl].animDur) $('s-animDur').value = data[S.activeTpl].animDur;
+      if (data[S.activeTpl].customCss) $('s-customCss').value = data[S.activeTpl].customCss;
+      renderCanvas();
+      renderLayerList();
+      updateAnimDurLabel();
+    }
   } catch(_) {}
 }
 
-function send(msg) {
-  if (state.ws && state.ws.readyState === 1) state.ws.send(JSON.stringify(msg));
-}
-
-// ── Load / Save Layouts ────────────────────────────────────────────
-async function loadLayouts() {
+async function loadScenes() {
   try {
-    const r = await fetch(API_URL);
+    const r = await fetch(API_SCENES);
     if (!r.ok) throw new Error();
-    state.layouts = await r.json();
-    applyLayoutToSliders(state.activeTpl);
-  } catch(_) {
-    toast('Không thể tải layout từ server', 'error');
-  }
+    const data = await r.json();
+    S.scenes = data.scenes || [];
+    renderSceneTree();
+  } catch(_) {}
 }
 
-async function saveLayouts() {
-  // Sync current sliders to layout
-  syncSlidersToLayout();
-  try {
-    const r = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(state.layouts),
-    });
-    if (!r.ok) throw new Error();
-    toast('Đã lưu layout thành công ✓', 'success');
-  } catch(_) {
-    toast('Lỗi lưu layout lên server!', 'error');
-  }
-}
-
-function syncSlidersToLayout() {
-  if (!state.layouts[state.activeTpl]) state.layouts[state.activeTpl] = {};
-  state.layouts[state.activeTpl] = {
-    camX: parseInt($('s-camX').value),
-    camY: parseInt($('s-camY').value),
-    camW: parseInt($('s-camW').value),
-    camH: parseInt($('s-camH').value),
-    camR: parseInt($('s-camR').value),
-    textX: parseInt($('s-textX').value),
-    textY: parseInt($('s-textY').value),
+function getCurrentLayout() {
+  return {
+    elements: JSON.parse(JSON.stringify(S.elements)),
+    animIn: S.activeAnim,
+    animDur: parseInt($('s-animDur').value),
     customCss: $('s-customCss').value,
+    assignedScenes: [...S.assignedScenes],
+    // flat values for backward compat with overlay
+    camX: (S.elements.find(e => e.type==='cam')?.x) ?? 5,
+    camY: (S.elements.find(e => e.type==='cam')?.y) ?? 5,
+    camW: (S.elements.find(e => e.type==='cam')?.w) ?? 25,
+    camH: (S.elements.find(e => e.type==='cam')?.h) ?? 25,
+    camR: (S.elements.find(e => e.type==='cam')?.r) ?? 8,
+    textX: (S.elements.find(e => e.type==='text')?.x) ?? 5,
+    textY: (S.elements.find(e => e.type==='text')?.y) ?? 80,
   };
 }
 
-function applyLayoutToSliders(tplId) {
-  const cfg = state.layouts[tplId] || { camX:5, camY:5, camW:25, camH:25, camR:8, textX:5, textY:80, customCss:'' };
-  $('s-camX').value  = cfg.camX;  $('s-camY').value  = cfg.camY;
-  $('s-camW').value  = cfg.camW;  $('s-camH').value  = cfg.camH;
-  $('s-camR').value  = cfg.camR;
-  $('s-textX').value = cfg.textX; $('s-textY').value = cfg.textY;
-  $('s-customCss').value = cfg.customCss || '';
-  updateAllLabels();
-  updateCanvas();
-}
-
-// ── Sliders ────────────────────────────────────────────────────────
-const SLIDERS = [
-  { id: 's-camX',  vId: 'v-camX',  nId: 'n-camX',  unit: '%' },
-  { id: 's-camY',  vId: 'v-camY',  nId: 'n-camY',  unit: '%' },
-  { id: 's-camW',  vId: 'v-camW',  nId: 'n-camW',  unit: '%' },
-  { id: 's-camH',  vId: 'v-camH',  nId: 'n-camH',  unit: '%' },
-  { id: 's-camR',  vId: 'v-camR',  nId: 'n-camR',  unit: 'px' },
-  { id: 's-textX', vId: 'v-textX', nId: 'n-textX', unit: '%' },
-  { id: 's-textY', vId: 'v-textY', nId: 'n-textY', unit: '%' },
-];
-
-function bindSliders() {
-  SLIDERS.forEach(({ id }) => {
-    $(id).addEventListener('input', () => {
-      updateAllLabels();
-      updateCanvas();
+async function saveLayouts() {
+  S.layouts[S.activeTpl] = getCurrentLayout();
+  try {
+    const r = await fetch(API_LAYOUTS, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(S.layouts),
     });
-  });
-  $('s-customCss').addEventListener('input', updateCanvas);
+    if (!r.ok) throw new Error();
+    toast('Đã lưu layout ✓', 'ok');
+  } catch(_) {
+    toast('Lỗi lưu layout!', 'err');
+  }
 }
 
-function updateAllLabels() {
-  SLIDERS.forEach(({ id, vId, nId, unit }) => {
-    const v = $(id).value + unit;
-    $(vId).textContent = v;
-    $(nId).textContent = v;
-  });
-  updatePosReadout();
-}
+// ── Template Gallery ───────────────────────────────────────────────
+function renderTemplateGallery() {
+  const grid = $('tgl-grid');
+  grid.innerHTML = Object.entries(TPL_META).map(([id, m]) => `
+    <div class="tgl-card ${id === S.activeTpl ? 'active':''}" data-tpl="${id}">
+      <div class="tgl-preview" style="--tpl-color:${m.color}">
+        <div class="tgl-preview-bg"></div>
+        <div class="tgl-preview-lt" style="border-left-color:${m.color}">
+          <span class="tgl-lt-p" style="color:#fff">Tiêu Đề Bài Giảng</span>
+          <span class="tgl-lt-s" style="color:${m.color}">MỤC SƯ NGUYỄN VĂN A</span>
+        </div>
+      </div>
+      <div class="tgl-meta">
+        <span class="tgl-name" style="color:${m.color}">${m.name}</span>
+        <span class="tgl-desc">${m.desc}</span>
+      </div>
+    </div>`).join('');
 
-function updatePosReadout() {
-  $('pr-cam').textContent  = `${$('s-camX').value}%, ${$('s-camY').value}%, ${$('s-camW').value}%, ${$('s-camH').value}%`;
-  $('pr-text').textContent = `${$('s-textX').value}%, ${$('s-textY').value}%`;
-}
-
-// ── Template Tabs ──────────────────────────────────────────────────
-function bindTemplateTabs() {
-  document.querySelectorAll('.tpl-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      syncSlidersToLayout(); // save current before switching
-      const tpl = tab.dataset.tpl;
-      document.querySelectorAll('.tpl-tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      state.activeTpl = tpl;
-      applyLayoutToSliders(tpl);
-      applyTemplate(tpl);
+  grid.querySelectorAll('.tgl-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const tpl = card.dataset.tpl;
+      setTemplate(tpl);
+      $('tpl-gallery').classList.remove('open');
     });
   });
 }
 
-function applyTemplate(tplId) {
-  const meta = TEMPLATE_META[tplId] || TEMPLATE_META['clean-dark'];
-  // Update canvas text frame style
-  const inner = $('canvas-text-inner');
-  inner.style.borderLeftColor = meta.border;
-  inner.style.background = `linear-gradient(to right, ${meta.bg}, ${meta.bg.replace('0.95', '0.6').replace('0.92','0.55').replace('0.08','0.03')})`;
-  // Color strip
+function setTemplate(tplId) {
+  S.activeTpl = tplId;
+  const meta = TPL_META[tplId];
+  $('active-tpl-badge').textContent = meta.name;
+  $('active-tpl-badge').style.color = meta.color;
+  $('lbl-tpl').textContent = meta.name;
   $('tpl-strip').style.background = meta.color;
-}
 
-// ── Canvas Update ──────────────────────────────────────────────────
-function updateCanvas() {
-  const canvas = $('canvas');
-  const W = canvas.offsetWidth;
-  const H = canvas.offsetHeight;
-
-  const cam = $('canvas-cam');
-  const camX = parseInt($('s-camX').value);
-  const camY = parseInt($('s-camY').value);
-  const camW = parseInt($('s-camW').value);
-  const camH = parseInt($('s-camH').value);
-  const camR = parseInt($('s-camR').value);
-
-  if (camW > 0 && camH > 0) {
-    cam.style.display = '';
-    cam.style.left   = (camX / 100 * W) + 'px';
-    cam.style.top    = (camY / 100 * H) + 'px';
-    cam.style.width  = (camW / 100 * W) + 'px';
-    cam.style.height = (camH / 100 * H) + 'px';
-    cam.style.borderRadius = camR + 'px';
-  } else {
-    cam.style.display = 'none';
+  // Apply saved layout or default
+  if (S.layouts[tplId]?.elements?.length) {
+    S.elements = JSON.parse(JSON.stringify(S.layouts[tplId].elements));
+    S.elements.forEach((e,i) => { if(!e.id) e.id='el-'+(i+1); });
+    if (S.layouts[tplId].customCss) $('s-customCss').value = S.layouts[tplId].customCss;
   }
 
-  const txt = $('canvas-text');
-  const textX = parseInt($('s-textX').value);
-  const textY = parseInt($('s-textY').value);
-  txt.style.left = (textX / 100 * W) + 'px';
-  txt.style.top  = (textY / 100 * H) + 'px';
-  txt.style.width = '50%';
+  // Update text frame colors to match template
+  S.elements.filter(e => e.type === 'text').forEach(e => {
+    e._tplColor = meta.color;
+  });
 
-  updatePosReadout();
+  renderCanvas();
+  renderLayerList();
+  renderTemplateGallery();
+  pushHistory();
+  toast(`Template: ${meta.name}`, 'inf');
 }
 
-// ── Drag Camera ────────────────────────────────────────────────────
-function initDragCam() {
-  const cam = $('canvas-cam');
+// ── Presets ────────────────────────────────────────────────────────
+function renderPresets() {
+  const grid = $('preset-grid');
+  grid.innerHTML = PRESETS.map(p => `
+    <div class="preset-card" data-preset="${p.id}" title="${p.desc}">
+      <span class="preset-icon">${p.icon}</span>
+      <span class="preset-name">${p.name}</span>
+      <span class="preset-desc">${p.desc}</span>
+    </div>`).join('');
+
+  grid.querySelectorAll('.preset-card').forEach(c => {
+    c.addEventListener('click', () => {
+      const p = PRESETS.find(x => x.id === c.dataset.preset);
+      if (p) { applyPreset(p); }
+    });
+  });
+}
+
+function applyPreset(preset, withHistory = true) {
+  S.elements = preset.elements.map((e, i) => ({ ...e, id: genId() }));
+  S.selectedId = null;
+  renderCanvas();
+  renderLayerList();
+  renderElProps();
+  if (withHistory) pushHistory();
+  toast(`Preset: ${preset.name}`, 'inf');
+}
+
+// ── Canvas Rendering ───────────────────────────────────────────────
+function renderCanvas() {
   const canvas = $('canvas');
-  let dragging = false, startX, startY, startLeft, startTop;
-  let resizing = false, resizeHandle = null, startW, startH;
+  const W = canvas.offsetWidth, H = canvas.offsetHeight;
+  if (!W || !H) return;
 
-  cam.addEventListener('mousedown', (e) => {
-    if (e.target.classList.contains('resize-handle')) {
-      resizing = true;
-      resizeHandle = e.target;
-      startX = e.clientX; startY = e.clientY;
-      startW = cam.offsetWidth; startH = cam.offsetHeight;
-      startLeft = cam.offsetLeft; startTop = cam.offsetTop;
-    } else {
-      dragging = true;
-      startX = e.clientX; startY = e.clientY;
-      startLeft = cam.offsetLeft; startTop = cam.offsetTop;
-      cam.classList.add('dragging');
-    }
-    e.preventDefault();
+  // Remove existing elements
+  canvas.querySelectorAll('.c-el').forEach(el => el.remove());
+
+  S.elements.forEach(el => {
+    if (!el.visible) return;
+    const dom = createElDom(el, W, H);
+    canvas.appendChild(dom);
   });
 
-  document.addEventListener('mousemove', (e) => {
-    if (dragging) {
-      const W = canvas.offsetWidth, H = canvas.offsetHeight;
-      let nx = startLeft + (e.clientX - startX);
-      let ny = startTop  + (e.clientY - startY);
-      nx = Math.max(0, Math.min(W - cam.offsetWidth,  nx));
-      ny = Math.max(0, Math.min(H - cam.offsetHeight, ny));
-      cam.style.left = nx + 'px';
-      cam.style.top  = ny + 'px';
-      // Update sliders
-      $('s-camX').value = Math.round(nx / W * 100);
-      $('s-camY').value = Math.round(ny / H * 100);
-      updateAllLabels();
-    } else if (resizing) {
-      const W = canvas.offsetWidth, H = canvas.offsetHeight;
-      const dx = e.clientX - startX, dy = e.clientY - startY;
-      let nw = startW, nh = startH, nl = startLeft, nt = startTop;
-      if (resizeHandle.classList.contains('br')) { nw = Math.max(40, startW + dx); nh = Math.max(30, startH + dy); }
-      else if (resizeHandle.classList.contains('bl')) { nw = Math.max(40, startW - dx); nh = Math.max(30, startH + dy); nl = startLeft + (startW - nw); }
-      else if (resizeHandle.classList.contains('tr')) { nw = Math.max(40, startW + dx); nh = Math.max(30, startH - dy); nt = startTop + (startH - nh); }
-      else if (resizeHandle.classList.contains('tl')) { nw = Math.max(40, startW - dx); nh = Math.max(30, startH - dy); nl = startLeft + (startW - nw); nt = startTop + (startH - nh); }
-      cam.style.left   = nl + 'px'; cam.style.top    = nt + 'px';
-      cam.style.width  = nw + 'px'; cam.style.height = nh + 'px';
-      $('s-camX').value = Math.round(nl / W * 100);
-      $('s-camY').value = Math.round(nt / H * 100);
-      $('s-camW').value = Math.round(nw / W * 100);
-      $('s-camH').value = Math.round(nh / H * 100);
-      updateAllLabels();
-    }
+  // Grid style based on snap
+  $('c-grid').classList.toggle('snap-active', S.snapEnabled);
+}
+
+function createElDom(el, W, H) {
+  const div = document.createElement('div');
+  div.className = 'c-el';
+  div.dataset.id = el.id;
+
+  const meta = TPL_META[S.activeTpl];
+  const elColor = meta?.color || '#a855f7';
+
+  // Position
+  div.style.left   = (el.x / 100 * W) + 'px';
+  div.style.top    = (el.y / 100 * H) + 'px';
+
+  if (el.type !== 'ticker') {
+    div.style.width  = (el.w / 100 * W) + 'px';
+    div.style.height = (el.h / 100 * H) + 'px';
+  } else {
+    div.style.width = '100%';
+    div.style.left = '0';
+    div.style.right = '0';
+  }
+
+  div.style.opacity = (el.opacity ?? 100) / 100;
+  if (el.locked) div.style.cursor = 'default';
+
+  // Selected highlight
+  if (el.id === S.selectedId) div.classList.add('selected');
+
+  // Type-specific content
+  if (el.type === 'cam') {
+    div.classList.add('c-cam');
+    div.style.borderRadius = (el.r || 0) + 'px';
+    const lbl = document.createElement('span');
+    lbl.className = 'c-cam-label';
+    lbl.textContent = '📹 ' + (el.label || 'CAM');
+    div.appendChild(lbl);
+    // Resize handles
+    ['tl','tr','bl','br'].forEach(pos => {
+      const h = document.createElement('span');
+      h.className = `rh cam ${pos}`;
+      h.dataset.handle = pos;
+      div.appendChild(h);
+    });
+  } else if (el.type === 'text') {
+    div.classList.add('c-text');
+    const inner = document.createElement('div');
+    inner.className = 'c-text-inner';
+    inner.style.borderLeftColor = elColor;
+    if (el.blur) inner.style.backdropFilter = `blur(${el.blur}px)`;
+    inner.innerHTML = `
+      <span class="c-text-primary" id="ct-p-${el.id}">Tên Bài Giảng / Ca Khúc</span>
+      <span class="c-text-secondary" id="ct-s-${el.id}" style="color:${elColor}">Mục Sư Nguyễn Văn A</span>`;
+    div.appendChild(inner);
+    // Resize handles
+    ['tl','tr','bl','br'].forEach(pos => {
+      const h = document.createElement('span');
+      h.className = `rh text ${pos}`;
+      h.dataset.handle = pos;
+      div.appendChild(h);
+    });
+    // Label
+    const lbl = document.createElement('div');
+    lbl.className = 'c-el-label';
+    lbl.textContent = '⠿ TEXT';
+    lbl.style.color = elColor;
+    div.appendChild(lbl);
+  } else if (el.type === 'ticker') {
+    div.classList.add('c-ticker');
+    div.innerHTML = `
+      <div class="ticker-label" style="background:${elColor}">📢 THÔNG BÁO</div>
+      <div class="ticker-scroll">
+        <span class="ticker-text">${el.label || 'Nội dung ticker chạy ngang...'}</span>
+      </div>`;
+    // For ticker, set top only
+    div.style.top = (el.y / 100 * H) + 'px';
+    div.style.left = '0'; div.style.right = '0'; div.style.width = '100%';
+  } else if (el.type === 'logo') {
+    div.classList.add('c-logo');
+    div.style.borderRadius = (el.r || 4) + 'px';
+    div.style.width  = (el.w / 100 * W) + 'px';
+    div.style.height = (el.h / 100 * H) + 'px';
+    const lbl = document.createElement('span');
+    lbl.className = 'c-logo-text';
+    lbl.textContent = el.label || '⛪ LOGO';
+    div.appendChild(lbl);
+    ['tl','tr','bl','br'].forEach(pos => {
+      const h = document.createElement('span');
+      h.className = `rh logo ${pos}`;
+      h.dataset.handle = pos;
+      div.appendChild(h);
+    });
+  }
+
+  // Events
+  if (!el.locked) {
+    div.addEventListener('mousedown', onElMouseDown);
+  }
+  div.addEventListener('click', (e) => {
+    e.stopPropagation();
+    selectEl(el.id);
   });
 
-  document.addEventListener('mouseup', () => {
-    dragging = false; resizing = false; resizeHandle = null;
-    cam.classList.remove('dragging');
+  return div;
+}
+
+// ── Layer List ─────────────────────────────────────────────────────
+function renderLayerList() {
+  const list = $('layer-list');
+  if (!S.elements.length) {
+    list.innerHTML = '<div style="padding:12px 4px;text-align:center;color:var(--t4);font-size:9px;font-family:var(--fm)">Chưa có layer nào</div>';
+    return;
+  }
+  list.innerHTML = S.elements.slice().reverse().map(el => {
+    const isSelected = el.id === S.selectedId;
+    const typeIcon = { cam:'📹', text:'Tt', ticker:'—', logo:'⛪' }[el.type] || '?';
+    const typeClass = { cam:'cam', text:'text', ticker:'ticker', logo:'logo' }[el.type] || 'text';
+    return `
+      <div class="layer-item ${typeClass==='cam'?'cam-item':''} ${isSelected?'selected':''}" data-lid="${el.id}">
+        <div class="layer-thumb ${typeClass}">${typeIcon}</div>
+        <span class="layer-name">${el.label || el.type}</span>
+        <div class="layer-controls">
+          <button class="layer-ctrl ${el.visible?'active':''}" data-action="vis" data-lid="${el.id}" title="Toggle visibility">
+            <span class="ms">${el.visible?'visibility':'visibility_off'}</span>
+          </button>
+          <button class="layer-ctrl ${el.locked?'locked':''}" data-action="lock" data-lid="${el.id}" title="Lock">
+            <span class="ms">${el.locked?'lock':'lock_open'}</span>
+          </button>
+          <button class="layer-ctrl del" data-action="del" data-lid="${el.id}" title="Delete">
+            <span class="ms">close</span>
+          </button>
+        </div>
+      </div>`;
+  }).join('');
+
+  list.querySelectorAll('.layer-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      if (e.target.closest('[data-action]')) return;
+      selectEl(item.dataset.lid);
+    });
+  });
+
+  list.querySelectorAll('[data-action]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const { action, lid } = btn.dataset;
+      const el = S.elements.find(x => x.id === lid);
+      if (!el) return;
+      if (action === 'vis')  { el.visible = !el.visible; }
+      if (action === 'lock') { el.locked  = !el.locked; }
+      if (action === 'del')  {
+        S.elements = S.elements.filter(x => x.id !== lid);
+        if (S.selectedId === lid) { S.selectedId = null; renderElProps(); }
+      }
+      renderCanvas();
+      renderLayerList();
+      pushHistory();
+    });
   });
 }
 
-// ── Drag Text ──────────────────────────────────────────────────────
-function initDragText() {
-  const txt = $('canvas-text');
+// ── Selection ─────────────────────────────────────────────────────
+function selectEl(id) {
+  S.selectedId = id;
+  renderCanvas();
+  renderLayerList();
+  renderElProps();
+}
+
+// ── Element Properties ─────────────────────────────────────────────
+function renderElProps() {
+  const el = S.elements.find(e => e.id === S.selectedId);
+  const propsDiv = $('el-props');
+  if (!el) {
+    propsDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--t4);font-size:10px;font-family:var(--fm)">Chọn một layer để chỉnh sửa</div>';
+    return;
+  }
+
+  const typeColor = { cam:'c', text:'p', ticker:'a', logo:'g' }[el.type] || 'p';
+  const typeLabel = { cam:'Camera', text:'Lower Third', ticker:'Ticker', logo:'Logo' }[el.type] || el.type;
+
+  propsDiv.innerHTML = `
+    <div class="prop-section">
+      <div class="prop-hdr">
+        <div class="prop-hdr-icon ${typeColor}"><span class="ms" style="font-size:11px;font-family:'Material Symbols Outlined'">${{cam:'videocam',text:'text_fields',ticker:'horizontal_rule',logo:'shield'}[el.type]||'widgets'}</span></div>
+        <span class="prop-hdr-title">${typeLabel}</span>
+      </div>
+      <div class="prop-body">
+        <div class="fld">
+          <label class="flbl">Nhãn</label>
+          <input class="finput" id="ep-label" type="text" value="${el.label||''}" placeholder="${el.type}" />
+        </div>
+        ${el.type !== 'ticker' ? `
+        <div class="frow">
+          <div class="fld">
+            <label class="flbl">X <span class="flbl-val" id="ep-xv">${el.x}%</span></label>
+            <div class="srow"><input type="range" class="finput" id="ep-x" min="0" max="90" value="${el.x}" /><span class="snum" id="ep-xn">${el.x}%</span></div>
+          </div>
+          <div class="fld">
+            <label class="flbl">Y <span class="flbl-val" id="ep-yv">${el.y}%</span></label>
+            <div class="srow"><input type="range" class="finput" id="ep-y" min="0" max="90" value="${el.y}" /><span class="snum" id="ep-yn">${el.y}%</span></div>
+          </div>
+        </div>
+        <div class="frow">
+          <div class="fld">
+            <label class="flbl">Rộng <span class="flbl-val" id="ep-wv">${el.w}%</span></label>
+            <div class="srow"><input type="range" class="finput" id="ep-w" min="5" max="100" value="${el.w}" /><span class="snum" id="ep-wn">${el.w}%</span></div>
+          </div>
+          <div class="fld">
+            <label class="flbl">Cao <span class="flbl-val" id="ep-hv">${el.h}%</span></label>
+            <div class="srow"><input type="range" class="finput" id="ep-h" min="5" max="100" value="${el.h}" /><span class="snum" id="ep-hn">${el.h}%</span></div>
+          </div>
+        </div>
+        ${el.type !== 'text' ? `<div class="fld"><label class="flbl">Bo góc <span class="flbl-val" id="ep-rv">${el.r}px</span></label><div class="srow"><input type="range" class="finput" id="ep-r" min="0" max="80" value="${el.r}" /><span class="snum" id="ep-rn">${el.r}px</span></div></div>` : ''}
+        ` : `<div class="fld"><label class="flbl">Nội dung ticker</label><input class="finput" id="ep-ticker-content" type="text" value="${el.label||''}" /></div>`}
+        <div class="frow">
+          <div class="fld">
+            <label class="flbl">Opacity <span class="flbl-val" id="ep-opv">${el.opacity??100}%</span></label>
+            <div class="srow"><input type="range" class="finput" id="ep-op" min="0" max="100" value="${el.opacity??100}" /><span class="snum" id="ep-opn">${el.opacity??100}%</span></div>
+          </div>
+          ${el.type !== 'cam' ? `<div class="fld"><label class="flbl">Blur <span class="flbl-val" id="ep-blv">${el.blur??0}px</span></label><div class="srow"><input type="range" class="finput" id="ep-bl" min="0" max="20" value="${el.blur??0}" /><span class="snum" id="ep-bln">${el.blur??0}px</span></div></div>` : ''}
+        </div>
+        ${el.type === 'cam' ? `<label class="checkbox-row"><input type="checkbox" id="ep-ar" ${el.lockAR?'checked':''}><span>Giữ tỷ lệ 16:9</span></label>` : ''}
+      </div>
+    </div>`;
+
+  // Bind prop sliders
+  const bindPropSlider = (id, prop, unit='%') => {
+    const inp = $(id);
+    if (!inp) return;
+    inp.addEventListener('input', () => {
+      el[prop] = parseFloat(inp.value);
+      const vEl = $(`ep-${prop.slice(-1)}v`) || $(`ep-${id.slice(3)}v`);
+      const nEl = $(`ep-${prop.slice(-1)}n`) || $(`ep-${id.slice(3)}n`);
+      const val = inp.value + unit;
+      if ($(id+'v')) $(id+'v').textContent = val;
+      if ($(id+'n')) $(id+'n').textContent = val;
+      renderCanvas();
+    });
+    inp.addEventListener('change', pushHistory);
+  };
+
+  if ($('ep-x')) {
+    $('ep-x').addEventListener('input', () => { el.x = parseFloat($('ep-x').value); $('ep-xv').textContent=$('ep-xn').textContent=$('ep-x').value+'%'; renderCanvas(); });
+    $('ep-x').addEventListener('change', pushHistory);
+    $('ep-y').addEventListener('input', () => { el.y = parseFloat($('ep-y').value); $('ep-yv').textContent=$('ep-yn').textContent=$('ep-y').value+'%'; renderCanvas(); });
+    $('ep-y').addEventListener('change', pushHistory);
+    $('ep-w').addEventListener('input', () => { el.w = parseFloat($('ep-w').value); $('ep-wv').textContent=$('ep-wn').textContent=$('ep-w').value+'%'; renderCanvas(); });
+    $('ep-w').addEventListener('change', pushHistory);
+    $('ep-h').addEventListener('input', () => { el.h = parseFloat($('ep-h').value); $('ep-hv').textContent=$('ep-hn').textContent=$('ep-h').value+'%'; renderCanvas(); });
+    $('ep-h').addEventListener('change', pushHistory);
+  }
+  if ($('ep-r')) {
+    $('ep-r').addEventListener('input', () => { el.r = parseFloat($('ep-r').value); $('ep-rv').textContent=$('ep-rn').textContent=$('ep-r').value+'px'; renderCanvas(); });
+    $('ep-r').addEventListener('change', pushHistory);
+  }
+  $('ep-op').addEventListener('input', () => { el.opacity = parseFloat($('ep-op').value); $('ep-opv').textContent=$('ep-opn').textContent=$('ep-op').value+'%'; renderCanvas(); });
+  $('ep-op').addEventListener('change', pushHistory);
+  if ($('ep-bl')) {
+    $('ep-bl').addEventListener('input', () => { el.blur = parseFloat($('ep-bl').value); $('ep-blv').textContent=$('ep-bln').textContent=$('ep-bl').value+'px'; renderCanvas(); });
+    $('ep-bl').addEventListener('change', pushHistory);
+  }
+  if ($('ep-ar')) {
+    $('ep-ar').addEventListener('change', () => { el.lockAR = $('ep-ar').checked; });
+  }
+  $('ep-label').addEventListener('input', () => { el.label = $('ep-label').value; renderCanvas(); renderLayerList(); });
+  $('ep-label').addEventListener('change', pushHistory);
+  if ($('ep-ticker-content')) {
+    $('ep-ticker-content').addEventListener('input', () => { el.label = $('ep-ticker-content').value; renderCanvas(); });
+    $('ep-ticker-content').addEventListener('change', pushHistory);
+  }
+}
+
+// ── Drag ──────────────────────────────────────────────────────────
+function onElMouseDown(e) {
+  if (e.target.classList.contains('rh')) { onResizeStart(e); return; }
+  const elDiv = e.currentTarget;
+  const elId = elDiv.dataset.id;
+  const el = S.elements.find(x => x.id === elId);
+  if (!el || el.locked) return;
+  if (el.type === 'ticker') return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  selectEl(elId);
   const canvas = $('canvas');
-  let dragging = false, startX, startY, startLeft, startTop;
-
-  txt.addEventListener('mousedown', (e) => {
-    dragging = true;
-    startX = e.clientX; startY = e.clientY;
-    startLeft = txt.offsetLeft; startTop = txt.offsetTop;
-    e.preventDefault();
-  });
-
-  document.addEventListener('mousemove', (e) => {
-    if (!dragging) return;
-    const W = canvas.offsetWidth, H = canvas.offsetHeight;
-    let nx = startLeft + (e.clientX - startX);
-    let ny = startTop  + (e.clientY - startY);
-    nx = Math.max(0, Math.min(W - txt.offsetWidth,  nx));
-    ny = Math.max(0, Math.min(H - txt.offsetHeight, ny));
-    txt.style.left = nx + 'px';
-    txt.style.top  = ny + 'px';
-    $('s-textX').value = Math.round(nx / W * 100);
-    $('s-textY').value = Math.round(ny / H * 100);
-    updateAllLabels();
-  });
-
-  document.addEventListener('mouseup', () => { dragging = false; });
+  const W = canvas.offsetWidth, H = canvas.offsetHeight;
+  S.dragging = { elId, startX: e.clientX, startY: e.clientY, startElX: el.x, startElY: el.y, W, H };
 }
 
-// ── Preview text sync ──────────────────────────────────────────────
-function bindPreviewText() {
-  $('preview-text-primary').addEventListener('input', () => {
-    $('ct-primary').textContent = $('preview-text-primary').value || '—';
-  });
-  $('preview-text-secondary').addEventListener('input', () => {
-    $('ct-secondary').textContent = $('preview-text-secondary').value || '';
-  });
+function onResizeStart(e) {
+  e.preventDefault(); e.stopPropagation();
+  const handle = e.target;
+  const elDiv = handle.closest('.c-el');
+  const elId = elDiv.dataset.id;
+  const el = S.elements.find(x => x.id === elId);
+  if (!el) return;
+
+  const canvas = $('canvas');
+  const W = canvas.offsetWidth, H = canvas.offsetHeight;
+  S.resizing = { elId, handle: handle.dataset.handle, startX: e.clientX, startY: e.clientY, startElX: el.x, startElY: el.y, startElW: el.w, startElH: el.h, W, H };
 }
 
-// ── Reset Camera ───────────────────────────────────────────────────
-$('btn-reset-cam').addEventListener('click', () => {
-  $('s-camX').value = 5; $('s-camY').value = 5;
-  $('s-camW').value = 25; $('s-camH').value = 25; $('s-camR').value = 8;
-  updateAllLabels(); updateCanvas();
-  toast('Đã reset vị trí Camera', 'info');
+document.addEventListener('mousemove', (e) => {
+  const canvas = $('canvas');
+  // Cursor position
+  if (canvas) {
+    const rect = canvas.getBoundingClientRect();
+    if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
+      const cx = Math.round((e.clientX - rect.left) / rect.width * 100);
+      const cy = Math.round((e.clientY - rect.top) / rect.height * 100);
+      $('pr-text').textContent = `${cx}%, ${cy}%`;
+    }
+  }
+
+  if (S.dragging) {
+    const { elId, startX, startY, startElX, startElY, W, H } = S.dragging;
+    const el = S.elements.find(x => x.id === elId);
+    if (!el) return;
+
+    const dx = (e.clientX - startX) / W * 100;
+    const dy = (e.clientY - startY) / H * 100;
+    let nx = startElX + dx;
+    let ny = startElY + dy;
+
+    if (S.snapEnabled) {
+      nx = Math.round(nx / S.snapSize) * S.snapSize;
+      ny = Math.round(ny / S.snapSize) * S.snapSize;
+    }
+    nx = Math.max(0, Math.min(100 - el.w, nx));
+    ny = Math.max(0, Math.min(100 - el.h, ny));
+
+    el.x = parseFloat(nx.toFixed(1));
+    el.y = parseFloat(ny.toFixed(1));
+    renderCanvas();
+    if (S.selectedId === elId) renderElProps();
+  }
+
+  if (S.resizing) {
+    const { elId, handle, startX, startY, startElX, startElY, startElW, startElH, W, H } = S.resizing;
+    const el = S.elements.find(x => x.id === elId);
+    if (!el) return;
+
+    const dx = (e.clientX - startX) / W * 100;
+    const dy = (e.clientY - startY) / H * 100;
+
+    let nw = startElW, nh = startElH, nx = startElX, ny = startElY;
+
+    if (handle.includes('r')) nw = Math.max(5, startElW + dx);
+    if (handle.includes('l')) { nw = Math.max(5, startElW - dx); nx = startElX + (startElW - nw); }
+    if (handle.includes('b')) nh = Math.max(5, startElH + dy);
+    if (handle.includes('t')) { nh = Math.max(5, startElH - dy); ny = startElY + (startElH - nh); }
+
+    // Lock 16:9 AR for cam
+    if (el.lockAR && el.type === 'cam') {
+      const aspect = 16/9;
+      if (handle.includes('r') || handle.includes('l')) {
+        nh = nw / aspect * (W/H);
+      } else {
+        nw = nh * aspect * (H/W);
+      }
+    }
+
+    if (S.snapEnabled) {
+      nw = Math.round(nw / S.snapSize) * S.snapSize || S.snapSize;
+      nh = Math.round(nh / S.snapSize) * S.snapSize || S.snapSize;
+      nx = Math.round(nx / S.snapSize) * S.snapSize;
+      ny = Math.round(ny / S.snapSize) * S.snapSize;
+    }
+
+    el.w = parseFloat(nw.toFixed(1));
+    el.h = parseFloat(nh.toFixed(1));
+    el.x = parseFloat(Math.max(0, nx).toFixed(1));
+    el.y = parseFloat(Math.max(0, ny).toFixed(1));
+    renderCanvas();
+  }
 });
+
+document.addEventListener('mouseup', () => {
+  if (S.dragging || S.resizing) pushHistory();
+  S.dragging = null;
+  S.resizing = null;
+});
+
+// Deselect on canvas click
+$('canvas').addEventListener('click', () => { S.selectedId = null; renderCanvas(); renderLayerList(); renderElProps(); });
+
+// ── Keyboard Shortcuts ─────────────────────────────────────────────
+document.addEventListener('keydown', (e) => {
+  if (['INPUT','TEXTAREA'].includes(e.target.tagName)) return;
+
+  const el = S.elements.find(x => x.id === S.selectedId);
+  const step = e.shiftKey ? 5 : 1;
+
+  if (el && !el.locked) {
+    let moved = false;
+    if (e.key === 'ArrowLeft')  { el.x = Math.max(0, el.x - step); moved = true; }
+    if (e.key === 'ArrowRight') { el.x = Math.min(100 - el.w, el.x + step); moved = true; }
+    if (e.key === 'ArrowUp')    { el.y = Math.max(0, el.y - step); moved = true; }
+    if (e.key === 'ArrowDown')  { el.y = Math.min(100 - el.h, el.y + step); moved = true; }
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+      S.elements = S.elements.filter(x => x.id !== S.selectedId);
+      S.selectedId = null;
+      renderCanvas(); renderLayerList(); renderElProps(); pushHistory();
+      return;
+    }
+    if (moved) { e.preventDefault(); renderCanvas(); renderElProps(); }
+  }
+
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.shiftKey && e.key === 'z'))) { e.preventDefault(); redo(); }
+});
+
+// ── Undo / Redo ────────────────────────────────────────────────────
+function pushHistory() {
+  const snapshot = JSON.stringify(S.elements);
+  // Remove any future history if we branched
+  if (S.histIdx < S.history.length - 1) S.history = S.history.slice(0, S.histIdx + 1);
+  S.history.push(snapshot);
+  if (S.history.length > S.maxHistory) S.history.shift();
+  S.histIdx = S.history.length - 1;
+  updateHistoryBtns();
+}
+
+function undo() {
+  if (S.histIdx <= 0) return;
+  S.histIdx--;
+  S.elements = JSON.parse(S.history[S.histIdx]);
+  renderCanvas(); renderLayerList(); renderElProps(); updateHistoryBtns();
+  toast('Undo ✓', 'inf');
+}
+
+function redo() {
+  if (S.histIdx >= S.history.length - 1) return;
+  S.histIdx++;
+  S.elements = JSON.parse(S.history[S.histIdx]);
+  renderCanvas(); renderLayerList(); renderElProps(); updateHistoryBtns();
+  toast('Redo ✓', 'inf');
+}
+
+function updateHistoryBtns() {
+  $('btn-undo').disabled = S.histIdx <= 0;
+  $('btn-redo').disabled = S.histIdx >= S.history.length - 1;
+}
+
+// ── Add Elements ───────────────────────────────────────────────────
+function addCam() {
+  const camCount = S.elements.filter(e => e.type === 'cam').length;
+  S.elements.push({ id:genId(), type:'cam', x:5+camCount*30, y:5, w:25, h:28, r:6, label:`CAM ${camCount+1}`, opacity:100, blur:0, visible:true, locked:false });
+  renderCanvas(); renderLayerList(); pushHistory();
+  toast('Thêm Camera ✓', 'ok');
+}
+
+function addText() {
+  S.elements.push({ id:genId(), type:'text', x:5, y:75, w:50, h:14, r:0, label:'Lower Third', opacity:95, blur:8, visible:true, locked:false });
+  renderCanvas(); renderLayerList(); pushHistory();
+  toast('Thêm Lower Third ✓', 'ok');
+}
+
+function addTicker() {
+  if (S.elements.find(e => e.type === 'ticker')) { toast('Chỉ có thể thêm 1 ticker!', 'warn'); return; }
+  S.elements.push({ id:genId(), type:'ticker', x:0, y:88, w:100, h:8, r:0, label:'📢 Thông báo chạy ngang · Nội dung ticker · ', opacity:95, blur:0, visible:true, locked:false });
+  renderCanvas(); renderLayerList(); pushHistory();
+  toast('Thêm Ticker ✓', 'ok');
+}
+
+function addLogo() {
+  S.elements.push({ id:genId(), type:'logo', x:80, y:4, w:14, h:16, r:4, label:'⛪ LOGO', opacity:80, blur:0, visible:true, locked:false });
+  renderCanvas(); renderLayerList(); pushHistory();
+  toast('Thêm Logo ✓', 'ok');
+}
+
+// ── Scene Tree ─────────────────────────────────────────────────────
+function renderSceneTree() {
+  const tree = $('scene-tree');
+  if (!S.scenes.length) {
+    tree.innerHTML = '<div style="font-size:9px;color:var(--t4);font-family:var(--fm);padding:6px">Không tải được lộ trình</div>';
+    return;
+  }
+  tree.innerHTML = S.scenes.map(scene => `
+    <div class="scene-grp-lbl">${scene.label || scene.id}</div>
+    ${(scene.items||[]).map(item => `
+      <div class="scene-assign-item" data-scene="${scene.id}" data-item="${item.id}" id="sai-${item.id}">
+        <div class="sai-dot"></div>
+        <span class="sai-name">${item.label}</span>
+        <span class="sai-badge">${S.assignedScenes.has(item.id) ? '✓' : ''}</span>
+      </div>`).join('')}`).join('');
+
+  tree.querySelectorAll('.scene-assign-item').forEach(row => {
+    row.addEventListener('click', () => {
+      const itemId = row.dataset.item;
+      if (S.assignedScenes.has(itemId)) {
+        S.assignedScenes.delete(itemId);
+        row.classList.remove('assigned');
+        row.querySelector('.sai-badge').textContent = '';
+      } else {
+        S.assignedScenes.add(itemId);
+        row.classList.add('assigned');
+        row.querySelector('.sai-badge').textContent = '✓';
+      }
+    });
+  });
+}
+
+// ── Animation ──────────────────────────────────────────────────────
+function renderAnimPicker() {
+  $('anim-grid').innerHTML = ANIMS.map(a => `
+    <button class="anim-btn ${a.id===S.activeAnim?'active':''}" data-anim="${a.id}">${a.label}</button>`).join('');
+  $('anim-grid').querySelectorAll('.anim-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      S.activeAnim = btn.dataset.anim;
+      document.querySelectorAll('.anim-btn').forEach(b => b.classList.toggle('active', b.dataset.anim === S.activeAnim));
+    });
+  });
+}
+
+function updateAnimDurLabel() {
+  const v = $('s-animDur').value;
+  $('v-animDur').textContent = v + 'ms';
+  $('n-animDur').textContent = v;
+}
+
+// ── Animation Preview ──────────────────────────────────────────────
+$('btn-preview-anim').addEventListener('click', () => {
+  const canvas = $('canvas');
+  const els = canvas.querySelectorAll('.c-el');
+  const anim = S.activeAnim;
+  const dur = parseInt($('s-animDur').value);
+
+  els.forEach(el => {
+    el.style.transition = '';
+    const origTransform = el.style.transform;
+    const origOpacity = el.style.opacity;
+
+    if (anim === 'slide') {
+      el.style.transform = 'translateX(-60px)'; el.style.opacity = '0';
+    } else if (anim === 'fade') {
+      el.style.opacity = '0';
+    } else if (anim === 'scale') {
+      el.style.transform = 'scale(0.7)'; el.style.opacity = '0';
+    } else if (anim === 'drop') {
+      el.style.transform = 'translateY(-40px)'; el.style.opacity = '0';
+    }
+
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      el.style.transition = `transform ${dur}ms cubic-bezier(0.2,0,0,1), opacity ${dur}ms ease`;
+      el.style.transform = origTransform || '';
+      el.style.opacity = origOpacity || '';
+      setTimeout(() => el.style.transition = '', dur + 100);
+    }));
+  });
+  toast(`Preview: ${anim} (${dur}ms)`, 'inf');
+});
+
+// ── OBS Export ─────────────────────────────────────────────────────
+function generateOBSJson() {
+  const W = 1920, H = 1080;
+  const sources = S.elements.filter(e => e.visible).map((el, i) => {
+    const x = Math.round(el.x / 100 * W);
+    const y = Math.round(el.y / 100 * H);
+    const w = Math.round(el.w / 100 * W);
+    const h = Math.round(el.h / 100 * H);
+    const typeMap = { cam: 'dshow_input', text: 'text_gdiplus', ticker: 'text_gdiplus', logo: 'color_source' };
+    return {
+      name: el.label || el.type,
+      type: typeMap[el.type] || 'browser_source',
+      settings: el.type === 'text' || el.type === 'ticker' ? { text: el.label } : {},
+      transform: { x, y, cx: w, cy: h, rot: 0 }
+    };
+  });
+
+  return {
+    name: `OBSChurch - ${TPL_META[S.activeTpl]?.name || S.activeTpl}`,
+    uuid: crypto.randomUUID?.() || 'obs-church-' + Date.now(),
+    sources,
+    settings: { template: S.activeTpl, animIn: S.activeAnim }
+  };
+}
+
+$('btn-gen-obs').addEventListener('click', () => {
+  const json = generateOBSJson();
+  $('export-preview').textContent = JSON.stringify(json, null, 2).slice(0, 500) + '...';
+  toast('JSON đã tạo — bấm Download để tải', 'ok');
+});
+
+$('btn-dl-obs').addEventListener('click', () => {
+  const json = generateOBSJson();
+  const blob = new Blob([JSON.stringify(json, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `obs-church-${S.activeTpl}-${Date.now()}.json`;
+  a.click();
+  toast('Đã tải file OBS JSON ✓', 'ok');
+});
+
+// ── Snap toggle ────────────────────────────────────────────────────
+$('btn-snap').addEventListener('click', () => {
+  S.snapEnabled = !S.snapEnabled;
+  $('btn-snap').classList.toggle('active', S.snapEnabled);
+  $('c-grid').classList.toggle('snap-active', S.snapEnabled);
+  toast(S.snapEnabled ? 'Snap ON' : 'Snap OFF', 'inf');
+});
+
+// ── Gallery ────────────────────────────────────────────────────────
+$('btn-open-gallery').addEventListener('click', () => $('tpl-gallery').classList.add('open'));
+$('btn-tgl-close').addEventListener('click', () => $('tpl-gallery').classList.remove('open'));
+$('tpl-gallery').addEventListener('click', e => { if (e.target === $('tpl-gallery')) $('tpl-gallery').classList.remove('open'); });
+
+// ── Panel tabs ─────────────────────────────────────────────────────
+document.querySelectorAll('.panel-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    $('tab-layers').style.display = tab.dataset.tab === 'layers' ? '' : 'none';
+    $('tab-presets').style.display = tab.dataset.tab === 'presets' ? '' : 'none';
+    $('tab-css').style.display = tab.dataset.tab === 'css' ? '' : 'none';
+  });
+});
+
+// ── Undo/Redo buttons ──────────────────────────────────────────────
+$('btn-undo').addEventListener('click', undo);
+$('btn-redo').addEventListener('click', redo);
+
+// ── Add element buttons ────────────────────────────────────────────
+$('btn-add-cam').addEventListener('click', addCam);
+$('btn-add-text').addEventListener('click', addText);
+$('btn-add-ticker').addEventListener('click', addTicker);
+$('btn-add-logo').addEventListener('click', addLogo);
+
+// ── Assign all ────────────────────────────────────────────────────
+$('btn-assign-all').addEventListener('click', () => {
+  S.scenes.forEach(scene => (scene.items||[]).forEach(item => S.assignedScenes.add(item.id)));
+  renderSceneTree();
+  toast('Đã áp layout cho tất cả cảnh ✓', 'ok');
+});
+
+// ── Anim Duration ──────────────────────────────────────────────────
+$('s-animDur').addEventListener('input', updateAnimDurLabel);
 
 // ── Test Live ──────────────────────────────────────────────────────
 $('btn-test-live').addEventListener('click', () => {
-  syncSlidersToLayout();
-  const layout = state.layouts[state.activeTpl] || {};
-  send({
+  const layout = getCurrentLayout();
+  wsSend({
     type: 'OVERLAY_SHOW',
     payload: {
-      templateId:     state.activeTpl,
-      songName:       $('preview-text-primary').value || 'Demo Live Test',
-      speakerName:    $('preview-text-secondary').value || '',
-      announcement:   '',
-      scriptureRef:   '',
-      scriptureVerse: '',
+      templateId: S.activeTpl,
+      songName: 'Demo Live Test',
+      speakerName: 'Preview Mode',
       ...layout,
     }
   });
-  toast('Đã đẩy layout test lên Overlay live ✓', 'success');
+  toast('Đã đẩy lên Overlay Live ✓', 'ok');
 });
 
 // ── Save ───────────────────────────────────────────────────────────
 $('btn-save-layout').addEventListener('click', saveLayouts);
 
-// ── Resize observer ────────────────────────────────────────────────
-new ResizeObserver(() => updateCanvas()).observe($('canvas'));
+// ── Bind All ───────────────────────────────────────────────────────
+function bindAll() {
+  $('tpl-strip').style.background = TPL_META[S.activeTpl]?.color || '#a855f7';
+}
 
 // ── Toast ──────────────────────────────────────────────────────────
-function toast(msg, type = 'info') {
+function toast(msg, type='inf') {
   const box = $('toast-box');
   const t = document.createElement('div');
   t.className = 'toast ' + type;
   t.textContent = msg;
   box.appendChild(t);
   requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('show')));
-  setTimeout(() => {
-    t.classList.remove('show');
-    setTimeout(() => t.remove(), 250);
-  }, 2500);
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 250); }, 2500);
 }
 </script>
 </body>

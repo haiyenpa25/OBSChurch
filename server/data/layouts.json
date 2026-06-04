@@ -1,12 +1,12 @@
 {
   "clean-dark": {
-    "camX": 5,
-    "camY": 5,
+    "camX": 66,
+    "camY": 36,
     "camW": 25,
     "camH": 25,
     "camR": 8,
-    "textX": 5,
-    "textY": 80,
+    "textX": 6,
+    "textY": 77,
     "customCss": "/* Clean Dark custom styles */"
   },
   "vintage": {
