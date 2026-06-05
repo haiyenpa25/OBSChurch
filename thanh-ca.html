@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thánh Ca Online — OBSChurch Lyric Browser</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Serif+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#07070f;--surface:#0f0f1c;--card:#141428;--elevated:#1a1a32;
+      --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.04);
+      --blue:#4d8eff;--green:#4edea3;--purple:#a855f7;--amber:#fbbf24;--red:#ef4444;
+      --text1:#f0f0ff;--text2:#a0a0c0;--text3:#606080;
+      --font:'Inter',sans-serif;
+    }
+    html,body{height:100%;background:var(--bg);font-family:var(--font);color:var(--text1);overflow:hidden;-webkit-font-smoothing:antialiased}
+
+    /* ── LAYOUT ── */
+    #app{display:grid;grid-template-rows:56px 1fr;height:100%}
+
+    /* ── TOPBAR ── */
+    #topbar{
+      display:flex;align-items:center;gap:12px;padding:0 20px;
+      background:var(--surface);border-bottom:1px solid var(--border);
+      flex-shrink:0;
+    }
+    .brand{display:flex;align-items:center;gap:8px}
+    .brand-icon{font-size:22px}
+    .brand-name{font-size:15px;font-weight:800;letter-spacing:-0.02em}
+    .brand-name em{color:var(--green);font-style:normal}
+    .topbar-sep{width:1px;height:24px;background:var(--border);margin:0 4px}
+    .tb-status{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3)}
+    .tb-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+    .topbar-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+    .tb-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--text2);font-size:11px;font-family:var(--font);cursor:pointer;text-decoration:none;transition:.15s}
+    .tb-btn:hover{background:rgba(255,255,255,0.05);color:var(--text1)}
+    .tb-btn .material-symbols-outlined{font-size:14px}
+    .tb-btn.primary{background:rgba(78,222,163,0.15);border-color:rgba(78,222,163,0.4);color:var(--green)}
+
+    /* ── WORKSPACE ── */
+    #workspace{display:grid;grid-template-columns:340px 1fr 320px;overflow:hidden}
+
+    /* ── LEFT PANEL: Thư viện bài hát ── */
+    #panel-left{
+      background:var(--surface);border-right:1px solid var(--border);
+      display:flex;flex-direction:column;overflow:hidden;
+    }
+    .panel-hdr{
+      padding:12px 14px 10px;border-bottom:1px solid var(--border);flex-shrink:0;
+    }
+    .panel-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+    
+    /* Collection tabs */
+    .coll-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
+    .coll-tab{padding:4px 9px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:9px;font-family:var(--font);cursor:pointer;transition:.15s;white-space:nowrap}
+    .coll-tab.active{background:rgba(78,222,163,0.15);border-color:rgba(78,222,163,0.35);color:var(--green)}
+    .coll-tab:hover:not(.active){background:rgba(255,255,255,0.04);color:var(--text2)}
+
+    /* Search */
+    .search-box{position:relative}
+    .search-box .material-symbols-outlined{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--text3);pointer-events:none}
+    #search-input{width:100%;padding:7px 8px 7px 30px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text1);font-size:12px;font-family:var(--font);outline:none;transition:.2s}
+    #search-input:focus{border-color:rgba(78,222,163,0.4);background:var(--elevated)}
+    #search-input::placeholder{color:var(--text3)}
+
+    /* Song list */
+    #song-list{flex:1;overflow-y:auto;padding:6px 0}
+    #song-list::-webkit-scrollbar{width:4px}
+    #song-list::-webkit-scrollbar-track{background:transparent}
+    #song-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+    .song-item{
+      display:flex;align-items:center;gap:10px;padding:8px 14px;cursor:pointer;
+      border-bottom:1px solid var(--border2);transition:.12s;
+    }
+    .song-item:hover{background:rgba(255,255,255,0.04)}
+    .song-item.active{background:rgba(78,222,163,0.08);border-left:3px solid var(--green)}
+    .song-item.active{padding-left:11px}
+    .song-num{
+      min-width:28px;height:22px;border-radius:4px;background:var(--elevated);
+      font-size:9px;font-weight:700;color:var(--text3);display:flex;align-items:center;
+      justify-content:center;font-family:'Inter',monospace;flex-shrink:0;
+    }
+    .song-info{flex:1;min-width:0}
+    .song-title{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .song-meta{font-size:10px;color:var(--text3);margin-top:2px}
+    .song-key{
+      font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;
+      background:rgba(168,85,247,0.15);color:var(--purple);flex-shrink:0;
+    }
+
+    /* Load more / fetch controls */
+    .fetch-bar{padding:10px 14px;border-top:1px solid var(--border);flex-shrink:0}
+    .fetch-progress{margin-bottom:6px;font-size:10px;color:var(--text3)}
+    .progress-bar-wrap{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:6px}
+    .progress-bar{height:100%;background:var(--green);border-radius:2px;transition:width .3s}
+    .fetch-btns{display:flex;gap:5px}
+    .fetch-btn{flex:1;padding:6px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:10px;font-family:var(--font);cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:3px}
+    .fetch-btn:hover{background:rgba(255,255,255,0.06);color:var(--text1)}
+    .fetch-btn.primary{background:rgba(77,142,255,0.15);border-color:rgba(77,142,255,0.4);color:var(--blue)}
+    .fetch-btn .material-symbols-outlined{font-size:12px}
+
+    /* ── CENTER: Lời bài hát ── */
+    #panel-center{
+      display:flex;flex-direction:column;overflow:hidden;background:var(--bg);
+    }
+    .song-header{
+      padding:16px 24px 12px;border-bottom:1px solid var(--border);flex-shrink:0;
+      background:var(--surface);
+    }
+    .song-header-title{font-size:20px;font-weight:800;letter-spacing:-0.02em;margin-bottom:4px}
+    .song-header-meta{display:flex;align-items:center;gap:12px;font-size:11px;color:var(--text3)}
+    .meta-chip{display:flex;align-items:center;gap:4px}
+    .meta-chip .material-symbols-outlined{font-size:13px}
+
+    /* Sections / Lines navigator */
+    #lyrics-nav{flex:1;overflow-y:auto;padding:16px 24px}
+    #lyrics-nav::-webkit-scrollbar{width:5px}
+    #lyrics-nav::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+    .section-block{margin-bottom:20px}
+    .section-label{
+      font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+      color:var(--text3);margin-bottom:8px;display:flex;align-items:center;gap:6px;
+    }
+    .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+    .lyric-line{
+      padding:10px 16px;margin-bottom:4px;border-radius:8px;cursor:pointer;
+      border:1px solid transparent;transition:.15s;position:relative;
+      font-size:15px;font-weight:500;line-height:1.5;color:var(--text1);
+    }
+    .lyric-line:hover{background:var(--card);border-color:var(--border)}
+    .lyric-line.active{
+      background:rgba(78,222,163,0.1);border-color:rgba(78,222,163,0.3);
+      color:#fff;
+    }
+    .lyric-line.active::before{
+      content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
+      width:3px;height:60%;background:var(--green);border-radius:0 2px 2px 0;
+    }
+    .line-actions{
+      position:absolute;right:10px;top:50%;transform:translateY(-50%);
+      display:none;gap:4px;
+    }
+    .lyric-line:hover .line-actions{display:flex}
+    .line-action-btn{
+      width:26px;height:26px;border-radius:5px;border:1px solid var(--border);
+      background:var(--elevated);color:var(--text2);font-size:12px;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;transition:.12s;
+    }
+    .line-action-btn:hover{background:var(--blue);border-color:var(--blue);color:#fff}
+    .line-action-btn .material-symbols-outlined{font-size:13px}
+
+    /* Empty state */
+    .empty-state{
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      height:100%;gap:12px;text-align:center;color:var(--text3);padding:40px;
+    }
+    .empty-state .material-symbols-outlined{font-size:56px;opacity:.3}
+    .empty-state h3{font-size:16px;font-weight:600;color:var(--text2)}
+    .empty-state p{font-size:12px;line-height:1.6}
+
+    /* ── RIGHT PANEL: Preview + Controls ── */
+    #panel-right{
+      background:var(--surface);border-left:1px solid var(--border);
+      display:flex;flex-direction:column;overflow:hidden;
+    }
+    .right-section{padding:14px;border-bottom:1px solid var(--border);flex-shrink:0}
+    .rsec-title{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+
+    /* OBS Preview */
+    .obs-preview{
+      aspect-ratio:16/9;background:#000;border-radius:8px;border:1px solid var(--border);
+      overflow:hidden;position:relative;display:flex;align-items:flex-end;padding:0;
+    }
+    .preview-bg{position:absolute;inset:0;background:linear-gradient(135deg,#0a0a20 0%,#050510 100%)}
+    .preview-overlay{
+      position:relative;z-index:2;width:100%;padding:10px 14px 14px;
+      background:linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+    }
+    .preview-text{
+      font-size:13px;font-weight:700;color:#fff;line-height:1.4;
+      text-shadow:0 2px 8px rgba(0,0,0,0.9);
+    }
+    .preview-song{font-size:9px;color:rgba(255,255,255,0.5);margin-top:4px}
+    .preview-badge{
+      position:absolute;top:8px;right:8px;z-index:3;
+      background:rgba(0,0,0,0.6);border:1px solid var(--border);border-radius:4px;
+      padding:2px 7px;font-size:9px;color:var(--text3);font-family:'Inter',monospace;
+    }
+    .preview-badge.live{background:rgba(239,68,68,0.2);border-color:rgba(239,68,68,0.4);color:var(--red)}
+
+    /* Controls */
+    .ctrl-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:8px}
+    .ctrl-btn{
+      padding:7px 4px;border-radius:6px;border:1px solid var(--border);background:transparent;
+      color:var(--text2);font-size:9px;font-family:var(--font);cursor:pointer;
+      display:flex;flex-direction:column;align-items:center;gap:3px;transition:.15s;
+    }
+    .ctrl-btn .material-symbols-outlined{font-size:16px}
+    .ctrl-btn:hover{background:rgba(255,255,255,0.05);color:var(--text1)}
+    .ctrl-btn.show{background:rgba(78,222,163,0.15);border-color:rgba(78,222,163,0.4);color:var(--green)}
+    .ctrl-btn.hide{background:rgba(239,68,68,0.12);border-color:rgba(239,68,68,0.3);color:var(--red)}
+    .ctrl-btn.live{background:rgba(78,222,163,0.25);border-color:var(--green);color:var(--green);animation:livepulse 1.5s ease-in-out infinite}
+    @keyframes livepulse{0%,100%{box-shadow:0 0 0 0 rgba(78,222,163,0.4)}50%{box-shadow:0 0 0 6px transparent}}
+
+    /* Template picker */
+    .tpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+    .tpl-pill{
+      padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:transparent;
+      font-size:10px;font-family:var(--font);cursor:pointer;color:var(--text2);
+      display:flex;align-items:center;gap:5px;transition:.15s;
+    }
+    .tpl-pill.active{border-color:rgba(78,222,163,0.4);color:var(--green);background:rgba(78,222,163,0.08)}
+    .tpl-pill:hover:not(.active){background:rgba(255,255,255,0.04);color:var(--text1)}
+    .tpl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+    /* Auto-advance */
+    .auto-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+    .auto-toggle{
+      position:relative;width:32px;height:17px;cursor:pointer;flex-shrink:0;
+    }
+    .auto-toggle input{opacity:0;width:0;height:0}
+    .auto-slider{position:absolute;inset:0;background:var(--border);border-radius:10px;transition:.2s}
+    .auto-toggle input:checked+.auto-slider{background:var(--green)}
+    .auto-slider::before{
+      content:'';position:absolute;width:13px;height:13px;
+      left:2px;bottom:2px;background:#fff;border-radius:50%;transition:.2s;
+    }
+    .auto-toggle input:checked+.auto-slider::before{transform:translateX(15px)}
+    .auto-label{font-size:10px;color:var(--text2);flex:1}
+    .auto-speed{
+      width:40px;height:22px;background:var(--elevated);border:1px solid var(--border);
+      border-radius:4px;color:var(--text1);font-size:10px;text-align:center;padding:0 3px;
+    }
+
+    /* Keyboard shortcuts hint */
+    .shortcuts{padding:8px 14px;background:var(--card);border-top:1px solid var(--border);flex-shrink:0}
+    .shortcuts-title{font-size:8px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+    .kb-list{display:flex;flex-wrap:wrap;gap:4px}
+    .kb-item{display:flex;align-items:center;gap:3px;font-size:9px;color:var(--text3)}
+    kbd{background:var(--elevated);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:9px;font-family:'Inter',monospace;color:var(--text2)}
+
+    /* Toast */
+    #toast-box{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:6px}
+    .toast{padding:9px 14px;border-radius:7px;background:var(--card);border:1px solid var(--border);font-size:12px;opacity:0;transform:translateY(8px);transition:.2s}
+    .toast.show{opacity:1;transform:translateY(0)}
+    .toast.success{border-color:rgba(78,222,163,0.4);color:var(--green)}
+    .toast.info{border-color:rgba(77,142,255,0.35);color:var(--blue)}
+    .toast.warning{border-color:rgba(251,191,36,0.35);color:var(--amber)}
+
+    /* Loading overlay */
+    #loading{
+      position:fixed;inset:0;background:rgba(7,7,15,0.8);backdrop-filter:blur(4px);
+      z-index:9998;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;
+    }
+    .loading-spinner{
+      width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--green);
+      border-radius:50%;animation:spin .7s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading-msg{font-size:13px;color:var(--text2)}
+    #loading.hidden{display:none}
+
+    /* Responsive adjustments */
+    @media(max-width:900px){
+      #workspace{grid-template-columns:280px 1fr}
+      #panel-right{display:none}
+    }
+  </style>
+</head>
+<body>
+<div id="loading">
+  <div class="loading-spinner"></div>
+  <div class="loading-msg">Đang khởi động Thánh Ca Browser...</div>
+</div>
+
+<div id="app">
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <div class="brand">
+      <div class="brand-icon">🎵</div>
+      <div class="brand-name">THÁNH CA <em>ONLINE</em></div>
+    </div>
+    <div class="topbar-sep"></div>
+    <div class="tb-status">
+      <div class="tb-dot" id="ws-dot" style="background:var(--text3)"></div>
+      <span id="ws-label">Chờ kết nối...</span>
+    </div>
+    <div class="topbar-right">
+      <a href="lyrics.html" class="tb-btn">
+        <span class="material-symbols-outlined">library_music</span>Thư Viện Bài Hát
+      </a>
+      <a href="index.html" class="tb-btn">
+        <span class="material-symbols-outlined">dashboard</span>Command Center
+      </a>
+    </div>
+  </div>
+
+  <!-- WORKSPACE -->
+  <div id="workspace">
+
+    <!-- LEFT: Song Browser -->
+    <div id="panel-left">
+      <div class="panel-hdr">
+        <div class="panel-title">Tuyển Tập</div>
+        <div class="coll-tabs" id="coll-tabs">
+          <!-- populated by JS -->
+        </div>
+        <div class="search-box">
+          <span class="material-symbols-outlined">search</span>
+          <input type="text" id="search-input" placeholder="Tìm bài hát...">
+        </div>
+      </div>
+
+      <div id="song-list">
+        <div class="empty-state">
+          <span class="material-symbols-outlined">downloading</span>
+          <h3>Tải bài hát</h3>
+          <p>Bấm nút bên dưới để tải danh sách bài hát từ thanhcatinlanh.com</p>
+        </div>
+      </div>
+
+      <div class="fetch-bar">
+        <div class="fetch-progress" id="fetch-progress">Chưa tải bài nào</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+        <div class="fetch-btns">
+          <button class="fetch-btn primary" id="btn-load-catalog" onclick="loadCatalog()">
+            <span class="material-symbols-outlined">refresh</span>Tải DS
+          </button>
+          <button class="fetch-btn" id="btn-fetch-10" onclick="fetchBatch(1,20)">
+            <span class="material-symbols-outlined">download</span>Tải 1-20
+          </button>
+          <button class="fetch-btn" id="btn-fetch-all" onclick="fetchBatch(1,100)">
+            <span class="material-symbols-outlined">cloud_download</span>Tải 100
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTER: Lyrics -->
+    <div id="panel-center">
+      <div class="song-header" id="song-header" style="display:none">
+        <div class="song-header-title" id="hdr-title">—</div>
+        <div class="song-header-meta">
+          <div class="meta-chip"><span class="material-symbols-outlined">person</span><span id="hdr-author">—</span></div>
+          <div class="meta-chip"><span class="material-symbols-outlined">music_note</span><span id="hdr-key">—</span></div>
+          <div class="meta-chip"><span class="material-symbols-outlined">format_list_numbered</span><span id="hdr-number">—</span></div>
+          <div class="meta-chip"><span class="material-symbols-outlined">menu_book</span><span id="hdr-collection">—</span></div>
+        </div>
+      </div>
+
+      <div id="lyrics-nav">
+        <div class="empty-state" id="empty-center">
+          <span class="material-symbols-outlined">music_note</span>
+          <h3>Chọn bài hát</h3>
+          <p>Chọn bài hát từ danh sách bên trái để xem lời và chiếu lên màn hình</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Controls -->
+    <div id="panel-right">
+      <!-- Preview -->
+      <div class="right-section">
+        <div class="rsec-title">🎬 OBS Preview</div>
+        <div class="obs-preview">
+          <div class="preview-bg"></div>
+          <div class="preview-badge" id="preview-badge">PREVIEW</div>
+          <div class="preview-overlay">
+            <div class="preview-text" id="preview-text">Chọn một dòng để xem trước</div>
+            <div class="preview-song" id="preview-song">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="right-section">
+        <div class="rsec-title">⚡ Điều Khiển</div>
+        <div class="ctrl-grid">
+          <button class="ctrl-btn show" id="btn-show-obs" onclick="showOnOBS()">
+            <span class="material-symbols-outlined">visibility</span>Phát [F1]
+          </button>
+          <button class="ctrl-btn hide" id="btn-hide-obs" onclick="hideOnOBS()">
+            <span class="material-symbols-outlined">visibility_off</span>Tắt [F2]
+          </button>
+          <button class="ctrl-btn" id="btn-next-line" onclick="nextLine()">
+            <span class="material-symbols-outlined">skip_next</span>Tiếp [F3]
+          </button>
+        </div>
+        <div class="auto-row">
+          <label class="auto-toggle">
+            <input type="checkbox" id="auto-advance" onchange="toggleAutoAdvance()">
+            <span class="auto-slider"></span>
+          </label>
+          <span class="auto-label">Tự chuyển (giây):</span>
+          <input type="number" class="auto-speed" id="auto-speed" value="5" min="2" max="60">
+        </div>
+      </div>
+
+      <!-- Template -->
+      <div class="right-section">
+        <div class="rsec-title">🎨 Template</div>
+        <div class="tpl-grid" id="tpl-grid">
+          <button class="tpl-pill active" data-tpl="lyric-clean" onclick="setTemplate('lyric-clean',this)">
+            <div class="tpl-dot" style="background:#4edea3"></div>Clean
+          </button>
+          <button class="tpl-pill" data-tpl="lyric-dark" onclick="setTemplate('lyric-dark',this)">
+            <div class="tpl-dot" style="background:#4d8eff"></div>Dark
+          </button>
+          <button class="tpl-pill" data-tpl="lyric-minimal" onclick="setTemplate('lyric-minimal',this)">
+            <div class="tpl-dot" style="background:#a855f7"></div>Minimal
+          </button>
+          <button class="tpl-pill" data-tpl="lyric-fullscreen" onclick="setTemplate('lyric-fullscreen',this)">
+            <div class="tpl-dot" style="background:#fbbf24"></div>Fullscreen
+          </button>
+        </div>
+      </div>
+
+      <!-- Position -->
+      <div class="right-section" style="flex:1;overflow-y:auto">
+        <div class="rsec-title">📐 Vị Trí</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <label style="font-size:9px;color:var(--text3)">
+            X (%)
+            <input type="range" id="pos-x" min="0" max="90" value="5" style="width:100%;margin-top:3px" oninput="updatePos()">
+            <span id="pos-x-val" style="font-family:monospace;color:var(--text2)">5%</span>
+          </label>
+          <label style="font-size:9px;color:var(--text3)">
+            Y (%)
+            <input type="range" id="pos-y" min="0" max="90" value="75" style="width:100%;margin-top:3px" oninput="updatePos()">
+            <span id="pos-y-val" style="font-family:monospace;color:var(--text2)">75%</span>
+          </label>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">
+          <label style="font-size:9px;color:var(--text3)">
+            Cỡ chữ (px)
+            <input type="range" id="font-size" min="16" max="72" value="32" style="width:100%;margin-top:3px" oninput="updatePos()">
+            <span id="font-size-val" style="font-family:monospace;color:var(--text2)">32px</span>
+          </label>
+          <label style="font-size:9px;color:var(--text3)">
+            Màu nhấn
+            <input type="color" id="accent-color" value="#4edea3" style="width:100%;height:28px;margin-top:3px;border:1px solid var(--border);border-radius:4px;background:transparent;cursor:pointer">
+          </label>
+        </div>
+      </div>
+
+      <!-- Shortcuts -->
+      <div class="shortcuts">
+        <div class="shortcuts-title">Phím tắt</div>
+        <div class="kb-list">
+          <div class="kb-item"><kbd>↑↓</kbd>Chọn dòng</div>
+          <div class="kb-item"><kbd>Enter</kbd>Phát</div>
+          <div class="kb-item"><kbd>Esc</kbd>Tắt</div>
+          <div class="kb-item"><kbd>F1-F3</kbd>Nhanh</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast-box"></div>
+
+<script>
+/* ════════════════════════════════════════════════════
+   Thánh Ca Online Browser — OBSChurch Integration
+   ════════════════════════════════════════════════════ */
+
+const API      = 'http://localhost/OBSChurch/api/scraper.php';
+const WS_URL   = 'ws://localhost:3000';
+const API_BCAST = 'http://localhost:3000/api/broadcast';
+
+const COLLECTIONS = [
+  { id:'thanh-ca-httl-viet-nam',  label:'HTTL VN',   total:903 },
+  { id:'thanh-ca-baptist-bac-my', label:'Báp-tít BM', total:0  },
+  { id:'thanh-ca-tin-lanh-bac-my',label:'TL Bắc Mỹ', total:0  },
+  { id:'ton-vinh-chua-hang-huu',  label:'Tôn Vinh',  total:0  },
+  { id:'ca-khuc-chuc-ton',         label:'Chúc Tôn', total:0  },
+  { id:'bai-ca-moi',              label:'Bài Ca Mới', total:0  },
+];
+
+// ── State ──────────────────────────────────────────
+const state = {
+  ws: null,
+  songs: [],          // all songs in catalog
+  filteredSongs: [],
+  cachedSongs: [],    // songs with lyrics
+  currentSong: null,
+  currentLine: null,  // { sectionIdx, lineIdx }
+  currentTemplate: 'lyric-clean',
+  posX: 5, posY: 75, fontSize: 32, accentColor: '#4edea3',
+  activeCollection: 'thanh-ca-httl-viet-nam',
+  autoTimer: null,
+  overlayVisible: false,
+};
+
+// ── Init ────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  buildCollectionTabs();
+  connectWS();
+  await loadCachedSongs();
+  document.getElementById('loading').classList.add('hidden');
+  
+  // Keyboard
+  document.addEventListener('keydown', onKey);
+  
+  // Search
+  document.getElementById('search-input').addEventListener('input', filterSongs);
+});
+
+// ── Collection Tabs ──────────────────────────────────
+function buildCollectionTabs() {
+  const tabs = document.getElementById('coll-tabs');
+  COLLECTIONS.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'coll-tab' + (c.id === state.activeCollection ? ' active' : '');
+    btn.textContent = c.label;
+    btn.onclick = () => switchCollection(c.id);
+    tabs.appendChild(btn);
+  });
+}
+
+function switchCollection(id) {
+  state.activeCollection = id;
+  document.querySelectorAll('.coll-tab').forEach((b,i) => {
+    b.classList.toggle('active', COLLECTIONS[i].id === id);
+  });
+  filterSongs();
+}
+
+// ── WebSocket ─────────────────────────────────────────
+function connectWS() {
+  try {
+    state.ws = new WebSocket(WS_URL);
+    state.ws.onopen = () => {
+      document.getElementById('ws-dot').style.background = 'var(--green)';
+      document.getElementById('ws-label').textContent = 'OBS Server ✓';
+    };
+    state.ws.onclose = () => {
+      document.getElementById('ws-dot').style.background = 'var(--red)';
+      document.getElementById('ws-label').textContent = 'Mất kết nối';
+      setTimeout(connectWS, 3000);
+    };
+    state.ws.onerror = () => state.ws.close();
+  } catch(e) {}
+}
+
+function sendWS(msg) {
+  if (state.ws?.readyState === 1) {
+    state.ws.send(JSON.stringify(msg));
+    return true;
+  }
+  return false;
+}
+
+async function broadcast(msg) {
+  try {
+    await fetch(API_BCAST, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(msg),
+    });
+  } catch {}
+}
+
+// ── Load cached songs ─────────────────────────────────
+async function loadCachedSongs() {
+  try {
+    const res = await fetch(`${API}?action=list-cached`);
+    const data = await res.json();
+    state.cachedSongs = data.songs || [];
+    renderSongList(state.cachedSongs);
+    document.getElementById('fetch-progress').textContent = 
+      `Đã cache: ${state.cachedSongs.length} bài`;
+  } catch(e) {
+    console.warn('No cached songs:', e);
+  }
+}
+
+// ── Load catalog from server ──────────────────────────
+async function loadCatalog() {
+  const coll = state.activeCollection;
+  document.getElementById('fetch-progress').textContent = 'Đang tải danh sách...';
+  document.getElementById('btn-load-catalog').disabled = true;
+  
+  try {
+    const res = await fetch(`${API}?action=catalog&collection=${coll}`);
+    const data = await res.json();
+    state.songs = data.songs || [];
+    
+    document.getElementById('fetch-progress').textContent = 
+      `Catalog: ${state.songs.length} bài — Cache: ${state.cachedSongs.length} bài`;
+    
+    filterSongs();
+    toast(`Đã tải danh sách ${state.songs.length} bài`, 'success');
+  } catch(e) {
+    toast('Lỗi tải catalog!', 'warning');
+  } finally {
+    document.getElementById('btn-load-catalog').disabled = false;
+  }
+}
+
+// ── Fetch batch lyrics ────────────────────────────────
+async function fetchBatch(start, end) {
+  const coll = state.activeCollection;
+  document.getElementById('fetch-progress').textContent = `Đang tải bài ${start}-${end}...`;
+  
+  // Show loading
+  document.getElementById('progress-bar').style.width = '10%';
+  
+  try {
+    const res = await fetch(`${API}?action=batch&collection=${coll}&start=${start}&end=${end}`);
+    const data = await res.json();
+    
+    document.getElementById('progress-bar').style.width = '100%';
+    setTimeout(() => document.getElementById('progress-bar').style.width = '0%', 1000);
+    
+    await loadCachedSongs();
+    toast(`Đã tải ${data.fetched || 0} bài hát`, 'success');
+  } catch(e) {
+    toast('Lỗi khi tải batch!', 'warning');
+    document.getElementById('progress-bar').style.width = '0%';
+  }
+}
+
+// ── Render song list ──────────────────────────────────
+function filterSongs() {
+  const q = document.getElementById('search-input').value.toLowerCase().trim();
+  const coll = state.activeCollection;
+  
+  let songs = state.cachedSongs.filter(s => s.collection === coll || !coll);
+  
+  if (state.songs.length > 0) {
+    // Merge catalog + cached
+    const cachedIds = new Set(state.cachedSongs.map(s => s.id));
+    const catalogOnly = state.songs
+      .filter(s => s.collection === coll && !cachedIds.has(s.id))
+      .map(s => ({ ...s, sections: 0, cached: false }));
+    songs = [...songs.map(s => ({...s, cached: true})), ...catalogOnly];
+  }
+  
+  if (q) {
+    songs = songs.filter(s => 
+      s.title?.toLowerCase().includes(q) || 
+      String(s.number).includes(q) ||
+      s.author?.toLowerCase().includes(q)
+    );
+  }
+  
+  // Sort by number
+  songs.sort((a,b) => (a.number||0) - (b.number||0));
+  
+  state.filteredSongs = songs;
+  renderSongList(songs);
+}
+
+function renderSongList(songs) {
+  const el = document.getElementById('song-list');
+  
+  if (!songs.length) {
+    el.innerHTML = `<div class="empty-state">
+      <span class="material-symbols-outlined">search_off</span>
+      <h3>Không tìm thấy</h3>
+      <p>Hãy tải danh sách trước</p>
+    </div>`;
+    return;
+  }
+  
+  el.innerHTML = songs.map(s => `
+    <div class="song-item ${s.id === state.currentSong?.id ? 'active' : ''}" 
+         onclick="openSong('${s.id}','${s.collection || state.activeCollection}','${escapeSongTitle(s.title)}')"
+         data-id="${s.id}">
+      <div class="song-num">${s.number || '—'}</div>
+      <div class="song-info">
+        <div class="song-title">${s.title || '—'}</div>
+        <div class="song-meta">${s.author || ''} ${s.sections ? `• ${s.sections} đoạn` : ''}</div>
+      </div>
+      ${s.key ? `<div class="song-key">${s.key}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+function escapeSongTitle(t) {
+  return (t||'').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+// ── Open song ─────────────────────────────────────────
+async function openSong(id, collection, titleHint) {
+  document.getElementById('loading').classList.remove('hidden');
+  document.querySelector('.loading-msg').textContent = 'Đang tải lời bài hát...';
+  
+  try {
+    const coll = collection || state.activeCollection;
+    const res = await fetch(`${API}?action=song&slug=${encodeURIComponent(id)}&collection=${coll}`);
+    const song = await res.json();
+    
+    if (song.error) throw new Error(song.error);
+    
+    state.currentSong = song;
+    state.currentLine = null;
+    
+    renderSongDetails(song);
+    
+    // Update song list active state
+    document.querySelectorAll('.song-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.id === id);
+    });
+    
+  } catch(e) {
+    toast('Lỗi tải bài hát: ' + e.message, 'warning');
+  } finally {
+    document.getElementById('loading').classList.add('hidden');
+  }
+}
+
+function renderSongDetails(song) {
+  document.getElementById('song-header').style.display = '';
+  document.getElementById('hdr-title').textContent = song.title || '—';
+  document.getElementById('hdr-author').textContent = song.author || 'Không rõ';
+  document.getElementById('hdr-key').textContent = song.key || '—';
+  document.getElementById('hdr-number').textContent = 'Bài ' + (song.number || '—');
+  document.getElementById('hdr-collection').textContent = song.collection || '';
+  document.getElementById('empty-center').style.display = 'none';
+  
+  const nav = document.getElementById('lyrics-nav');
+  
+  if (!song.sections || song.sections.length === 0) {
+    nav.innerHTML = `<div class="empty-state">
+      <span class="material-symbols-outlined">music_off</span>
+      <h3>Không có lời bài hát</h3>
+      <p>Bài hát này chưa có lời trong hệ thống</p>
+    </div>`;
+    return;
+  }
+  
+  nav.innerHTML = song.sections.map((sec, si) => `
+    <div class="section-block" data-sec="${si}">
+      <div class="section-label">${sec.label || 'Đoạn ' + (si+1)}</div>
+      ${(sec.lines || []).map((line, li) => `
+        <div class="lyric-line" data-sec="${si}" data-line="${li}" 
+             onclick="selectLine(${si},${li})"
+             id="line-${si}-${li}">
+          ${line}
+          <div class="line-actions">
+            <button class="line-action-btn" title="Phát dòng này" onclick="event.stopPropagation();selectLine(${si},${li});showOnOBS()">
+              <span class="material-symbols-outlined">send</span>
+            </button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+// ── Line selection ────────────────────────────────────
+function selectLine(si, li) {
+  state.currentLine = { si, li };
+  
+  document.querySelectorAll('.lyric-line').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById(`line-${si}-${li}`);
+  if (el) {
+    el.classList.add('active');
+    el.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  }
+  
+  const line = state.currentSong?.sections[si]?.lines[li] || '';
+  updatePreview(line);
+}
+
+function updatePreview(text) {
+  document.getElementById('preview-text').textContent = text || '—';
+  document.getElementById('preview-song').textContent = state.currentSong?.title || '—';
+}
+
+// ── OBS Controls ──────────────────────────────────────
+function showOnOBS() {
+  if (!state.currentSong || !state.currentLine) {
+    toast('Chọn một dòng trước!', 'warning');
+    return;
+  }
+  
+  const { si, li } = state.currentLine;
+  const line = state.currentSong.sections[si]?.lines[li] || '';
+  const nextLine = state.currentSong.sections[si]?.lines[li+1] || 
+                   state.currentSong.sections[si+1]?.lines[0] || '';
+  
+  const msg = {
+    type: 'OVERLAY_SHOW',
+    payload: {
+      templateId: state.currentTemplate,
+      primary: line,
+      secondary: nextLine ? `↓ ${nextLine}` : state.currentSong.title,
+      songName: state.currentSong.title,
+      textX: state.posX,
+      textY: state.posY,
+      fontSize: state.fontSize,
+      accentColor: state.accentColor,
+    }
+  };
+  
+  if (!sendWS(msg)) broadcast(msg);
+  
+  state.overlayVisible = true;
+  document.getElementById('preview-badge').textContent = '● LIVE';
+  document.getElementById('preview-badge').className = 'preview-badge live';
+  document.getElementById('btn-show-obs').classList.add('live');
+  
+  toast(`📡 Phát: "${line.substring(0,30)}..."`, 'success');
+}
+
+function hideOnOBS() {
+  const msg = { type: 'OVERLAY_HIDE', payload: {} };
+  if (!sendWS(msg)) broadcast(msg);
+  
+  state.overlayVisible = false;
+  document.getElementById('preview-badge').textContent = 'PREVIEW';
+  document.getElementById('preview-badge').className = 'preview-badge';
+  document.getElementById('btn-show-obs').classList.remove('live');
+  toast('Overlay đã tắt', 'info');
+}
+
+function nextLine() {
+  if (!state.currentLine || !state.currentSong) return;
+  
+  const { si, li } = state.currentLine;
+  const sec = state.currentSong.sections[si];
+  
+  if (li + 1 < sec.lines.length) {
+    selectLine(si, li + 1);
+  } else if (si + 1 < state.currentSong.sections.length) {
+    selectLine(si + 1, 0);
+  } else {
+    // End of song
+    toast('Hết bài hát', 'info');
+    return;
+  }
+  
+  if (state.overlayVisible) showOnOBS();
+}
+
+// ── Template ──────────────────────────────────────────
+function setTemplate(tplId, btn) {
+  state.currentTemplate = tplId;
+  document.querySelectorAll('.tpl-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── Position ──────────────────────────────────────────
+function updatePos() {
+  state.posX = parseInt(document.getElementById('pos-x').value);
+  state.posY = parseInt(document.getElementById('pos-y').value);
+  state.fontSize = parseInt(document.getElementById('font-size').value);
+  state.accentColor = document.getElementById('accent-color').value;
+  
+  document.getElementById('pos-x-val').textContent = state.posX + '%';
+  document.getElementById('pos-y-val').textContent = state.posY + '%';
+  document.getElementById('font-size-val').textContent = state.fontSize + 'px';
+}
+
+// ── Auto advance ──────────────────────────────────────
+function toggleAutoAdvance() {
+  const on = document.getElementById('auto-advance').checked;
+  
+  if (state.autoTimer) clearInterval(state.autoTimer);
+  state.autoTimer = null;
+  
+  if (on) {
+    const secs = parseInt(document.getElementById('auto-speed').value) || 5;
+    state.autoTimer = setInterval(() => {
+      nextLine();
+    }, secs * 1000);
+    toast(`Tự chuyển mỗi ${secs}s`, 'info');
+  }
+}
+
+// ── Keyboard ──────────────────────────────────────────
+function onKey(e) {
+  if (e.target.tagName === 'INPUT') return;
+  
+  switch(e.key) {
+    case 'ArrowDown':
+    case 'j':
+      e.preventDefault();
+      nextLine(); break;
+    
+    case 'ArrowUp':
+    case 'k':
+      e.preventDefault();
+      prevLine(); break;
+    
+    case 'Enter':
+      e.preventDefault();
+      showOnOBS(); break;
+    
+    case 'Escape':
+      e.preventDefault();
+      hideOnOBS(); break;
+    
+    case 'F1':
+      e.preventDefault();
+      showOnOBS(); break;
+    
+    case 'F2':
+      e.preventDefault();
+      hideOnOBS(); break;
+    
+    case 'F3':
+      e.preventDefault();
+      nextLine(); if (state.overlayVisible) showOnOBS(); break;
+  }
+}
+
+function prevLine() {
+  if (!state.currentLine || !state.currentSong) return;
+  const { si, li } = state.currentLine;
+  
+  if (li > 0) {
+    selectLine(si, li - 1);
+  } else if (si > 0) {
+    const prevSec = state.currentSong.sections[si - 1];
+    selectLine(si - 1, prevSec.lines.length - 1);
+  }
+  
+  if (state.overlayVisible) showOnOBS();
+}
+
+// ── Toast ─────────────────────────────────────────────
+function toast(msg, type='info') {
+  const box = document.getElementById('toast-box');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  box.appendChild(t);
+  requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('show')));
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 250); }, 2500);
+}
+</script>
+</body>
+</html>
