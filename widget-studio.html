@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Widget Studio — OBSChurch</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --f:'Inter',system-ui,sans-serif;--fm:'JetBrains Mono',monospace;
+  --b0:#04040c;--b1:#08081a;--b2:#0e0e22;--b3:#141430;--b4:#1a1a3a;
+  --bd:rgba(255,255,255,0.08);--bdd:rgba(255,255,255,0.04);
+  --p:#a855f7;--pd:rgba(168,85,247,0.15);--pp:rgba(168,85,247,0.3);
+  --g:#4edea3;--gd:rgba(78,222,163,0.15);--gp:rgba(78,222,163,0.3);
+  --b:#4d8eff;--bd2:rgba(77,142,255,0.15);--bp:rgba(77,142,255,0.3);
+  --a:#fbbf24;--ad:rgba(251,191,36,0.15);
+  --r:#ef4444;--rd:rgba(239,68,68,0.15);
+  --c:#00f5ff;
+  --t1:#f0f0ff;--t2:#9090b0;--t3:#505070;--t4:#2a2a48;
+}
+html,body{height:100%;background:var(--b0);font-family:var(--f);color:var(--t1);-webkit-font-smoothing:antialiased;overflow:hidden}
+button{font-family:var(--f);cursor:pointer;border:none;background:none}
+input,select,textarea{font-family:var(--f);color:var(--t1);background:var(--b1);border:1px solid var(--bd);outline:none;border-radius:4px}
+input:focus,select:focus,textarea:focus{border-color:var(--p)}
+.ms{font-family:'Material Symbols Outlined';font-style:normal;font-size:inherit;line-height:1}
+
+/* ── SHELL ── */
+#app{display:grid;grid-template-rows:44px 1fr;height:100vh}
+
+/* ── TOPBAR ── */
+#topbar{
+  background:rgba(4,4,12,0.98);border-bottom:1px solid var(--bd);
+  backdrop-filter:blur(20px);display:flex;align-items:center;
+  padding:0 10px;gap:8px;z-index:100;
+}
+.brand{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.brand-logo{width:24px;height:24px;background:linear-gradient(135deg,var(--b),#1d4ed8);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px}
+.brand-name{font-size:11px;font-weight:800;letter-spacing:0.04em}
+.brand-name em{color:var(--b);font-style:normal}
+.tb-sep{width:1px;height:16px;background:var(--bd);flex-shrink:0}
+.tb-btn{
+  display:flex;align-items:center;gap:4px;height:24px;padding:0 9px;
+  border-radius:5px;border:1px solid var(--bd);background:transparent;
+  color:var(--t2);font-size:9px;transition:all 0.15s;text-decoration:none;
+  cursor:pointer;white-space:nowrap;flex-shrink:0
+}
+.tb-btn:hover{background:rgba(255,255,255,0.07);color:var(--t1)}
+.tb-btn .ms{font-size:12px}
+.tb-btn.primary{background:linear-gradient(135deg,#1d4ed8,var(--b));border-color:transparent;color:#fff;font-weight:600;box-shadow:0 0 8px rgba(77,142,255,0.3)}
+.tb-btn.green{background:linear-gradient(135deg,#059669,var(--g));border-color:transparent;color:#fff;font-weight:600}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:6px}
+
+/* ── WORKSPACE ── */
+#workspace{display:grid;grid-template-columns:210px 1fr 290px;overflow:hidden}
+
+/* ═══ LEFT PANEL ═══ */
+#panel-left{background:var(--b1);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
+.lp-hdr{padding:7px 10px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:5px;flex-shrink:0}
+.lp-hdr-title{font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;flex:1}
+.lp-add{height:20px;padding:0 7px;border-radius:4px;border:1px solid var(--bd);background:transparent;color:var(--t3);font-size:9px;display:flex;align-items:center;gap:2px;transition:all 0.12s;cursor:pointer}
+.lp-add:hover{background:var(--bd2);color:var(--b);border-color:var(--bp)}
+.lp-add .ms{font-size:10px}
+
+/* Categories */
+.cat-item{display:flex;align-items:center;gap:6px;padding:5px 10px;cursor:pointer;border-left:2px solid transparent;transition:all 0.1s;border-bottom:1px solid var(--bdd)}
+.cat-item:hover{background:rgba(255,255,255,0.03)}
+.cat-item.active{background:var(--pd);border-left-color:var(--p)}
+.cat-icon{font-size:14px;flex-shrink:0;width:18px;text-align:center}
+.cat-info{flex:1;min-width:0}
+.cat-name{font-size:10px;font-weight:600;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cat-count{font-size:7px;color:var(--t3);font-family:var(--fm)}
+.cat-del{width:16px;height:16px;border-radius:3px;background:transparent;color:var(--t4);display:flex;align-items:center;justify-content:center;opacity:0;transition:all 0.1s;flex-shrink:0}
+.cat-item:hover .cat-del{opacity:1}
+.cat-del:hover{background:var(--rd);color:var(--r)}
+.cat-del .ms{font-size:11px}
+#cat-list{overflow-y:auto;max-height:180px}
+#cat-list::-webkit-scrollbar{width:2px}
+#cat-list::-webkit-scrollbar-thumb{background:var(--bd)}
+
+/* Widget list */
+#widget-list{flex:1;overflow-y:auto}
+#widget-list::-webkit-scrollbar{width:2px}
+#widget-list::-webkit-scrollbar-thumb{background:var(--bd)}
+.w-item{display:flex;align-items:center;gap:7px;padding:6px 10px;cursor:pointer;border-left:2px solid transparent;transition:all 0.1s;border-bottom:1px solid var(--bdd)}
+.w-item:hover{background:rgba(255,255,255,0.03)}
+.w-item.active{background:var(--ad);border-left-color:var(--a)}
+.w-icon{font-size:16px;flex-shrink:0;width:22px;text-align:center}
+.w-info{flex:1;min-width:0}
+.w-name{font-size:10px;font-weight:600;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.w-ver{font-size:7px;color:var(--t3);font-family:var(--fm)}
+.w-del{width:16px;height:16px;border-radius:3px;background:transparent;color:var(--t4);display:flex;align-items:center;justify-content:center;opacity:0;transition:all 0.1s;flex-shrink:0}
+.w-item:hover .w-del{opacity:1}
+.w-del:hover{background:var(--rd);color:var(--r)}
+.w-del .ms{font-size:11px}
+.w-empty{padding:16px;text-align:center;font-size:9px;color:var(--t4);font-family:var(--fm)}
+
+/* ═══ CENTER: Preview ═══ */
+#panel-center{
+  background:#020208;display:flex;flex-direction:column;align-items:center;
+  justify-content:flex-start;padding:10px 16px 12px;gap:8px;
+  position:relative;overflow:hidden;
+}
+#panel-center::before{
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(77,142,255,0.02) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(77,142,255,0.02) 1px,transparent 1px);
+  background-size:40px 40px;pointer-events:none;
+}
+
+/* Preview toolbar */
+#preview-toolbar{display:flex;gap:6px;align-items:center;z-index:10;flex-shrink:0;flex-wrap:wrap}
+.pt-btn{
+  height:24px;padding:0 10px;border-radius:5px;border:1px solid var(--bd);
+  background:var(--b2);color:var(--t2);font-size:9px;display:flex;
+  align-items:center;gap:4px;cursor:pointer;transition:all 0.12s;font-family:var(--fm)
+}
+.pt-btn:hover{background:var(--b3);color:var(--t1)}
+.pt-btn .ms{font-size:12px}
+.pt-sep{width:1px;height:16px;background:var(--bd)}
+.size-lbl{font-size:9px;color:var(--t3);font-family:var(--fm)}
+#size-slider{-webkit-appearance:none;height:3px;border-radius:2px;background:var(--bd);border:none;width:80px;cursor:pointer}
+#size-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--b);cursor:pointer}
+
+/* Preview frame */
+#preview-wrap{
+  position:relative;flex-shrink:0;
+  width:var(--pw,800px);height:var(--ph,450px);
+  border:1px solid var(--bd);border-radius:6px;overflow:hidden;
+  background:#0a0a16;
+  box-shadow:0 0 0 1px rgba(255,255,255,0.03),0 16px 50px rgba(0,0,0,0.9),0 0 40px rgba(77,142,255,0.05);
+  transition:width 0.3s,height 0.3s;
+}
+.pv-label{position:absolute;top:-18px;left:0;font-size:7px;font-family:var(--fm);color:var(--t3);letter-spacing:0.06em}
+.pv-label span{color:var(--t2)}
+#preview-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at 40% 60%,rgba(20,10,40,0.7),rgba(4,4,12,1));
+}
+#preview-iframe{position:absolute;inset:0;width:100%;height:100%;border:none;background:transparent}
+#preview-empty{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:8px;color:var(--t4)
+}
+#preview-empty .bi{font-size:32px}
+#preview-empty .tx{font-size:10px;font-family:var(--fm)}
+
+/* OBS URL badge */
+#obs-url-badge{
+  background:var(--b2);border:1px solid var(--bd);border-radius:5px;
+  padding:4px 10px;font-size:8px;font-family:var(--fm);color:var(--t3);
+  z-index:10;display:flex;align-items:center;gap:6px;flex-shrink:0;max-width:100%;
+}
+#obs-url-badge .url{color:var(--b);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+#obs-url-badge .copy-btn{color:var(--t3);cursor:pointer;transition:color 0.1s}
+#obs-url-badge .copy-btn:hover{color:var(--t1)}
+
+/* ═══ RIGHT PANEL ═══ */
+#panel-right{
+  background:var(--b1);border-left:1px solid var(--bd);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+
+/* Tabs */
+.rp-tabs{display:flex;border-bottom:1px solid var(--bd);flex-shrink:0}
+.rp-tab{flex:1;height:32px;display:flex;align-items:center;justify-content:center;gap:4px;
+  font-size:9px;font-weight:600;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s}
+.rp-tab:hover{color:var(--t2)}
+.rp-tab.active{color:var(--t1);border-bottom-color:var(--b)}
+.rp-tab .ms{font-size:13px}
+
+.rp-panel{display:none;flex:1;overflow-y:auto;flex-direction:column}
+.rp-panel.active{display:flex}
+.rp-panel::-webkit-scrollbar{width:3px}
+.rp-panel::-webkit-scrollbar-thumb{background:var(--bd)}
+
+/* Empty state */
+.rp-empty{display:flex;align-items:center;justify-content:center;height:100%;
+  color:var(--t4);font-size:9px;font-family:var(--fm);flex-direction:column;gap:6px;padding:20px;text-align:center}
+.rp-empty .bi{font-size:28px}
+
+/* Props panel */
+.prop-hdr{padding:8px 12px;border-bottom:1px solid var(--bd);background:var(--b2);flex-shrink:0;display:flex;align-items:center;gap:6px}
+.prop-hdr-icon{font-size:16px}
+.prop-hdr-title{font-size:10px;font-weight:700;color:var(--t1);flex:1}
+.prop-hdr-cat{font-size:7px;color:var(--t3);font-family:var(--fm);padding:2px 6px;border-radius:8px;background:var(--b3)}
+
+.props-body{padding:10px 12px;display:flex;flex-direction:column;gap:8px;flex:1}
+.pg{display:flex;flex-direction:column;gap:5px}
+.pg-title{font-size:8px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid var(--bd);padding-bottom:3px}
+.pf{display:flex;flex-direction:column;gap:3px}
+.pf.row{flex-direction:row;align-items:center;gap:6px}
+.pl{font-size:8px;color:var(--t3);font-family:var(--fm)}
+.pi{height:26px;padding:0 8px;border-radius:5px;font-size:10px;width:100%}
+.pi.small{width:60px}
+.pi.color{width:36px;height:26px;padding:2px;cursor:pointer}
+.pi-range{-webkit-appearance:none;height:3px;border-radius:2px;background:var(--bd);border:none;flex:1;cursor:pointer}
+.pi-range::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--p);cursor:pointer}
+.rv{font-size:8px;color:var(--t3);font-family:var(--fm);width:28px;text-align:right;flex-shrink:0}
+select.pi{background:var(--b1);cursor:pointer}
+
+/* Prop action row */
+.pa-row{display:flex;gap:5px;flex-wrap:wrap}
+.pa-btn{height:24px;padding:0 10px;border-radius:5px;border:1px solid var(--bd);background:var(--b2);color:var(--t2);font-size:9px;display:flex;align-items:center;gap:4px;cursor:pointer;transition:all 0.12s}
+.pa-btn:hover{background:var(--b3);color:var(--t1)}
+.pa-btn.primary{background:var(--bd2);border-color:var(--bp);color:var(--b)}
+.pa-btn.danger{border-color:var(--rd);color:var(--r)}
+.pa-btn.danger:hover{background:var(--rd)}
+.pa-btn .ms{font-size:11px}
+
+/* Meta section in props */
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+
+/* Code editor panel */
+.code-tabs{display:flex;gap:0;border-bottom:1px solid var(--bd);flex-shrink:0}
+.code-tab{height:28px;padding:0 12px;font-size:9px;color:var(--t3);cursor:pointer;display:flex;align-items:center;gap:4px;border-bottom:2px solid transparent;transition:all 0.12s;background:transparent;border-top:none;border-left:none;border-right:1px solid var(--bd)}
+.code-tab:last-child{border-right:none}
+.code-tab.active{color:var(--t1);border-bottom-color:var(--p)}
+.code-tab:hover:not(.active){color:var(--t2)}
+.code-area{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:8px}
+.code-editor{
+  flex:1;font-family:var(--fm);font-size:10px;color:#d4d4f7;
+  background:#0a0a1a;border:1px solid var(--bd);border-radius:5px;
+  padding:8px;resize:none;line-height:1.6;tab-size:2;
+  width:100%;min-height:200px;
+}
+.code-editor:focus{border-color:var(--p)}
+.code-save-row{display:flex;gap:6px;margin-top:6px;align-items:center;flex-shrink:0}
+.code-save-info{font-size:8px;color:var(--t3);font-family:var(--fm);flex:1}
+
+/* ── Modals ── */
+.m-bg{position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);z-index:8000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s}
+.m-bg.open{opacity:1;pointer-events:all}
+.m-box{background:var(--b2);border:1px solid var(--bd);border-radius:10px;width:380px;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.9)}
+.m-hdr{padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.m-title{font-size:12px;font-weight:700}
+.m-close{color:var(--t3);font-size:16px;cursor:pointer}
+.m-body{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.m-footer{padding:10px 16px;border-top:1px solid var(--bd);display:flex;gap:6px;justify-content:flex-end}
+.m-btn{height:28px;padding:0 14px;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;border:none}
+.m-btn.p{background:linear-gradient(135deg,#1d4ed8,var(--b));color:#fff}
+.m-btn.c{background:transparent;border:1px solid var(--bd);color:var(--t2)}
+.m-lbl{font-size:9px;color:var(--t3);font-family:var(--fm)}
+
+/* ── Toast ── */
+#toast-box{position:fixed;bottom:12px;right:12px;z-index:9999;pointer-events:none;display:flex;flex-direction:column;gap:4px}
+.toast{background:var(--b3);border:1px solid var(--bd);border-radius:6px;padding:6px 10px;font-size:9px;font-family:var(--fm);color:var(--t2);opacity:0;transform:translateY(6px);transition:opacity 0.2s,transform 0.2s}
+.toast.show{opacity:1;transform:none}
+.toast.ok{border-color:rgba(78,222,163,0.35);color:var(--g)}
+.toast.err{border-color:rgba(239,68,68,0.4);color:var(--r)}
+.toast.inf{border-color:rgba(77,142,255,0.35);color:var(--b)}
+</style>
+</head>
+<body>
+<div id="toast-box"></div>
+
+<!-- Modal: New Widget -->
+<div class="m-bg" id="m-new-w">
+  <div class="m-box">
+    <div class="m-hdr">
+      <span class="m-title">🧩 Tạo Widget Mới</span>
+      <button class="m-close" onclick="closeM('m-new-w')">✕</button>
+    </div>
+    <div class="m-body">
+      <div class="pf"><label class="m-lbl">Tên widget *</label><input class="pi" id="nw-name" placeholder="Countdown Timer"></div>
+      <div class="pf"><label class="m-lbl">ID (chữ thường, dấu gạch ngang) *</label><input class="pi" id="nw-id" placeholder="countdown-timer" style="font-family:var(--fm)"></div>
+      <div class="pf row">
+        <div style="flex:1"><label class="m-lbl">Icon</label><input class="pi" id="nw-icon" placeholder="⏱" value="🧩"></div>
+        <div style="flex:1"><label class="m-lbl">Phân loại</label>
+          <select class="pi" id="nw-cat" style="height:26px"></select>
+        </div>
+      </div>
+      <div class="pf"><label class="m-lbl">Mô tả</label><input class="pi" id="nw-desc" placeholder="Mô tả ngắn về widget này"></div>
+    </div>
+    <div class="m-footer">
+      <button class="m-btn c" onclick="closeM('m-new-w')">Hủy</button>
+      <button class="m-btn p" id="nw-ok">✓ Tạo Widget</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: New Category -->
+<div class="m-bg" id="m-new-cat">
+  <div class="m-box" style="width:320px">
+    <div class="m-hdr">
+      <span class="m-title">📁 Tạo Phân Loại</span>
+      <button class="m-close" onclick="closeM('m-new-cat')">✕</button>
+    </div>
+    <div class="m-body">
+      <div class="pf"><label class="m-lbl">Tên *</label><input class="pi" id="nc-name" placeholder="Lyrics"></div>
+      <div class="pf row">
+        <div style="flex:1"><label class="m-lbl">ID *</label><input class="pi" id="nc-id" placeholder="lyrics" style="font-family:var(--fm)"></div>
+        <div><label class="m-lbl">Icon</label><input class="pi small" id="nc-icon" placeholder="🎵" value="📁"></div>
+        <div><label class="m-lbl">Màu</label><input class="pi color" id="nc-color" type="color" value="#a855f7"></div>
+      </div>
+    </div>
+    <div class="m-footer">
+      <button class="m-btn c" onclick="closeM('m-new-cat')">Hủy</button>
+      <button class="m-btn p" id="nc-ok">✓ Tạo</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="app">
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <div class="brand">
+      <div class="brand-logo">🧩</div>
+      <div class="brand-name">WIDGET <em>STUDIO</em></div>
+    </div>
+    <div class="tb-sep"></div>
+    <span id="tb-crumb" style="font-size:9px;color:var(--t3);font-family:var(--fm)">Chọn widget</span>
+    <div class="tb-right">
+      <button class="tb-btn green" id="btn-new-w"><span class="ms">add</span>Widget Mới</button>
+      <button class="tb-btn primary" id="btn-save-all"><span class="ms">save</span>Lưu tất cả</button>
+      <div class="tb-sep"></div>
+      <a href="index.html" class="tb-btn"><span class="ms">arrow_back</span>Broadcast</a>
+      <a href="scene-types.html" class="tb-btn"><span class="ms">movie_creation</span>Scene Designer</a>
+      <a href="builder.html" class="tb-btn"><span class="ms">dashboard</span>Builder</a>
+    </div>
+  </div>
+
+  <div id="workspace">
+    <!-- LEFT -->
+    <div id="panel-left">
+      <!-- Categories -->
+      <div class="lp-hdr">
+        <span class="lp-hdr-title">Phân Loại</span>
+        <button class="lp-add" id="btn-new-cat"><span class="ms">add</span>Mới</button>
+      </div>
+      <div id="cat-list"></div>
+
+      <!-- Widgets -->
+      <div class="lp-hdr" style="border-top:1px solid var(--bd)">
+        <span class="lp-hdr-title">Widgets</span>
+        <span id="widget-count" style="font-size:8px;color:var(--t4);font-family:var(--fm)"></span>
+      </div>
+      <div id="widget-list"></div>
+    </div>
+
+    <!-- CENTER: Preview -->
+    <div id="panel-center">
+      <div id="preview-toolbar">
+        <button class="pt-btn" id="btn-refresh"><span class="ms">refresh</span>Làm mới</button>
+        <div class="pt-sep"></div>
+        <span class="size-lbl">Thu nhỏ</span>
+        <input type="range" id="size-slider" min="30" max="100" value="75">
+        <span class="size-lbl">To</span>
+        <div class="pt-sep"></div>
+        <button class="pt-btn" id="btn-16-9" title="16:9"><span class="ms">crop_16_9</span>16:9</button>
+        <button class="pt-btn" id="btn-4-3" title="4:3"><span class="ms">crop</span>4:3</button>
+        <button class="pt-btn" id="btn-banner" title="Banner"><span class="ms">view_stream</span>Banner</button>
+        <div class="pt-sep"></div>
+        <button class="pt-btn" id="btn-open-obs" title="Mở OBS URL"><span class="ms">open_in_new</span>OBS</button>
+      </div>
+
+      <div id="preview-wrap">
+        <div class="pv-label">PREVIEW · <span id="pv-dim">800 × 450</span></div>
+        <div id="preview-bg"></div>
+        <iframe id="preview-iframe" scrolling="no" title="Widget Preview"></iframe>
+        <div id="preview-empty">
+          <span class="bi">🧩</span>
+          <span class="tx">Chọn widget để xem preview</span>
+        </div>
+      </div>
+
+      <!-- OBS Browser Source URL -->
+      <div id="obs-url-badge">
+        <span class="ms" style="font-size:12px;flex-shrink:0">link</span>
+        <span>OBS URL:</span>
+        <span class="url" id="obs-url-text" onclick="copyObsUrl()">—</span>
+        <button class="copy-btn" onclick="copyObsUrl()" title="Copy URL">
+          <span class="ms" style="font-size:12px">content_copy</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- RIGHT: Props & Code -->
+    <div id="panel-right">
+      <div class="rp-tabs">
+        <div class="rp-tab active" data-tab="props"><span class="ms">tune</span>Properties</div>
+        <div class="rp-tab" data-tab="code"><span class="ms">code</span>Code</div>
+        <div class="rp-tab" data-tab="meta"><span class="ms">info</span>Meta</div>
+      </div>
+
+      <!-- Props tab -->
+      <div class="rp-panel active" id="tab-props">
+        <div class="rp-empty" id="props-empty"><span class="bi">👆</span><span>Chọn widget để chỉnh sửa</span></div>
+        <div id="props-content" style="display:none;flex:1;display:none;flex-direction:column"></div>
+      </div>
+
+      <!-- Code tab -->
+      <div class="rp-panel" id="tab-code">
+        <div class="rp-empty" id="code-empty"><span class="bi">📄</span><span>Chọn widget để chỉnh sửa code</span></div>
+        <div id="code-content" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+          <div class="code-tabs">
+            <button class="code-tab active" data-ctab="html">template.html</button>
+            <button class="code-tab" data-ctab="json">widget.json</button>
+          </div>
+          <div class="code-area">
+            <textarea class="code-editor" id="code-html" spellcheck="false" placeholder="HTML code..."></textarea>
+            <textarea class="code-editor" id="code-json" spellcheck="false" placeholder="JSON meta..." style="display:none"></textarea>
+            <div class="code-save-row">
+              <span class="code-save-info" id="code-dirty-lbl"></span>
+              <button class="pa-btn primary" id="btn-save-code"><span class="ms">save</span>Lưu code</button>
+              <button class="pa-btn" id="btn-format-json" style="display:none"><span class="ms">auto_fix_high</span>Format</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Meta tab -->
+      <div class="rp-panel" id="tab-meta">
+        <div class="rp-empty" id="meta-empty"><span class="bi">ℹ️</span><span>Chọn widget để xem thông tin</span></div>
+        <div id="meta-content" style="display:none;flex-direction:column">
+          <div class="prop-hdr">
+            <span class="prop-hdr-icon" id="meta-icon"></span>
+            <span class="prop-hdr-title" id="meta-title"></span>
+            <span class="prop-hdr-cat" id="meta-cat"></span>
+          </div>
+          <div style="padding:10px 12px;display:flex;flex-direction:column;gap:8px">
+            <div class="pg">
+              <div class="pg-title">Thông Tin Cơ Bản</div>
+              <div class="pf"><label class="pl">Tên</label><input class="pi" id="m-name"></div>
+              <div class="pf"><label class="pl">Mô tả</label><input class="pi" id="m-desc"></div>
+              <div class="pf row">
+                <div style="flex:1"><label class="pl">Icon</label><input class="pi" id="m-icon"></div>
+                <div style="flex:1"><label class="pl">Phiên bản</label><input class="pi" id="m-ver"></div>
+              </div>
+              <div class="pf"><label class="pl">Phân loại</label><select class="pi" id="m-cat" style="height:26px"></select></div>
+              <div class="pf"><label class="pl">Tags (phân cách bằng dấu phẩy)</label><input class="pi" id="m-tags"></div>
+            </div>
+            <div class="pg">
+              <div class="pg-title">Kích Thước Mặc Định (%)</div>
+              <div class="pf row">
+                <label class="pl" style="width:18px">W</label><input class="pi small" id="m-dw" type="number" min="5" max="100">
+                <label class="pl" style="width:18px;margin-left:4px">H</label><input class="pi small" id="m-dh" type="number" min="5" max="100">
+              </div>
+            </div>
+            <div class="pa-row">
+              <button class="pa-btn primary" id="btn-save-meta"><span class="ms">save</span>Lưu meta</button>
+              <button class="pa-btn danger" id="btn-delete-widget"><span class="ms">delete</span>Xóa Widget</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:3000';
+const $ = id => document.getElementById(id);
+
+// ─── State ──────────────────────────────────────────
+const S = {
+  categories: [],
+  widgets: [],
+  activeCatId: null,  // null = all
+  activeWidgetId: null,
+  activeMeta: null,
+  activeProps: {},    // current prop values
+  codeHtml: '',
+  codeJson: '',
+  codeDirty: false,
+  activeCodeTab: 'html',
+  previewAR: '16-9', // '16-9', '4-3', 'banner'
+  previewScale: 75,
+};
+
+// ─── Boot ───────────────────────────────────────────
+(async function init() {
+  await Promise.all([loadCategories(), loadWidgets()]);
+  bindAll();
+  updatePreviewSize();
+})();
+
+// ─── Load ────────────────────────────────────────────
+async function loadCategories() {
+  try {
+    const r = await fetch(`${API}/api/widget-categories`);
+    const d = await r.json();
+    S.categories = d.categories || [];
+  } catch { toast('Server offline — categories', 'err'); }
+}
+
+async function loadWidgets() {
+  try {
+    const r = await fetch(`${API}/api/widgets`);
+    S.widgets = await r.json();
+  } catch { S.widgets = []; }
+}
+
+async function reloadAll() {
+  await Promise.all([loadCategories(), loadWidgets()]);
+  renderCatList();
+  renderWidgetList();
+  populateCatSelects();
+}
+
+// ─── Render Categories ───────────────────────────────
+function renderCatList() {
+  const list = $('cat-list');
+  const all = [{ id: null, label: 'Tất cả', icon: '📦', color: '#9090b0' }, ...S.categories];
+  list.innerHTML = all.map(cat => `
+    <div class="cat-item ${cat.id === S.activeCatId ? 'active' : ''}" data-catid="${cat.id || ''}">
+      <span class="cat-icon" style="color:${cat.color||'#9090b0'}">${cat.icon || '📁'}</span>
+      <div class="cat-info">
+        <div class="cat-name">${cat.label}</div>
+        <div class="cat-count">${cat.id ? S.widgets.filter(w => w.category === cat.id).length : S.widgets.length} widgets</div>
+      </div>
+      ${cat.id ? `<button class="cat-del" data-del-cat="${cat.id}"><span class="ms">close</span></button>` : ''}
+    </div>`).join('');
+
+  list.querySelectorAll('.cat-item').forEach(el => {
+    el.addEventListener('click', e => {
+      if (e.target.closest('[data-del-cat]')) return;
+      S.activeCatId = el.dataset.catid || null;
+      renderCatList();
+      renderWidgetList();
+    });
+  });
+
+  list.querySelectorAll('[data-del-cat]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const id = btn.dataset.delCat;
+      if (!confirm(`Xóa phân loại "${id}"? Các widget vẫn giữ nhưng sẽ không còn phân loại.`)) return;
+      S.categories = S.categories.filter(c => c.id !== id);
+      if (S.activeCatId === id) S.activeCatId = null;
+      saveCategories();
+      renderCatList();
+      renderWidgetList();
+    });
+  });
+}
+
+// ─── Render Widgets ──────────────────────────────────
+function renderWidgetList() {
+  const list = $('widget-list');
+  const visible = S.activeCatId
+    ? S.widgets.filter(w => w.category === S.activeCatId)
+    : S.widgets;
+
+  $('widget-count').textContent = `${visible.length}/${S.widgets.length}`;
+
+  if (!visible.length) {
+    list.innerHTML = '<div class="w-empty">Không có widget nào</div>'; return;
+  }
+
+  list.innerHTML = visible.map(w => {
+    const cat = S.categories.find(c => c.id === w.category);
+    return `
+      <div class="w-item ${w.id === S.activeWidgetId ? 'active' : ''}" data-wid="${w.id}">
+        <span class="w-icon">${w.icon || '🧩'}</span>
+        <div class="w-info">
+          <div class="w-name">${w.name}</div>
+          <div class="w-ver">${w.version || '1.0.0'} · ${cat?.label || w.category || '?'}</div>
+        </div>
+        <button class="w-del" data-del-w="${w.id}" title="Xóa"><span class="ms">close</span></button>
+      </div>`;
+  }).join('');
+
+  list.querySelectorAll('.w-item').forEach(el => {
+    el.addEventListener('click', e => {
+      if (e.target.closest('[data-del-w]')) return;
+      selectWidget(el.dataset.wid);
+    });
+  });
+
+  list.querySelectorAll('[data-del-w]').forEach(btn => {
+    btn.addEventListener('click', async e => {
+      e.stopPropagation();
+      const id = btn.dataset.delW;
+      const w = S.widgets.find(x => x.id === id);
+      if (!confirm(`Xóa widget "${w?.name || id}"? Không thể khôi phục.`)) return;
+      try {
+        await fetch(`${API}/api/widgets/${id}/delete`, { method: 'POST' });
+        if (S.activeWidgetId === id) { S.activeWidgetId = null; clearRight(); }
+        toast(`Đã xóa widget "${w?.name || id}"`, 'ok');
+        await reloadAll();
+      } catch { toast('Lỗi xóa widget!', 'err'); }
+    });
+  });
+}
+
+// ─── Select Widget ───────────────────────────────────
+async function selectWidget(id) {
+  S.activeWidgetId = id;
+  const meta = S.widgets.find(w => w.id === id);
+  S.activeMeta = meta;
+
+  // Init props with defaults
+  S.activeProps = {};
+  (meta?.props || []).forEach(p => { S.activeProps[p.key] = p.default ?? ''; });
+
+  renderCatList();
+  renderWidgetList();
+  renderProps();
+  await loadCode(id);
+  renderMeta();
+  updatePreview();
+  updateObsUrl();
+  $('tb-crumb').textContent = `${meta?.icon || ''} ${meta?.name || id}`;
+}
+
+function clearRight() {
+  $('preview-empty').style.display = 'flex';
+  $('preview-iframe').src = '';
+  $('preview-empty').style.display = 'flex';
+  $('obs-url-text').textContent = '—';
+  $('tb-crumb').textContent = 'Chọn widget';
+}
+
+// ─── Preview ─────────────────────────────────────────
+function updatePreview() {
+  const id = S.activeWidgetId;
+  if (!id) { $('preview-empty').style.display = 'flex'; return; }
+
+  $('preview-empty').style.display = 'none';
+
+  // Build URL with props injected via query string
+  const propsB64 = btoa(unescape(encodeURIComponent(JSON.stringify(S.activeProps))));
+  const url = `http://localhost/OBSChurch/widgets/${id}/template.html?__props=${propsB64}`;
+
+  // Use blob injection to set __WIDGET_PROPS before loading
+  const iframe = $('preview-iframe');
+  iframe.onload = () => {
+    try {
+      // Inject props into iframe
+      iframe.contentWindow.__WIDGET_PROPS = { ...S.activeProps };
+      if (typeof iframe.contentWindow.__widgetReload === 'function') {
+        iframe.contentWindow.__widgetReload(S.activeProps);
+      }
+    } catch {}
+  };
+
+  // Load with srcdoc trick to inject props first
+  loadPreviewWidget(id, S.activeProps);
+}
+
+async function loadPreviewWidget(id, props) {
+  try {
+    const r = await fetch(`${API}/api/widgets/${id}/template`);
+    const html = await r.text();
+
+    // Inject __WIDGET_PROPS before the script runs
+    const injected = html.replace(
+      /(<script[\s\S]*?>)/i,
+      `$1\nwindow.__WIDGET_PROPS = ${JSON.stringify(props)};\n`
+    );
+
+    const iframe = $('preview-iframe');
+    iframe.srcdoc = injected;
+  } catch { toast('Không tải được template', 'err'); }
+}
+
+function updatePreviewSize() {
+  const scale = S.previewScale / 100;
+  const arMap = { '16-9': [16,9], '4-3': [4,3], 'banner': [16,3] };
+  const [aw, ah] = arMap[S.previewAR] || [16,9];
+  const maxW = Math.min(900, window.innerWidth - 240 - 310 - 40);
+  const w = Math.round(maxW * scale);
+  const h = Math.round(w * ah / aw);
+  const wrap = $('preview-wrap');
+  wrap.style.setProperty('--pw', w + 'px');
+  wrap.style.setProperty('--ph', h + 'px');
+  wrap.style.width = w + 'px';
+  wrap.style.height = h + 'px';
+  $('pv-dim').textContent = `${w} × ${h}`;
+}
+
+function updateObsUrl() {
+  const id = S.activeWidgetId;
+  if (!id) { $('obs-url-text').textContent = '—'; return; }
+  const url = `http://localhost/OBSChurch/widgets/${id}/template.html`;
+  $('obs-url-text').textContent = url;
+}
+
+function copyObsUrl() {
+  const url = $('obs-url-text').textContent;
+  if (url === '—') return;
+  navigator.clipboard.writeText(url).then(() => toast('Đã copy URL ✓', 'ok'));
+}
+
+// ─── Props Rendering ─────────────────────────────────
+function renderProps() {
+  const empty = $('props-empty');
+  const content = $('props-content');
+  const meta = S.activeMeta;
+
+  if (!meta) { empty.style.display = 'flex'; content.style.display = 'none'; return; }
+  empty.style.display = 'none';
+  content.style.display = 'flex';
+
+  const props = meta.props || [];
+
+  content.innerHTML = `
+    <div class="prop-hdr">
+      <span class="prop-hdr-icon">${meta.icon || '🧩'}</span>
+      <span class="prop-hdr-title">${meta.name}</span>
+      <span class="prop-hdr-cat">${meta.category || '?'}</span>
+    </div>
+    <div class="props-body">
+      ${props.length ? `
+        <div class="pg">
+          <div class="pg-title">Thuộc Tính Widget</div>
+          ${props.map(p => renderPropField(p)).join('')}
+        </div>
+      ` : '<div style="font-size:9px;color:var(--t4);font-family:var(--fm);padding:4px 0">Widget này không có thuộc tính</div>'}
+      <div class="pa-row">
+        <button class="pa-btn primary" id="pa-apply"><span class="ms">play_arrow</span>Áp dụng</button>
+        <button class="pa-btn" id="pa-reset"><span class="ms">restart_alt</span>Reset</button>
+      </div>
+      <div class="pg" style="border-top:1px solid var(--bd);padding-top:8px;margin-top:4px">
+        <div class="pg-title">Kích Thước Preview</div>
+        <div class="pf row">
+          <label class="pl" style="width:18px">W%</label>
+          <input class="pi small" type="number" id="sz-w" min="5" max="100" value="${meta.defaultSize?.w || 40}">
+          <label class="pl" style="width:18px;margin-left:4px">H%</label>
+          <input class="pi small" type="number" id="sz-h" min="5" max="100" value="${meta.defaultSize?.h || 14}">
+        </div>
+      </div>
+    </div>`;
+
+  // Bind prop inputs
+  content.querySelectorAll('[data-pkey]').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const key = inp.dataset.pkey;
+      const type = inp.dataset.ptype;
+      S.activeProps[key] = type === 'number' || type === 'range' ? parseFloat(inp.value) : inp.value;
+      if (type === 'range') {
+        const rv = content.querySelector(`[data-rv="${key}"]`);
+        if (rv) rv.textContent = inp.value;
+      }
+      // Live reload into iframe
+      liveReloadPreview();
+    });
+    inp.addEventListener('change', () => {
+      if (inp.dataset.ptype === 'boolean') {
+        S.activeProps[inp.dataset.pkey] = inp.checked;
+        liveReloadPreview();
+      }
+    });
+  });
+
+  $('pa-apply')?.addEventListener('click', () => updatePreview());
+  $('pa-reset')?.addEventListener('click', () => {
+    (S.activeMeta?.props || []).forEach(p => { S.activeProps[p.key] = p.default ?? ''; });
+    renderProps();
+    updatePreview();
+  });
+}
+
+function renderPropField(p) {
+  const val = S.activeProps[p.key] ?? p.default ?? '';
+  if (p.type === 'text') return `
+    <div class="pf"><label class="pl">${p.label}</label>
+    <input class="pi" data-pkey="${p.key}" data-ptype="text" value="${escHtml(String(val))}"></div>`;
+  if (p.type === 'color') return `
+    <div class="pf row"><label class="pl" style="flex:1">${p.label}</label>
+    <input class="pi color" type="color" data-pkey="${p.key}" data-ptype="color" value="${val || '#ffffff'}"></div>`;
+  if (p.type === 'range') return `
+    <div class="pf"><label class="pl">${p.label}</label>
+    <div style="display:flex;align-items:center;gap:6px">
+      <input class="pi-range" type="range" data-pkey="${p.key}" data-ptype="range"
+        min="${p.min ?? 0}" max="${p.max ?? 100}" step="${p.step ?? 1}" value="${val}">
+      <span class="rv" data-rv="${p.key}">${val}</span>
+    </div></div>`;
+  if (p.type === 'number') return `
+    <div class="pf row"><label class="pl" style="flex:1">${p.label}</label>
+    <input class="pi small" type="number" data-pkey="${p.key}" data-ptype="number"
+      min="${p.min ?? ''}" max="${p.max ?? ''}" step="${p.step ?? 1}" value="${val}"></div>`;
+  if (p.type === 'boolean') return `
+    <div class="pf row" style="align-items:center;gap:8px">
+      <label class="pl" style="flex:1">${p.label}</label>
+      <input type="checkbox" data-pkey="${p.key}" data-ptype="boolean" ${val ? 'checked' : ''}
+        style="width:16px;height:16px;cursor:pointer;accent-color:var(--p)"></div>`;
+  if (p.type === 'select') return `
+    <div class="pf"><label class="pl">${p.label}</label>
+    <select class="pi" data-pkey="${p.key}" data-ptype="select" style="height:26px">
+      ${(p.options || []).map(o => `<option value="${o}" ${o === val ? 'selected' : ''}>${o}</option>`).join('')}
+    </select></div>`;
+  return '';
+}
+
+function liveReloadPreview() {
+  const iframe = $('preview-iframe');
+  try {
+    if (iframe.contentWindow && typeof iframe.contentWindow.__widgetReload === 'function') {
+      iframe.contentWindow.__widgetReload({ ...S.activeProps });
+    }
+  } catch { /* cross-origin */ }
+}
+
+// ─── Code Editor ─────────────────────────────────────
+async function loadCode(id) {
+  $('code-empty').style.display = 'none';
+  $('code-content').style.display = 'flex';
+  S.codeDirty = false;
+  updateCodeDirtyLabel();
+
+  try {
+    const [tplR, metaR] = await Promise.all([
+      fetch(`${API}/api/widgets/${id}/template`),
+      fetch(`${API}/api/widgets/${id}/meta`),
+    ]);
+    S.codeHtml = await tplR.text();
+    S.codeJson = await metaR.text();
+    $('code-html').value = S.codeHtml;
+    $('code-json').value = S.codeJson;
+  } catch { toast('Lỗi tải code!', 'err'); }
+}
+
+function switchCodeTab(tabId) {
+  S.activeCodeTab = tabId;
+  document.querySelectorAll('.code-tab').forEach(t => t.classList.toggle('active', t.dataset.ctab === tabId));
+  $('code-html').style.display = tabId === 'html' ? 'block' : 'none';
+  $('code-json').style.display = tabId === 'json' ? 'block' : 'none';
+  $('btn-format-json').style.display = tabId === 'json' ? 'flex' : 'none';
+}
+
+async function saveCode() {
+  const id = S.activeWidgetId;
+  if (!id) return;
+  try {
+    if (S.activeCodeTab === 'html') {
+      await fetch(`${API}/api/widgets/${id}/template`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/html' },
+        body: $('code-html').value,
+      });
+      S.codeHtml = $('code-html').value;
+      toast('Đã lưu template.html ✓', 'ok');
+    } else {
+      JSON.parse($('code-json').value); // validate
+      await fetch(`${API}/api/widgets/${id}/meta`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: $('code-json').value,
+      });
+      S.codeJson = $('code-json').value;
+      toast('Đã lưu widget.json ✓', 'ok');
+      await reloadAll();
+      if (S.activeWidgetId) selectWidget(S.activeWidgetId);
+    }
+    S.codeDirty = false;
+    updateCodeDirtyLabel();
+    updatePreview();
+  } catch(e) {
+    toast(e.message.includes('JSON') ? 'JSON không hợp lệ!' : 'Lỗi lưu!', 'err');
+  }
+}
+
+function formatJson() {
+  try {
+    const parsed = JSON.parse($('code-json').value);
+    $('code-json').value = JSON.stringify(parsed, null, 2);
+    S.codeDirty = true;
+    updateCodeDirtyLabel();
+    toast('Formatted ✓', 'ok');
+  } catch { toast('JSON không hợp lệ!', 'err'); }
+}
+
+function updateCodeDirtyLabel() {
+  $('code-dirty-lbl').textContent = S.codeDirty ? '● Có thay đổi chưa lưu' : '';
+  $('code-dirty-lbl').style.color = S.codeDirty ? 'var(--a)' : 'var(--t4)';
+}
+
+// ─── Meta Editor ─────────────────────────────────────
+function renderMeta() {
+  const meta = S.activeMeta;
+  const empty = $('meta-empty');
+  const content = $('meta-content');
+
+  if (!meta) { empty.style.display = 'flex'; content.style.display = 'none'; return; }
+  empty.style.display = 'none';
+  content.style.display = 'flex';
+
+  $('meta-icon').textContent = meta.icon || '🧩';
+  $('meta-title').textContent = meta.name;
+  $('meta-cat').textContent   = meta.category || '?';
+  $('m-name').value  = meta.name || '';
+  $('m-desc').value  = meta.description || '';
+  $('m-icon').value  = meta.icon || '';
+  $('m-ver').value   = meta.version || '1.0.0';
+  $('m-tags').value  = (meta.tags || []).join(', ');
+  $('m-dw').value    = meta.defaultSize?.w || 40;
+  $('m-dh').value    = meta.defaultSize?.h || 14;
+  populateCatSelects();
+  // Set category select
+  const mCat = $('m-cat');
+  if (mCat) mCat.value = meta.category || '';
+}
+
+async function saveMeta() {
+  const id = S.activeWidgetId;
+  const meta = S.activeMeta;
+  if (!id || !meta) return;
+
+  const updated = {
+    ...meta,
+    name:        $('m-name').value.trim() || meta.name,
+    description: $('m-desc').value.trim(),
+    icon:        $('m-icon').value.trim() || meta.icon,
+    version:     $('m-ver').value.trim() || meta.version,
+    category:    $('m-cat')?.value || meta.category,
+    tags:        $('m-tags').value.split(',').map(t => t.trim()).filter(Boolean),
+    defaultSize: { w: parseInt($('m-dw').value)||40, h: parseInt($('m-dh').value)||14 },
+  };
+
+  try {
+    await fetch(`${API}/api/widgets/${id}/meta`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updated),
+    });
+    toast('Đã lưu meta ✓', 'ok');
+    await reloadAll();
+    selectWidget(id);
+  } catch { toast('Lỗi lưu meta!', 'err'); }
+}
+
+async function deleteWidget() {
+  const id = S.activeWidgetId;
+  const w = S.activeMeta;
+  if (!id) return;
+  if (!confirm(`Xóa widget "${w?.name || id}"? Không thể khôi phục.`)) return;
+  try {
+    await fetch(`${API}/api/widgets/${id}/delete`, { method: 'POST' });
+    S.activeWidgetId = null;
+    S.activeMeta = null;
+    clearRight();
+    $('code-content').style.display = 'none';
+    $('code-empty').style.display = 'flex';
+    $('meta-content').style.display = 'none';
+    $('meta-empty').style.display = 'flex';
+    toast(`Đã xóa "${w?.name || id}" ✓`, 'ok');
+    await reloadAll();
+  } catch { toast('Lỗi xóa!', 'err'); }
+}
+
+// ─── Categories ──────────────────────────────────────
+function populateCatSelects() {
+  const selects = ['nw-cat', 'm-cat'];
+  selects.forEach(id => {
+    const sel = $(id);
+    if (!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = S.categories.map(c =>
+      `<option value="${c.id}" ${c.id === cur ? 'selected' : ''}>${c.icon} ${c.label}</option>`
+    ).join('');
+    if (cur) sel.value = cur;
+  });
+}
+
+async function saveCategories() {
+  try {
+    await fetch(`${API}/api/categories`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ categories: S.categories }),
+    });
+  } catch { toast('Lỗi lưu categories!', 'err'); }
+}
+
+// ─── Bind All ────────────────────────────────────────
+function bindAll() {
+  renderCatList();
+  renderWidgetList();
+  populateCatSelects();
+
+  // Tab switching
+  document.querySelectorAll('.rp-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.rp-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.rp-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      $(`tab-${tab.dataset.tab}`)?.classList.add('active');
+    });
+  });
+
+  // Code tabs
+  document.querySelectorAll('.code-tab').forEach(t => {
+    t.addEventListener('click', () => switchCodeTab(t.dataset.ctab));
+  });
+  $('code-html').addEventListener('input', () => { S.codeDirty = true; updateCodeDirtyLabel(); });
+  $('code-json').addEventListener('input', () => { S.codeDirty = true; updateCodeDirtyLabel(); });
+  $('btn-save-code').addEventListener('click', saveCode);
+  $('btn-format-json').addEventListener('click', formatJson);
+
+  // Preview controls
+  $('btn-refresh').addEventListener('click', () => {
+    if (S.activeWidgetId) loadPreviewWidget(S.activeWidgetId, S.activeProps);
+  });
+  $('size-slider').addEventListener('input', e => {
+    S.previewScale = parseInt(e.target.value);
+    updatePreviewSize();
+  });
+  $('btn-16-9').addEventListener('click', () => { S.previewAR = '16-9'; updatePreviewSize(); });
+  $('btn-4-3').addEventListener('click', () => { S.previewAR = '4-3'; updatePreviewSize(); });
+  $('btn-banner').addEventListener('click', () => { S.previewAR = 'banner'; updatePreviewSize(); });
+  $('btn-open-obs').addEventListener('click', () => {
+    const id = S.activeWidgetId;
+    if (id) window.open(`http://localhost/OBSChurch/widgets/${id}/template.html`, '_blank');
+  });
+
+  // New widget modal
+  $('btn-new-w').addEventListener('click', () => {
+    populateCatSelects();
+    openM('m-new-w');
+  });
+  $('nw-name').addEventListener('input', () => {
+    const slug = $('nw-name').value.trim()
+      .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+    $('nw-id').value = slug;
+  });
+  $('nw-ok').addEventListener('click', async () => {
+    const id = $('nw-id').value.trim();
+    const name = $('nw-name').value.trim();
+    if (!id || !name) { toast('Nhập đủ thông tin!', 'err'); return; }
+    try {
+      const r = await fetch(`${API}/api/widgets/new`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id, name,
+          icon: $('nw-icon').value || '🧩',
+          category: $('nw-cat').value,
+          description: $('nw-desc').value,
+        }),
+      });
+      if (r.status === 409) { toast('Widget ID đã tồn tại!', 'err'); return; }
+      if (!r.ok) throw new Error(await r.text());
+      closeM('m-new-w');
+      $('nw-name').value = ''; $('nw-id').value = ''; $('nw-desc').value = '';
+      toast(`Đã tạo widget "${name}" ✓`, 'ok');
+      await reloadAll();
+      selectWidget(id);
+    } catch(e) { toast('Lỗi tạo widget: ' + e.message, 'err'); }
+  });
+
+  // New category
+  $('btn-new-cat').addEventListener('click', () => openM('m-new-cat'));
+  $('nc-ok').addEventListener('click', () => {
+    const id = $('nc-id').value.trim();
+    const name = $('nc-name').value.trim();
+    if (!id || !name) { toast('Nhập đủ thông tin!', 'err'); return; }
+    if (S.categories.find(c => c.id === id)) { toast('ID đã tồn tại!', 'err'); return; }
+    S.categories.push({
+      id, label: name,
+      icon: $('nc-icon').value || '📁',
+      color: $('nc-color').value || '#a855f7',
+      description: '',
+    });
+    saveCategories();
+    populateCatSelects();
+    renderCatList();
+    closeM('m-new-cat');
+    $('nc-name').value = ''; $('nc-id').value = '';
+    toast(`Đã tạo phân loại "${name}" ✓`, 'ok');
+  });
+
+  // Meta actions
+  $('btn-save-meta').addEventListener('click', saveMeta);
+  $('btn-delete-widget').addEventListener('click', deleteWidget);
+
+  // Save all (categories)
+  $('btn-save-all').addEventListener('click', async () => {
+    await saveCategories();
+    if (S.activeWidgetId) await saveMeta();
+    toast('Đã lưu tất cả ✓', 'ok');
+  });
+
+  // Close modals on bg click
+  ['m-new-w','m-new-cat'].forEach(id => {
+    $(id).addEventListener('click', e => { if (e.target === $(id)) closeM(id); });
+  });
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', e => {
+    if (e.target.matches('textarea')) return; // allow tab in textarea
+    if ((e.ctrlKey||e.metaKey) && e.key === 's') { e.preventDefault(); saveCode(); }
+  });
+
+  // Textarea Tab key → indent
+  [$('code-html'), $('code-json')].forEach(ta => {
+    ta.addEventListener('keydown', e => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const s = ta.selectionStart, end = ta.selectionEnd;
+        ta.value = ta.value.substring(0,s) + '  ' + ta.value.substring(end);
+        ta.selectionStart = ta.selectionEnd = s + 2;
+      }
+    });
+  });
+
+  window.addEventListener('resize', updatePreviewSize);
+}
+
+// ─── Modals ──────────────────────────────────────────
+function openM(id) { $(id).classList.add('open'); }
+function closeM(id) { $(id).classList.remove('open'); }
+
+// ─── Utils ───────────────────────────────────────────
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function toast(msg, type='inf') {
+  const box = $('toast-box');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  box.appendChild(t);
+  requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('show')));
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 250); }, 2500);
+}
+</script>
+</body>
+</html>

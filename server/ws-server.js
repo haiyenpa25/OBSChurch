@@ -81,11 +81,25 @@ function _handleHttpRequest(req, res) {
     postMap[url](req, res); return;
   }
 
-  // /api/widgets/:id/template
+  // /api/widgets/:id/template  (GET + POST)
   const tplMatch = url.match(/^\/api\/widgets\/([\w-]+)\/template$/);
-  if (tplMatch && method === 'GET') {
-    _handleGetWidgetTemplate(tplMatch[1], res); return;
-  }
+  if (tplMatch && method === 'GET') { _handleGetWidgetTemplate(tplMatch[1], res); return; }
+  if (tplMatch && method === 'POST') { _handleSaveWidgetTemplate(tplMatch[1], req, res); return; }
+
+  // /api/widgets/:id/meta  (GET + POST)
+  const metaMatch = url.match(/^\/api\/widgets\/([\w-]+)\/meta$/);
+  if (metaMatch && method === 'GET') { _handleGetWidgetMeta(metaMatch[1], res); return; }
+  if (metaMatch && method === 'POST') { _handleSaveWidgetMeta(metaMatch[1], req, res); return; }
+
+  // /api/widgets/new  (POST) — create new widget
+  if (url === '/api/widgets/new' && method === 'POST') { _handleCreateWidget(req, res); return; }
+
+  // /api/widgets/:id/delete  (POST)
+  const delMatch = url.match(/^\/api\/widgets\/([\w-]+)\/delete$/);
+  if (delMatch && method === 'POST') { _handleDeleteWidget(delMatch[1], res); return; }
+
+  // /api/categories  (POST) — save _categories.json
+  if (url === '/api/categories' && method === 'POST') { _handleSaveJson(req, res, PATHS.categories); return; }
 
   res.writeHead(404).end('Not Found');
 }
@@ -199,6 +213,135 @@ function _handleGetWidgetTemplate(widgetId, res) {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(data);
   });
+}
+
+function _handleSaveWidgetTemplate(widgetId, req, res) {
+  const tplPath = path.join(WIDGETS_PATH, widgetId, 'template.html');
+  let body = '';
+  req.on('data', c => body += c);
+  req.on('end', () => {
+    fs.writeFile(tplPath, body, 'utf8', err => {
+      if (err) { res.writeHead(500).end('Write error'); return; }
+      _jsonOk(res, { success: true });
+    });
+  });
+}
+
+function _handleGetWidgetMeta(widgetId, res) {
+  const metaPath = path.join(WIDGETS_PATH, widgetId, 'widget.json');
+  fs.readFile(metaPath, 'utf8', (err, data) => {
+    if (err) { res.writeHead(404).end('Not Found'); return; }
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(data);
+  });
+}
+
+function _handleSaveWidgetMeta(widgetId, req, res) {
+  const metaPath = path.join(WIDGETS_PATH, widgetId, 'widget.json');
+  let body = '';
+  req.on('data', c => body += c);
+  req.on('end', () => {
+    try {
+      const parsed = JSON.parse(body);
+      fs.writeFile(metaPath, JSON.stringify(parsed, null, 2), 'utf8', err => {
+        if (err) { res.writeHead(500).end('Write error'); return; }
+        _jsonOk(res, { success: true });
+      });
+    } catch { res.writeHead(400).end('Invalid JSON'); }
+  });
+}
+
+function _handleCreateWidget(req, res) {
+  let body = '';
+  req.on('data', c => body += c);
+  req.on('end', () => {
+    try {
+      const { id, name, icon, category, description } = JSON.parse(body);
+      if (!id || !name) { res.writeHead(400).end('id and name required'); return; }
+      const widgetDir = path.join(WIDGETS_PATH, id);
+      if (fs.existsSync(widgetDir)) { res.writeHead(409).end('Widget already exists'); return; }
+      fs.mkdirSync(widgetDir, { recursive: true });
+
+      const meta = {
+        id, name, icon: icon || '🧩', version: '1.0.0',
+        author: 'OBSChurch', category: category || 'graphics',
+        description: description || '', tags: [],
+        defaultSize: { w: 40, h: 14 }, minSize: { w: 20, h: 8 },
+        resizable: true, lockAR: false,
+        props: [
+          { key: 'title', label: 'Tiêu đề', type: 'text', default: name },
+          { key: 'textColor', label: 'Màu chữ', type: 'color', default: '#ffffff' },
+          { key: 'accentColor', label: 'Màu nhấn', type: 'color', default: '#a855f7' },
+          { key: 'fontSize', label: 'Cỡ chữ (em)', type: 'number', min: 0.5, max: 5, step: 0.1, default: 1.2 },
+        ],
+      };
+
+      const template = `<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>${name}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 100%; height: 100%;
+    background: transparent;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .widget-wrap {
+    padding: 12px 20px;
+    border-left: 4px solid var(--accent, #a855f7);
+    background: rgba(0,0,0,0.75);
+    border-radius: 0 8px 8px 0;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.4s ease;
+  }
+  .widget-wrap.visible { opacity: 1; transform: none; }
+  .title {
+    font-size: var(--font-size, 1.2em);
+    font-weight: 700;
+    color: var(--text-color, #fff);
+  }
+</style>
+</head>
+<body>
+<div class="widget-wrap" id="wrap">
+  <span class="title" id="title">${name}</span>
+</div>
+<script>
+const P = window.__WIDGET_PROPS || {};
+function apply(p) {
+  document.documentElement.style.setProperty('--accent', p.accentColor || '#a855f7');
+  document.documentElement.style.setProperty('--text-color', p.textColor || '#ffffff');
+  document.documentElement.style.setProperty('--font-size', (p.fontSize || 1.2) + 'em');
+  document.getElementById('title').textContent = p.title || '${name}';
+}
+apply(P);
+setTimeout(() => document.getElementById('wrap').classList.add('visible'), 100);
+window.__widgetReload = (np) => { Object.assign(P, np); apply(P); };
+</script>
+</body>
+</html>`;
+
+      fs.writeFile(path.join(widgetDir, 'widget.json'), JSON.stringify(meta, null, 2), 'utf8', err1 => {
+        if (err1) { res.writeHead(500).end('Write meta error'); return; }
+        fs.writeFile(path.join(widgetDir, 'template.html'), template, 'utf8', err2 => {
+          if (err2) { res.writeHead(500).end('Write template error'); return; }
+          _jsonOk(res, { success: true, widget: meta });
+        });
+      });
+    } catch(e) { res.writeHead(400).end('Invalid JSON: ' + e.message); }
+  });
+}
+
+function _handleDeleteWidget(widgetId, res) {
+  const widgetDir = path.join(WIDGETS_PATH, widgetId);
+  if (!fs.existsSync(widgetDir)) { res.writeHead(404).end('Not Found'); return; }
+  fs.rmSync(widgetDir, { recursive: true, force: true });
+  _jsonOk(res, { success: true });
 }
 
 function _setCorsHeaders(res) {
