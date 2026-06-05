@@ -1,0 +1,157 @@
+<!-- OBSChurch Widget: Countdown Timer -->
+<!-- Props được inject bởi overlay engine dưới dạng biến CSS/JS -->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&family=Inter:wght@400;600;700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .w-countdown {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    font-family: 'Inter', sans-serif;
+    padding: 12px 16px;
+    background: var(--bg);
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Glow accent border top */
+  .w-countdown::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+  }
+
+  .cwd-label {
+    font-size: 11px; font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.12em;
+    opacity: 0.9; margin-bottom: 8px;
+    display: var(--show-label);
+  }
+
+  /* Digital style */
+  .cwd-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: var(--font-size);
+    font-weight: 800;
+    color: var(--color);
+    letter-spacing: 0.05em;
+    line-height: 1;
+    text-shadow: 0 0 20px rgba(255,255,255,0.15);
+  }
+
+  /* Blocks style */
+  .cwd-blocks { display: flex; gap: 8px; align-items: center; }
+  .cwd-block {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 6px 10px;
+    text-align: center;
+    min-width: 50px;
+  }
+  .cwd-block-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: calc(var(--font-size) * 0.9px);
+    font-weight: 800;
+    color: var(--color);
+    display: block;
+  }
+  .cwd-block-lbl {
+    font-size: 8px; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.1em;
+    display: block; margin-top: 3px;
+  }
+  .cwd-sep { font-size: calc(var(--font-size) * 0.8px); color: var(--accent); font-weight: 700; font-family: monospace; }
+
+  /* Minimal */
+  .cwd-minimal { font-size: calc(var(--font-size) * 0.7px); color: var(--color); font-family: monospace; font-weight: 700; }
+</style>
+
+<div class="w-countdown" id="w-root">
+  <div class="cwd-label" id="cwd-label">Buổi lễ bắt đầu sau</div>
+  <div id="cwd-display-wrap"></div>
+</div>
+
+<script>
+(function() {
+  // Props injected by overlay engine via window.__WIDGET_PROPS
+  const P = window.__WIDGET_PROPS || {
+    label: 'Buổi lễ bắt đầu sau',
+    targetTime: '09:00',
+    color: '#ffffff',
+    accentColor: '#a855f7',
+    bgColor: '#0a0a1a',
+    bgOpacity: 85,
+    fontSize: 48,
+    showSeconds: true,
+    showLabel: true,
+    style: 'digital'
+  };
+
+  const root = document.getElementById('w-root');
+  const labelEl = document.getElementById('cwd-label');
+  const wrap = document.getElementById('cwd-display-wrap');
+
+  // Apply CSS vars
+  const bg = P.bgColor || '#0a0a1a';
+  const op = (P.bgOpacity ?? 85) / 100;
+  // Convert hex to rgba
+  function hexToRgba(hex, alpha) {
+    const r = parseInt(hex.slice(1,3),16);
+    const g = parseInt(hex.slice(3,5),16);
+    const b = parseInt(hex.slice(5,7),16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+  root.style.setProperty('--color', P.color || '#fff');
+  root.style.setProperty('--accent', P.accentColor || '#a855f7');
+  root.style.setProperty('--bg', hexToRgba(bg, op));
+  root.style.setProperty('--font-size', (P.fontSize || 48) + 'px');
+  root.style.setProperty('--show-label', P.showLabel !== false ? 'block' : 'none');
+
+  labelEl.textContent = P.label || 'Buổi lễ bắt đầu sau';
+
+  // Tick function
+  function getRemaining() {
+    const now = new Date();
+    const [h, m] = (P.targetTime || '09:00').split(':').map(Number);
+    const end = new Date(now);
+    end.setHours(h, m, 0, 0);
+    if (end <= now) end.setDate(end.getDate() + 1);
+    return Math.max(0, Math.floor((end - now) / 1000));
+  }
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  const wStyle = P.style || 'digital';
+
+  function renderDisplay(diff) {
+    const hh = Math.floor(diff / 3600);
+    const mm = Math.floor((diff % 3600) / 60);
+    const ss = diff % 60;
+    const showSec = P.showSeconds !== false;
+
+    if (wStyle === 'blocks') {
+      wrap.innerHTML = `<div class="cwd-blocks">
+        <div class="cwd-block"><span class="cwd-block-num">${pad(hh)}</span><span class="cwd-block-lbl">Giờ</span></div>
+        <span class="cwd-sep">:</span>
+        <div class="cwd-block"><span class="cwd-block-num">${pad(mm)}</span><span class="cwd-block-lbl">Phút</span></div>
+        ${showSec ? `<span class="cwd-sep">:</span><div class="cwd-block"><span class="cwd-block-num">${pad(ss)}</span><span class="cwd-block-lbl">Giây</span></div>` : ''}
+      </div>`;
+    } else if (wStyle === 'minimal') {
+      wrap.innerHTML = `<div class="cwd-minimal">${pad(hh)}:${pad(mm)}${showSec?':'+pad(ss):''}</div>`;
+    } else {
+      // digital
+      wrap.innerHTML = `<div class="cwd-display">${pad(hh)}:${pad(mm)}${showSec?'<span style="color:var(--accent)">:</span>'+pad(ss):''}</div>`;
+    }
+  }
+
+  renderDisplay(getRemaining());
+  setInterval(() => renderDisplay(getRemaining()), 1000);
+})();
+</script>

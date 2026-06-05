@@ -24,6 +24,7 @@ const PORT         = 3000;
 const PING_MS      = 20_000;
 const SCENES_PATH  = path.join(__dirname, 'data', 'scenes.json');
 const LAYOUTS_PATH = path.join(__dirname, 'data', 'layouts.json');
+const WIDGETS_PATH = path.join(__dirname, '..', 'widgets');
 
 // ─── Bootstrap ───────────────────────────────────────
 const httpServer = http.createServer(_handleHttpRequest);
@@ -63,6 +64,18 @@ function _handleHttpRequest(req, res) {
   if (req.url === '/api/state' && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(appState));
+    return;
+  }
+
+  if (req.url === '/api/widgets' && req.method === 'GET') {
+    _handleGetWidgets(res);
+    return;
+  }
+
+  // /api/widgets/:id/template
+  const tplMatch = req.url.match(/^\/api\/widgets\/([\w-]+)\/template$/);
+  if (tplMatch && req.method === 'GET') {
+    _handleGetWidgetTemplate(tplMatch[1], res);
     return;
   }
 
@@ -108,6 +121,35 @@ function _handleSaveLayouts(req, res) {
     } catch (e) {
       res.writeHead(400).end('Invalid JSON');
     }
+  });
+}
+
+function _handleGetWidgets(res) {
+  fs.readdir(WIDGETS_PATH, { withFileTypes: true }, (err, entries) => {
+    if (err) { res.writeHead(200, { 'Content-Type': 'application/json' }); res.end('[]'); return; }
+    const dirs = entries.filter(e => e.isDirectory()).map(e => e.name);
+    const results = [];
+    let pending = dirs.length;
+    if (!pending) { res.writeHead(200, { 'Content-Type': 'application/json' }); res.end('[]'); return; }
+    dirs.forEach(dir => {
+      const jsonPath = path.join(WIDGETS_PATH, dir, 'widget.json');
+      fs.readFile(jsonPath, 'utf8', (err2, data) => {
+        if (!err2) { try { results.push(JSON.parse(data)); } catch(_) {} }
+        if (--pending === 0) {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify(results));
+        }
+      });
+    });
+  });
+}
+
+function _handleGetWidgetTemplate(widgetId, res) {
+  const tplPath = path.join(WIDGETS_PATH, widgetId, 'template.html');
+  fs.readFile(tplPath, 'utf8', (err, data) => {
+    if (err) { res.writeHead(404).end('Not Found'); return; }
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(data);
   });
 }
 

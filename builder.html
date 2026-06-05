@@ -506,12 +506,112 @@
     .toast.err{border-color:rgba(239,68,68,0.4);color:var(--r)}
     .toast.inf{border-color:rgba(77,142,255,0.35);color:var(--b)}
     .toast.warn{border-color:rgba(251,191,36,0.35);color:var(--a)}
+
+    /* ══ WIDGET LIBRARY MODAL ════════════════════════════════════ */
+    #widget-library{
+      position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(10px);
+      z-index:9100;display:flex;align-items:center;justify-content:center;
+      opacity:0;pointer-events:none;transition:opacity 0.2s;
+    }
+    #widget-library.open{opacity:1;pointer-events:all}
+    .wlib-box{
+      background:var(--b2);border:1px solid var(--bd);border-radius:14px;
+      width:800px;max-height:84vh;overflow:hidden;
+      box-shadow:0 24px 70px rgba(0,0,0,0.9);
+      display:flex;flex-direction:column;
+      transform:translateY(12px);transition:transform 0.2s;
+    }
+    #widget-library.open .wlib-box{transform:translateY(0)}
+    .wlib-hdr{
+      padding:14px 18px;border-bottom:1px solid var(--bd);
+      display:flex;align-items:center;gap:12px;
+    }
+    .wlib-title{font-size:14px;font-weight:800;flex:1}
+    .wlib-title em{color:var(--g);font-style:normal}
+    .wlib-search{
+      flex:1;max-width:220px;height:28px;padding:0 10px;
+      border-radius:6px;border:1px solid var(--bd);
+      background:var(--b0);color:var(--t1);font-size:11px;
+    }
+    .wlib-search:focus{outline:none;border-color:var(--g)}
+    .wlib-close{background:none;border:none;color:var(--t3);cursor:pointer;font-size:18px}
+    .wlib-cats{
+      display:flex;gap:6px;padding:10px 18px;
+      border-bottom:1px solid var(--bd);flex-shrink:0;
+    }
+    .wlib-cat{
+      height:24px;padding:0 12px;border-radius:12px;
+      border:1px solid var(--bd);background:transparent;
+      color:var(--t3);font-size:10px;font-family:var(--fm);
+      cursor:pointer;transition:all 0.12s;
+    }
+    .wlib-cat:hover{background:rgba(255,255,255,0.06);color:var(--t1)}
+    .wlib-cat.active{background:var(--gd);border-color:rgba(78,222,163,0.35);color:var(--g)}
+    .wlib-grid{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+      padding:16px;overflow-y:auto;flex:1;
+    }
+    .wlib-grid::-webkit-scrollbar{width:4px}
+    .wlib-grid::-webkit-scrollbar-thumb{background:var(--bd);border-radius:4px}
+    .wcard{
+      background:var(--b1);border:1px solid var(--bd);border-radius:10px;
+      overflow:hidden;cursor:pointer;transition:all 0.15s;
+      display:flex;flex-direction:column;
+    }
+    .wcard:hover{transform:translateY(-2px);border-color:rgba(255,255,255,0.15);box-shadow:0 8px 24px rgba(0,0,0,0.5)}
+    .wcard-preview{
+      width:100%;aspect-ratio:16/9;
+      background:var(--b0);position:relative;overflow:hidden;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .wcard-icon{font-size:32px;opacity:0.8}
+    .wcard-cat-badge{
+      position:absolute;top:6px;right:6px;
+      background:rgba(0,0,0,0.6);border:1px solid var(--bd);
+      border-radius:10px;padding:1px 7px;
+      font-size:8px;font-family:var(--fm);color:var(--t3);
+    }
+    .wcard-meta{padding:10px 12px;flex:1}
+    .wcard-name{font-size:12px;font-weight:700;display:block;margin-bottom:3px}
+    .wcard-desc{font-size:9px;color:var(--t3);font-family:var(--fm);line-height:1.4}
+    .wcard-props{
+      padding:6px 12px 10px;
+      display:flex;gap:4px;flex-wrap:wrap;
+    }
+    .wcard-prop-tag{
+      background:var(--b3);border:1px solid var(--bd);
+      border-radius:8px;padding:1px 6px;
+      font-size:8px;font-family:var(--fm);color:var(--t3);
+    }
+    .wlib-empty{
+      grid-column:1/-1;text-align:center;
+      padding:40px;color:var(--t4);
+      font-size:12px;font-family:var(--fm);
+    }
+    /* Widget element on canvas */
+    .c-widget{
+      background:rgba(15,10,30,0.85);
+      border:2px solid var(--p);border-radius:6px;
+      display:flex;align-items:center;justify-content:center;
+      position:relative;overflow:hidden;
+    }
+    .c-widget.selected{box-shadow:0 0 0 2px var(--p),0 0 20px rgba(168,85,247,0.3)}
+    .c-widget-iframe{
+      width:100%;height:100%;
+      border:none;pointer-events:none;
+      border-radius:4px;
+    }
+    .c-widget-placeholder{
+      display:flex;flex-direction:column;align-items:center;gap:6px;
+      color:rgba(168,85,247,0.6);font-size:10px;font-family:var(--fm);
+    }
+    .c-widget-placeholder .wi-icon{font-size:28px;display:block}
+    .c-widget-placeholder .wi-name{font-size:9px;letter-spacing:0.08em;text-transform:uppercase}
   </style>
 </head>
 <body>
 <div id="toast-box"></div>
 
-<!-- Template Gallery Modal -->
 <div id="tpl-gallery">
   <div class="tpl-gallery-box">
     <div class="tgl-hdr">
@@ -520,6 +620,26 @@
     </div>
     <div class="tgl-grid" id="tgl-grid">
       <!-- rendered by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- Widget Library Modal -->
+<div id="widget-library">
+  <div class="wlib-box">
+    <div class="wlib-hdr">
+      <span class="wlib-title">🧩 <em>Widget</em> Library</span>
+      <input class="wlib-search" id="wlib-search" type="text" placeholder="Tìm widget..." />
+      <button class="wlib-close" id="btn-wlib-close">✕</button>
+    </div>
+    <div class="wlib-cats" id="wlib-cats">
+      <button class="wlib-cat active" data-cat="all">Tất cả</button>
+      <button class="wlib-cat" data-cat="timing">⏱ Thời gian</button>
+      <button class="wlib-cat" data-cat="text">📝 Văn bản</button>
+      <button class="wlib-cat" data-cat="media">🖼 Media</button>
+    </div>
+    <div class="wlib-grid" id="wlib-grid">
+      <div class="wlib-empty">Đang tải widget...</div>
     </div>
   </div>
 </div>
@@ -562,6 +682,9 @@
       </button>
       <button class="tb-btn" id="btn-add-logo">
         <span class="ms">shield</span>Logo
+      </button>
+      <button class="tb-btn green" id="btn-open-widgets" style="font-weight:700">
+        <span class="ms">extension</span>+ Widget
       </button>
 
       <div class="topbar-sep"></div>
@@ -751,6 +874,7 @@
  ═══════════════════════════════════════════════════════════════════ */
 const API_LAYOUTS = 'http://localhost:3000/api/layouts';
 const API_SCENES  = 'http://localhost:3000/api/scenes';
+const API_WIDGETS = 'http://localhost:3000/api/widgets';
 const WS_URL      = 'ws://localhost:3000';
 
 // ── Utils ──────────────────────────────────────────────────────────
@@ -761,18 +885,19 @@ const ms = name => { const s = document.createElement('span'); s.className = 'ms
 const S = {
   ws: null,
   activeTpl: 'clean-dark',
-  layouts: {},       // { tplId: { elements:[], animIn:'slide', animDur:600, customCss:'' } }
+  layouts: {},
   scenes: [],
+  widgets: [],       // loaded from /api/widgets
   assignedScenes: new Set(),
-  elements: [],      // [{ id, type, x, y, w, h, r, label, opacity, blur, visible, locked, animEl }]
+  elements: [],
   selectedId: null,
   snapEnabled: true,
-  snapSize: 5,       // % grid
+  snapSize: 5,
   history: [],
   histIdx: -1,
   maxHistory: 30,
-  dragging: null,    // { elId, startX, startY, startElX, startElY }
-  resizing: null,    // { elId, handle, startX, startY, ... }
+  dragging: null,
+  resizing: null,
   activeAnim: 'slide',
 };
 
@@ -853,6 +978,7 @@ const ANIMS = [
   renderAnimPicker();
   await loadLayouts();
   await loadScenes();
+  await loadWidgets();       // ← Load widget library
   applyPreset(PRESETS[0], false);
   pushHistory();
   bindAll();
@@ -1692,10 +1818,297 @@ $('btn-test-live').addEventListener('click', () => {
 // ── Save ───────────────────────────────────────────────────────────
 $('btn-save-layout').addEventListener('click', saveLayouts);
 
+// ── Widget Library ─────────────────────────────────────────────────
+async function loadWidgets() {
+  try {
+    const r = await fetch(API_WIDGETS);
+    if (!r.ok) throw new Error();
+    S.widgets = await r.json();
+    renderWidgetLibrary('all', '');
+  } catch(_) {
+    S.widgets = [];
+    renderWidgetLibrary('all', '');
+  }
+}
+
+function renderWidgetLibrary(cat = 'all', query = '') {
+  const grid = $('wlib-grid');
+  const filtered = S.widgets.filter(w => {
+    const matchCat   = cat === 'all' || w.category === cat;
+    const matchQuery = !query || w.name.toLowerCase().includes(query) || (w.description||'').toLowerCase().includes(query) || (w.tags||[]).some(t => t.includes(query));
+    return matchCat && matchQuery;
+  });
+
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="wlib-empty">${S.widgets.length ? 'Không tìm thấy widget phù hợp' : 'Chưa có widget — đặt file vào /widgets/'}</div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(w => `
+    <div class="wcard" data-wid="${w.id}" title="${w.description || ''}">
+      <div class="wcard-preview">
+        <span class="wcard-icon">${w.icon || '🧩'}</span>
+        <span class="wcard-cat-badge">${w.category || 'widget'}</span>
+      </div>
+      <div class="wcard-meta">
+        <span class="wcard-name">${w.name}</span>
+        <span class="wcard-desc">${w.description || ''}</span>
+      </div>
+      <div class="wcard-props">
+        ${(w.props || []).slice(0,4).map(p => `<span class="wcard-prop-tag">${p.label}</span>`).join('')}
+        ${(w.props||[]).length > 4 ? `<span class="wcard-prop-tag">+${(w.props||[]).length - 4}</span>` : ''}
+      </div>
+    </div>`).join('');
+
+  grid.querySelectorAll('.wcard').forEach(card => {
+    card.addEventListener('click', () => {
+      const wid = card.dataset.wid;
+      const wdef = S.widgets.find(w => w.id === wid);
+      if (wdef) {
+        addWidgetElement(wdef);
+        $('widget-library').classList.remove('open');
+        toast(`Thêm widget: ${wdef.name} ✓`, 'ok');
+      }
+    });
+  });
+}
+
+function addWidgetElement(wdef) {
+  // Build default props from widget.json
+  const defaultProps = {};
+  (wdef.props || []).forEach(p => { defaultProps[p.key] = p.default ?? ''; });
+
+  const el = {
+    id: genId(),
+    type: 'widget',
+    widgetId: wdef.id,
+    widgetName: wdef.name,
+    widgetIcon: wdef.icon || '🧩',
+    props: defaultProps,
+    propDefs: wdef.props || [],
+    x: 5, y: 5,
+    w: wdef.defaultSize?.w || 25,
+    h: wdef.defaultSize?.h || 20,
+    r: 6,
+    label: wdef.name,
+    opacity: 100,
+    blur: 0,
+    visible: true,
+    locked: false,
+    resizable: wdef.resizable !== false,
+    lockAR: wdef.lockAR || false,
+  };
+  S.elements.push(el);
+  S.selectedId = el.id;
+  renderCanvas();
+  renderLayerList();
+  renderElProps();
+  pushHistory();
+}
+
+// Widget element canvas rendering (add to createElDom)
+const _origCreateElDom = createElDom;
+// Override createElDom to handle 'widget' type
+const _createElDomOrig = createElDom;
+window._createElDomWidget = function(el, W, H) {
+  const div = document.createElement('div');
+  div.className = 'c-el c-widget';
+  div.dataset.id = el.id;
+  div.style.left   = (el.x / 100 * W) + 'px';
+  div.style.top    = (el.y / 100 * H) + 'px';
+  div.style.width  = (el.w / 100 * W) + 'px';
+  div.style.height = (el.h / 100 * H) + 'px';
+  div.style.borderRadius = (el.r || 6) + 'px';
+  div.style.opacity = (el.opacity ?? 100) / 100;
+  if (el.id === S.selectedId) div.classList.add('selected');
+  if (el.locked) div.style.cursor = 'default';
+
+  // Placeholder view (iframe would need srcdoc — use placeholder for builder preview)
+  div.innerHTML = `
+    <div class="c-widget-placeholder">
+      <span class="wi-icon">${el.widgetIcon || '🧩'}</span>
+      <span class="wi-name">${el.widgetName || el.widgetId}</span>
+    </div>`;
+
+  // Resize handles
+  ['tl','tr','bl','br'].forEach(pos => {
+    const h = document.createElement('span');
+    h.className = `rh text ${pos}`;
+    h.dataset.handle = pos;
+    div.appendChild(h);
+  });
+
+  if (!el.locked) div.addEventListener('mousedown', onElMouseDown);
+  div.addEventListener('click', e => { e.stopPropagation(); selectEl(el.id); });
+  return div;
+};
+
+// Widget prop form in Element Properties
+const _origRenderElProps = renderElProps;
+function renderElProps() {
+  const el = S.elements.find(e => e.id === S.selectedId);
+  if (el?.type === 'widget') {
+    renderWidgetElProps(el);
+    return;
+  }
+  _origRenderElProps();
+}
+
+function renderWidgetElProps(el) {
+  const propsDiv = $('el-props');
+  const propDefs = el.propDefs || [];
+
+  const fieldsHtml = propDefs.map(p => {
+    const val = el.props?.[p.key] ?? p.default ?? '';
+    let inputHtml = '';
+    if (p.type === 'text' || p.type === 'url') {
+      inputHtml = `<input class="finput wp-inp" type="text" data-key="${p.key}" value="${String(val).replace(/"/g,'&quot;')}" placeholder="${p.default||''}" />`;
+    } else if (p.type === 'textarea') {
+      inputHtml = `<textarea class="finput wp-inp" data-key="${p.key}" rows="3">${val}</textarea>`;
+    } else if (p.type === 'number') {
+      inputHtml = `<input class="finput wp-inp" type="number" data-key="${p.key}" value="${val}" />`;
+    } else if (p.type === 'range') {
+      inputHtml = `<div class="srow"><input type="range" class="finput wp-inp" data-key="${p.key}" min="${p.min||0}" max="${p.max||100}" step="${p.step||1}" value="${val}" /><span class="snum" id="wpr-${p.key}">${val}</span></div>`;
+    } else if (p.type === 'color') {
+      inputHtml = `<input class="finput wp-inp" type="color" data-key="${p.key}" value="${val}" style="height:32px;padding:2px" />`;
+    } else if (p.type === 'boolean') {
+      inputHtml = `<label class="checkbox-row wp-inp-bool" data-key="${p.key}"><input type="checkbox" ${val?'checked':''} /><span>${p.label}</span></label>`;
+    } else if (p.type === 'select') {
+      const opts = (p.options||[]).map(o => `<option value="${o}" ${o===val?'selected':''}>${o}</option>`).join('');
+      inputHtml = `<select class="finput wp-inp" data-key="${p.key}">${opts}</select>`;
+    } else if (p.type === 'time') {
+      inputHtml = `<input class="finput wp-inp" type="time" data-key="${p.key}" value="${val}" />`;
+    } else {
+      inputHtml = `<input class="finput wp-inp" type="text" data-key="${p.key}" value="${val}" />`;
+    }
+
+    if (p.type === 'boolean') return `<div class="fld">${inputHtml}</div>`;
+    return `<div class="fld"><label class="flbl">${p.label}</label>${inputHtml}</div>`;
+  }).join('');
+
+  propsDiv.innerHTML = `
+    <div class="prop-section">
+      <div class="prop-hdr">
+        <div class="prop-hdr-icon p" style="font-size:14px">${el.widgetIcon}</div>
+        <span class="prop-hdr-title">${el.widgetName}</span>
+        <span style="font-size:8px;color:var(--g);font-family:var(--fm)">WIDGET</span>
+      </div>
+      <div class="prop-body">
+        <div class="fld">
+          <label class="flbl">X <span class="flbl-val" id="wp-xv">${el.x}%</span></label>
+          <div class="srow"><input type="range" class="finput" id="wp-x" min="0" max="90" value="${el.x}" /><span class="snum">${el.x}%</span></div>
+        </div>
+        <div class="fld">
+          <label class="flbl">Y <span class="flbl-val" id="wp-yv">${el.y}%</span></label>
+          <div class="srow"><input type="range" class="finput" id="wp-y" min="0" max="90" value="${el.y}" /><span class="snum">${el.y}%</span></div>
+        </div>
+        <div class="frow">
+          <div class="fld"><label class="flbl">Rộng <span class="flbl-val" id="wp-wv">${el.w}%</span></label><div class="srow"><input type="range" class="finput" id="wp-w" min="5" max="100" value="${el.w}" /><span class="snum">${el.w}%</span></div></div>
+          <div class="fld"><label class="flbl">Cao <span class="flbl-val" id="wp-hv">${el.h}%</span></label><div class="srow"><input type="range" class="finput" id="wp-h" min="5" max="100" value="${el.h}" /><span class="snum">${el.h}%</span></div></div>
+        </div>
+        <hr style="border-color:var(--bd);margin:4px 0" />
+        ${fieldsHtml}
+        <div class="fld">
+          <label class="flbl">Opacity <span class="flbl-val" id="wp-opv">${el.opacity}%</span></label>
+          <div class="srow"><input type="range" class="finput" id="wp-op" min="0" max="100" value="${el.opacity}" /><span class="snum">${el.opacity}%</span></div>
+        </div>
+      </div>
+    </div>`;
+
+  // Bind position sliders
+  ['x','y','w','h'].forEach(k => {
+    const inp = $(`wp-${k}`);
+    if (!inp) return;
+    inp.addEventListener('input', () => {
+      el[k] = parseFloat(inp.value);
+      $(`wp-${k}v`).textContent = inp.value + '%';
+      renderCanvas();
+    });
+    inp.addEventListener('change', pushHistory);
+  });
+  $('wp-op').addEventListener('input', () => { el.opacity = parseFloat($('wp-op').value); $('wp-opv').textContent = $('wp-op').value + '%'; renderCanvas(); });
+  $('wp-op').addEventListener('change', pushHistory);
+
+  // Bind widget props
+  propsDiv.querySelectorAll('.wp-inp').forEach(inp => {
+    const key = inp.dataset.key;
+    if (!key) return;
+    const pdef = propDefs.find(p => p.key === key);
+    const ev = inp.type === 'range' ? 'input' : 'change';
+    inp.addEventListener(ev, () => {
+      let v = inp.type === 'checkbox' ? inp.checked : inp.type === 'range' ? parseFloat(inp.value) : inp.value;
+      el.props[key] = v;
+      if (inp.type === 'range') {
+        const numEl = $(`wpr-${key}`);
+        if (numEl) numEl.textContent = inp.value;
+      }
+    });
+    inp.addEventListener('change', pushHistory);
+  });
+  propsDiv.querySelectorAll('.wp-inp-bool input').forEach(cb => {
+    const key = cb.closest('[data-key]')?.dataset.key;
+    if (!key) return;
+    cb.addEventListener('change', () => { el.props[key] = cb.checked; pushHistory(); });
+  });
+}
+
+// Patch createElDom to support 'widget' type
+const _origCreateElDomRef = createElDom;
+window._origCreateElDomRef = createElDom;
+
+// Monkey-patch renderCanvas to handle widget type
+const _origRenderCanvas = renderCanvas;
+function renderCanvas() {
+  const canvas = $('canvas');
+  const W = canvas.offsetWidth, H = canvas.offsetHeight;
+  if (!W || !H) return;
+  canvas.querySelectorAll('.c-el').forEach(el => el.remove());
+  $('c-grid').classList.toggle('snap-active', S.snapEnabled);
+
+  S.elements.forEach(el => {
+    if (!el.visible) return;
+    let dom;
+    if (el.type === 'widget') {
+      dom = window._createElDomWidget(el, W, H);
+    } else {
+      dom = createElDomBase(el, W, H);
+    }
+    canvas.appendChild(dom);
+  });
+}
+
+// Rename original createElDom to createElDomBase
+const createElDomBase = createElDom;
+
+// ── Widget Library Modal Bindings ───────────────────────────────────
+function openWidgetLibrary() { $('widget-library').classList.add('open'); }
+function closeWidgetLibrary() { $('widget-library').classList.remove('open'); }
+
 // ── Bind All ───────────────────────────────────────────────────────
 function bindAll() {
   $('tpl-strip').style.background = TPL_META[S.activeTpl]?.color || '#a855f7';
+
+  // Widget library
+  $('btn-open-widgets').addEventListener('click', openWidgetLibrary);
+  $('btn-wlib-close').addEventListener('click', closeWidgetLibrary);
+  $('widget-library').addEventListener('click', e => { if (e.target === $('widget-library')) closeWidgetLibrary(); });
+
+  // Category filter
+  $('wlib-cats').querySelectorAll('.wlib-cat').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $('wlib-cats').querySelectorAll('.wlib-cat').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderWidgetLibrary(btn.dataset.cat, $('wlib-search').value.toLowerCase());
+    });
+  });
+
+  // Search
+  $('wlib-search').addEventListener('input', () => {
+    const cat = $('wlib-cats').querySelector('.wlib-cat.active')?.dataset.cat || 'all';
+    renderWidgetLibrary(cat, $('wlib-search').value.toLowerCase());
+  });
 }
+
 
 // ── Toast ──────────────────────────────────────────────────────────
 function toast(msg, type='inf') {

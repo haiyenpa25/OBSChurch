@@ -1,0 +1,26 @@
+{
+  "id": "countdown",
+  "name": "Đồng Hồ Đếm Ngược",
+  "icon": "⏱",
+  "version": "1.0.0",
+  "author": "OBSChurch",
+  "category": "timing",
+  "description": "Đếm ngược đến giờ bắt đầu buổi lễ. Tự động cập nhật mỗi giây.",
+  "tags": ["thời gian", "đếm ngược", "mở đầu"],
+  "defaultSize": { "w": 28, "h": 20 },
+  "minSize": { "w": 15, "h": 12 },
+  "resizable": true,
+  "lockAR": false,
+  "props": [
+    { "key": "label",       "label": "Tiêu đề",         "type": "text",    "default": "Buổi lễ bắt đầu sau" },
+    { "key": "targetTime",  "label": "Giờ bắt đầu",     "type": "time",    "default": "09:00" },
+    { "key": "color",       "label": "Màu chữ",          "type": "color",   "default": "#ffffff" },
+    { "key": "accentColor", "label": "Màu nhấn",         "type": "color",   "default": "#a855f7" },
+    { "key": "bgColor",     "label": "Màu nền",          "type": "color",   "default": "#0a0a1a" },
+    { "key": "bgOpacity",   "label": "Độ mờ nền",        "type": "range",   "min": 0, "max": 100, "default": 85 },
+    { "key": "fontSize",    "label": "Cỡ chữ số (px)",  "type": "range",   "min": 20, "max": 120, "default": 48 },
+    { "key": "showSeconds", "label": "Hiện giây",        "type": "boolean", "default": true },
+    { "key": "showLabel",   "label": "Hiện tiêu đề",     "type": "boolean", "default": true },
+    { "key": "style",       "label": "Kiểu hiển thị",   "type": "select",  "options": ["digital","blocks","minimal"], "default": "digital" }
+  ]
+}

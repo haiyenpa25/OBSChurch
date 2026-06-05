@@ -1,0 +1,28 @@
+{
+  "id": "scripture-verse",
+  "name": "Câu Kinh Thánh",
+  "icon": "📖",
+  "version": "1.0.0",
+  "author": "OBSChurch",
+  "category": "text",
+  "description": "Hiển thị câu Kinh Thánh với tham chiếu. Hỗ trợ nhiều phong cách.",
+  "tags": ["kinh thánh", "câu gốc", "scripture", "verse"],
+  "defaultSize": { "w": 60, "h": 25 },
+  "minSize": { "w": 30, "h": 15 },
+  "resizable": true,
+  "lockAR": false,
+  "props": [
+    { "key": "verse",      "label": "Câu Kinh Thánh",  "type": "textarea","default": "Vì Đức Chúa Trời yêu thương thế gian đến nỗi đã ban Con một của Ngài, hầu cho hễ ai tin Con ấy không bị hư mất mà được sự sống đời đời." },
+    { "key": "reference",  "label": "Tham chiếu",      "type": "text",   "default": "Giăng 3:16" },
+    { "key": "translation","label": "Bản dịch",        "type": "text",   "default": "TTHĐ" },
+    { "key": "textColor",  "label": "Màu câu",         "type": "color",  "default": "#ffffff" },
+    { "key": "refColor",   "label": "Màu tham chiếu",  "type": "color",  "default": "#a855f7" },
+    { "key": "bgColor",    "label": "Màu nền",         "type": "color",  "default": "#0a0a18" },
+    { "key": "bgOpacity",  "label": "Độ mờ nền",       "type": "range",  "min": 0, "max": 100, "default": 90 },
+    { "key": "fontSize",   "label": "Cỡ chữ câu (px)", "type": "range",  "min": 10, "max": 40, "default": 16 },
+    { "key": "lineHeight", "label": "Giãn dòng",       "type": "range",  "min": 1.2, "max": 2.5, "step": 0.1, "default": 1.6 },
+    { "key": "accentColor","label": "Màu viền/nhấn",   "type": "color",  "default": "#a855f7" },
+    { "key": "style",      "label": "Kiểu",            "type": "select", "options": ["classic","centered","quote","card"], "default": "classic" },
+    { "key": "showTrans",  "label": "Hiện bản dịch",   "type": "boolean","default": true }
+  ]
+}

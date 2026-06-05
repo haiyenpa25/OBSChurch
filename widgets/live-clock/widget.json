@@ -1,0 +1,25 @@
+{
+  "id": "live-clock",
+  "name": "Đồng Hồ Trực Tiếp",
+  "icon": "🕐",
+  "version": "1.0.0",
+  "author": "OBSChurch",
+  "category": "timing",
+  "description": "Đồng hồ hiển thị giờ thực tế. Hỗ trợ dạng số, analog, và minimal.",
+  "tags": ["đồng hồ", "giờ", "clock", "thời gian"],
+  "defaultSize": { "w": 18, "h": 14 },
+  "minSize": { "w": 10, "h": 10 },
+  "resizable": true,
+  "lockAR": false,
+  "props": [
+    { "key": "style",      "label": "Kiểu hiển thị",  "type": "select",  "options": ["digital","analog","minimal"], "default": "digital" },
+    { "key": "format24h",  "label": "Định dạng 24h",  "type": "boolean", "default": true },
+    { "key": "showDate",   "label": "Hiện ngày tháng","type": "boolean", "default": true },
+    { "key": "showSeconds","label": "Hiện giây",       "type": "boolean", "default": true },
+    { "key": "color",      "label": "Màu chữ",         "type": "color",   "default": "#ffffff" },
+    { "key": "accentColor","label": "Màu nhấn",        "type": "color",   "default": "#4d8eff" },
+    { "key": "bgColor",    "label": "Màu nền",         "type": "color",   "default": "#08080f" },
+    { "key": "bgOpacity",  "label": "Độ mờ nền",       "type": "range",   "min": 0, "max": 100, "default": 80 },
+    { "key": "fontSize",   "label": "Cỡ chữ (px)",     "type": "range",   "min": 14, "max": 80, "default": 32 }
+  ]
+}

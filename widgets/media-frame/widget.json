@@ -1,0 +1,26 @@
+{
+  "id": "media-frame",
+  "name": "Khung Hình / Logo",
+  "icon": "🖼",
+  "version": "1.0.0",
+  "author": "OBSChurch",
+  "category": "media",
+  "description": "Hiển thị ảnh, logo hội thánh hoặc banner. Hỗ trợ URL hoặc file local.",
+  "tags": ["ảnh", "logo", "hình", "banner", "media"],
+  "defaultSize": { "w": 20, "h": 20 },
+  "minSize": { "w": 8, "h": 8 },
+  "resizable": true,
+  "lockAR": false,
+  "props": [
+    { "key": "imageUrl",     "label": "URL hình ảnh",   "type": "url",     "default": "" },
+    { "key": "fit",          "label": "Cách hiển thị",  "type": "select",  "options": ["contain","cover","fill","none"], "default": "contain" },
+    { "key": "borderRadius", "label": "Bo góc (px)",     "type": "range",   "min": 0, "max": 200, "default": 8 },
+    { "key": "opacity",      "label": "Độ mờ (%)",       "type": "range",   "min": 10, "max": 100, "default": 100 },
+    { "key": "border",       "label": "Có viền",         "type": "boolean", "default": false },
+    { "key": "borderColor",  "label": "Màu viền",        "type": "color",   "default": "#a855f7" },
+    { "key": "borderWidth",  "label": "Độ dày viền",     "type": "range",   "min": 1, "max": 10, "default": 2 },
+    { "key": "shadow",       "label": "Đổ bóng",         "type": "boolean", "default": true },
+    { "key": "bgColor",      "label": "Màu nền (nếu không có ảnh)", "type": "color", "default": "#111122" },
+    { "key": "placeholder",  "label": "Nhãn khi chưa có ảnh",       "type": "text",  "default": "⛪ LOGO" }
+  ]
+}

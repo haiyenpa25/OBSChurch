@@ -1,0 +1,175 @@
+<!-- OBSChurch Widget: Live Clock -->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Inter:wght@400;500;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .w-clock {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+  .w-clock::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 2px; background: var(--accent);
+  }
+
+  /* Digital */
+  .clk-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: var(--fs);
+    font-weight: 800;
+    color: var(--color);
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+  .clk-secs { color: var(--accent); }
+  .clk-date {
+    font-size: calc(var(--fs) * 0.38);
+    color: rgba(255,255,255,0.5);
+    font-family: 'Inter', sans-serif;
+    margin-top: 5px;
+    letter-spacing: 0.04em;
+  }
+
+  /* Analog */
+  .clk-analog-wrap { position: relative; }
+  .clk-face {
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--accent);
+    box-shadow: 0 0 12px rgba(77,142,255,0.3), inset 0 0 8px rgba(0,0,0,0.5);
+    position: relative;
+  }
+  .hand {
+    position: absolute;
+    bottom: 50%; left: 50%;
+    transform-origin: bottom center;
+    border-radius: 2px;
+    background: var(--color);
+  }
+  .hand.hour   { width: 4px; margin-left: -2px; background: var(--color); }
+  .hand.minute { width: 3px; margin-left: -1.5px; background: var(--color); }
+  .hand.second { width: 2px; margin-left: -1px; background: var(--accent); }
+  .center-dot {
+    position: absolute; top: 50%; left: 50%;
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Minimal */
+  .clk-minimal {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: var(--fs);
+    color: var(--color);
+    font-weight: 700;
+    opacity: 0.9;
+  }
+</style>
+
+<div class="w-clock" id="w-root">
+  <div id="clk-content"></div>
+</div>
+
+<script>
+(function() {
+  const P = window.__WIDGET_PROPS || {
+    style: 'digital',
+    format24h: true,
+    showDate: true,
+    showSeconds: true,
+    color: '#ffffff',
+    accentColor: '#4d8eff',
+    bgColor: '#08080f',
+    bgOpacity: 80,
+    fontSize: 32
+  };
+
+  const root    = document.getElementById('w-root');
+  const content = document.getElementById('clk-content');
+
+  function hexToRgba(hex, alpha) {
+    if (!hex || hex.length < 7) return `rgba(8,8,15,${alpha})`;
+    const r = parseInt(hex.slice(1,3),16);
+    const g = parseInt(hex.slice(3,5),16);
+    const b = parseInt(hex.slice(5,7),16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+
+  root.style.setProperty('--bg',     hexToRgba(P.bgColor||'#08080f', (P.bgOpacity||80)/100));
+  root.style.setProperty('--color',  P.color  || '#fff');
+  root.style.setProperty('--accent', P.accentColor || '#4d8eff');
+  root.style.setProperty('--fs',     (P.fontSize || 32) + 'px');
+
+  const style = P.style || 'digital';
+  const days = ['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
+  const months = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+
+  function pad(n) { return String(n).padStart(2,'0'); }
+
+  if (style === 'analog') {
+    const sz = Math.min(root.offsetWidth, root.offsetHeight) * 0.8 || 80;
+    content.innerHTML = `
+      <div class="clk-analog-wrap">
+        <div class="clk-face" id="clk-face" style="width:${sz}px;height:${sz}px">
+          <div class="hand hour"   id="h-hour"   style="height:${sz*0.28}px"></div>
+          <div class="hand minute" id="h-min"    style="height:${sz*0.36}px"></div>
+          <div class="hand second" id="h-sec"    style="height:${sz*0.4}px;display:${P.showSeconds?'block':'none'}"></div>
+          <div class="center-dot"></div>
+        </div>
+      </div>`;
+
+    function tickAnalog() {
+      const now = new Date();
+      const h = now.getHours() % 12, m = now.getMinutes(), s = now.getSeconds();
+      const hDeg = h * 30 + m * 0.5;
+      const mDeg = m * 6 + s * 0.1;
+      const sDeg = s * 6;
+      document.getElementById('h-hour').style.transform = `rotate(${hDeg}deg)`;
+      document.getElementById('h-min').style.transform  = `rotate(${mDeg}deg)`;
+      if (P.showSeconds) document.getElementById('h-sec').style.transform = `rotate(${sDeg}deg)`;
+    }
+    tickAnalog();
+    setInterval(tickAnalog, 1000);
+
+  } else if (style === 'minimal') {
+    content.innerHTML = `<div class="clk-minimal" id="clk-m">00:00</div>`;
+    function tickMin() {
+      const now = new Date();
+      let h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+      if (!P.format24h) { const ampm = h >= 12 ? ' PM' : ' AM'; h = h % 12 || 12; document.getElementById('clk-m').textContent = `${pad(h)}:${pad(m)}${P.showSeconds?':'+pad(s):''}${ampm}`; return; }
+      document.getElementById('clk-m').textContent = `${pad(h)}:${pad(m)}${P.showSeconds?':'+pad(s):''}`;
+    }
+    tickMin(); setInterval(tickMin, 1000);
+
+  } else {
+    // digital
+    content.innerHTML = `
+      <div class="clk-time" id="clk-d">00:00<span class="clk-secs" id="clk-sec">:00</span></div>
+      <div class="clk-date" id="clk-date" style="display:${P.showDate?'block':'none'}">Thứ Hai, 01/01/2025</div>`;
+    function tickDig() {
+      const now = new Date();
+      let h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+      let suffix = '';
+      if (!P.format24h) { suffix = h >= 12 ? ' PM' : ' AM'; h = h % 12 || 12; }
+      document.getElementById('clk-d').childNodes[0].textContent = `${pad(h)}:${pad(m)}`;
+      const secEl = document.getElementById('clk-sec');
+      if (P.showSeconds) { secEl.textContent = ':' + pad(s) + suffix; secEl.style.display = ''; }
+      else { secEl.textContent = suffix; }
+      if (P.showDate) {
+        const d = now;
+        document.getElementById('clk-date').textContent =
+          `${days[d.getDay()]}, ${pad(d.getDate())}/${months[d.getMonth()]}/${d.getFullYear()}`;
+      }
+    }
+    tickDig(); setInterval(tickDig, 1000);
+  }
+})();
+</script>
