@@ -4,22 +4,73 @@
       "itemId": "gl-01",
       "sceneTypeId": "giang-luan",
       "activeOverlayId": "binh-thuong",
-      "data": {
-        "speakerName": "",
-        "sermonTopic": "",
-        "bibleRef": "",
-        "bibleVerse": ""
-      }
+      "data": { "speakerName": "", "sermonTopic": "", "bibleRef": "", "bibleVerse": "" }
     },
-    "cl-01": {
-      "itemId": "cl-01",
+    "gl-02": {
+      "itemId": "gl-02",
+      "sceneTypeId": "giang-luan",
+      "activeOverlayId": "scripture-full",
+      "data": { "speakerName": "", "sermonTopic": "", "bibleRef": "", "bibleVerse": "" }
+    },
+    "gl-03": {
+      "itemId": "gl-03",
+      "sceneTypeId": "giang-luan",
+      "activeOverlayId": "cam-full",
+      "data": { "speakerName": "", "sermonTopic": "", "bibleRef": "", "bibleVerse": "" }
+    },
+    "gl-04": {
+      "itemId": "gl-04",
+      "sceneTypeId": "giang-luan",
+      "activeOverlayId": "binh-thuong",
+      "data": { "speakerName": "", "sermonTopic": "", "bibleRef": "", "bibleVerse": "" }
+    },
+    "gl-05": {
+      "itemId": "gl-05",
+      "sceneTypeId": "giang-luan",
+      "activeOverlayId": "scripture-full",
+      "data": { "speakerName": "", "sermonTopic": "", "bibleRef": "", "bibleVerse": "" }
+    },
+    "gl-06": {
+      "itemId": "gl-06",
+      "sceneTypeId": "giang-luan",
+      "activeOverlayId": "scripture-full",
+      "data": { "speakerName": "", "sermonTopic": "", "bibleRef": "", "bibleVerse": "" }
+    },
+    "tv-01": {
+      "itemId": "tv-01",
       "sceneTypeId": "tho-phuong",
       "activeOverlayId": "cam-toan-canh",
-      "data": {
-        "songName": "",
-        "singerName": "",
-        "lyrics": ""
-      }
+      "data": { "songName": "", "singerName": "", "lyrics": "" }
+    },
+    "tv-02": {
+      "itemId": "tv-02",
+      "sceneTypeId": "tho-phuong",
+      "activeOverlayId": "cam-toan-canh",
+      "data": { "songName": "", "singerName": "", "lyrics": "" }
+    },
+    "tv-03": {
+      "itemId": "tv-03",
+      "sceneTypeId": "tho-phuong",
+      "activeOverlayId": "cam-toan-canh",
+      "data": { "songName": "", "singerName": "", "lyrics": "" }
+    },
+    "tba-01": {
+      "itemId": "tba-01",
+      "sceneTypeId": "thong-bao",
+      "activeOverlayId": "ticker-bottom",
+      "data": { "title": "", "content": "" }
+    },
+    "tba-02": {
+      "itemId": "tba-02",
+      "sceneTypeId": "thong-bao",
+      "activeOverlayId": "ticker-bottom",
+      "data": { "title": "", "content": "" }
+    },
+    "tba-03": {
+      "itemId": "tba-03",
+      "sceneTypeId": "thong-bao",
+      "activeOverlayId": "ticker-bottom",
+      "data": { "title": "", "content": "" }
     }
   }
 }

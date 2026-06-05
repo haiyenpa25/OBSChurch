@@ -1682,7 +1682,7 @@ function switchOverlay(stypeId, overlayId, itemId) {
   // Push WS message
   const stype   = state.sceneTypes[stypeId];
   const overlay = stype?.overlays?.find(o => o.id === overlayId);
-  wsSend({
+  send({
     type: 'OVERLAY_SWITCH',
     payload: {
       sceneTypeId: stypeId,
@@ -1693,7 +1693,7 @@ function switchOverlay(stypeId, overlayId, itemId) {
   });
 
   renderOverlaySwitcher();
-  toast(`Overlay: ${overlay?.label || overlayId}`, 'ok');
+  toast(`Overlay: ${overlay?.label || overlayId}`, 'success');
 }
 
 // ── Current Item rendering ─────────────────────────────────────────

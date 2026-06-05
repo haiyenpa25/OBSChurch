@@ -2,84 +2,99 @@
   "scenes": [
     {
       "id": "dau-gio",
-      "label": "Đầu giờ",
+      "label": "🎵 Đầu giờ",
       "items": [
         { "id": "dg-01", "order": 1, "label": "Nhạc nền đầu giờ", "templateId": "clean-dark", "type": "music" },
-        { "id": "dg-02", "order": 2, "label": "Thông báo chào mừng", "templateId": "glassmorphism", "type": "announcement" }
+        { "id": "dg-02", "order": 2, "label": "Slide chào mừng", "templateId": "glassmorphism", "type": "announcement" },
+        { "id": "dg-03", "order": 3, "label": "Thông báo tuần này", "templateId": "glassmorphism", "type": "announcement" }
       ]
     },
     {
-      "id": "chinh-le",
-      "label": "Chính lễ",
+      "id": "khai-le",
+      "label": "⛪ Khai lễ",
       "items": [
-        { "id": "cl-01", "order": 1, "label": "Bài hát khai lễ", "templateId": "clean-dark", "type": "music" },
-        { "id": "cl-02", "order": 2, "label": "Cầu nguyện khai lễ", "templateId": "vintage", "type": "prayer" },
-        { "id": "cl-03", "order": 3, "label": "Bài hát 2", "templateId": "clean-dark", "type": "music" },
-        { "id": "cl-04", "order": 4, "label": "Bài hát 3", "templateId": "clean-dark", "type": "music" }
+        { "id": "kl-01", "order": 1, "label": "Bài hát khai lễ 1", "templateId": "clean-dark", "type": "music" },
+        { "id": "kl-02", "order": 2, "label": "Bài hát khai lễ 2", "templateId": "clean-dark", "type": "music" },
+        { "id": "kl-03", "order": 3, "label": "Cầu nguyện khai lễ", "templateId": "vintage", "type": "prayer" }
+      ]
+    },
+    {
+      "id": "ton-vinh",
+      "label": "🙌 Thờ phượng & Tôn vinh",
+      "items": [
+        { "id": "tv-01", "order": 1, "label": "Bài hát thờ phượng 1", "templateId": "clean-dark", "type": "music", "sceneTypeId": "tho-phuong" },
+        { "id": "tv-02", "order": 2, "label": "Bài hát thờ phượng 2", "templateId": "clean-dark", "type": "music", "sceneTypeId": "tho-phuong" },
+        { "id": "tv-03", "order": 3, "label": "Bài hát thờ phượng 3", "templateId": "clean-dark", "type": "music", "sceneTypeId": "tho-phuong" },
+        { "id": "tv-04", "order": 4, "label": "Cầu nguyện thờ phượng", "templateId": "vintage", "type": "prayer" },
+        { "id": "tv-05", "order": 5, "label": "Bài hát chậm / cầu thay", "templateId": "vintage", "type": "music" }
+      ]
+    },
+    {
+      "id": "don-ca",
+      "label": "🎤 Đơn ca / Ban ngành",
+      "items": [
+        { "id": "dc-01", "order": 1, "label": "Giới thiệu ca sĩ / Ban", "templateId": "glassmorphism", "type": "speaker" },
+        { "id": "dc-02", "order": 2, "label": "Bài tôn vinh đơn ca", "templateId": "glassmorphism", "type": "music" },
+        { "id": "dc-03", "order": 3, "label": "Bài hát ban ngành", "templateId": "vintage", "type": "music" }
       ]
     },
     {
       "id": "giang-luan",
-      "label": "Giảng luận",
+      "label": "📖 Giảng luận",
       "items": [
-        { "id": "gl-01", "order": 1, "label": "Giới thiệu diễn giả", "templateId": "scifi", "type": "speaker" },
-        { "id": "gl-02", "order": 2, "label": "Câu gốc Kinh Thánh", "templateId": "vintage", "type": "scripture" },
-        { "id": "gl-03", "order": 3, "label": "Đề tài giảng", "templateId": "scifi", "type": "topic" }
-      ]
-    },
-    {
-      "id": "ton-vinh-don-ca",
-      "label": "Tôn vinh đơn ca",
-      "items": [
-        { "id": "tv-01", "order": 1, "label": "Giới thiệu ca sĩ", "templateId": "glassmorphism", "type": "speaker" },
-        { "id": "tv-02", "order": 2, "label": "Bài hát đơn ca", "templateId": "glassmorphism", "type": "music" }
-      ]
-    },
-    {
-      "id": "ton-vinh-ban-nganh",
-      "label": "Tôn vinh ban ngành",
-      "items": [
-        { "id": "tb-01", "order": 1, "label": "Giới thiệu ban", "templateId": "vintage", "type": "speaker" },
-        { "id": "tb-02", "order": 2, "label": "Bài hát ban ngành", "templateId": "vintage", "type": "music" }
+        { "id": "gl-01", "order": 1, "label": "Giới thiệu diễn giả", "templateId": "scifi", "type": "speaker", "sceneTypeId": "giang-luan" },
+        { "id": "gl-02", "order": 2, "label": "Câu gốc Kinh Thánh", "templateId": "scripture-fullscreen", "type": "scripture", "sceneTypeId": "giang-luan" },
+        { "id": "gl-03", "order": 3, "label": "Đề tài bài giảng", "templateId": "sermon-topic", "type": "topic", "sceneTypeId": "giang-luan" },
+        { "id": "gl-04", "order": 4, "label": "Phần giảng chính", "templateId": "scifi", "type": "speaker", "sceneTypeId": "giang-luan" },
+        { "id": "gl-05", "order": 5, "label": "Kinh Thánh minh họa 1", "templateId": "scripture-fullscreen", "type": "scripture", "sceneTypeId": "giang-luan" },
+        { "id": "gl-06", "order": 6, "label": "Kinh Thánh minh họa 2", "templateId": "scripture-fullscreen", "type": "scripture", "sceneTypeId": "giang-luan" },
+        { "id": "gl-07", "order": 7, "label": "Cầu nguyện sau giảng", "templateId": "vintage", "type": "prayer" }
       ]
     },
     {
       "id": "tiec-thanh",
-      "label": "Tiệc thánh",
+      "label": "🍞 Tiệc thánh",
       "items": [
-        { "id": "tt-01", "order": 1, "label": "Bẻ bánh — Cầu nguyện", "templateId": "vintage", "type": "prayer" },
-        { "id": "tt-02", "order": 2, "label": "Dâng chén", "templateId": "vintage", "type": "prayer" }
+        { "id": "tt-01", "order": 1, "label": "Chuẩn bị tiệc thánh", "templateId": "vintage", "type": "prayer" },
+        { "id": "tt-02", "order": 2, "label": "Bẻ bánh — Cầu nguyện", "templateId": "vintage", "type": "prayer" },
+        { "id": "tt-03", "order": 3, "label": "Dâng chén", "templateId": "vintage", "type": "prayer" },
+        { "id": "tt-04", "order": 4, "label": "Bài hát dâng tiệc", "templateId": "clean-dark", "type": "music" }
       ]
     },
     {
-      "id": "cam-goc-rong",
-      "label": "Cam gốc rộng",
+      "id": "dang-hien",
+      "label": "💝 Dâng hiến",
       "items": [
-        { "id": "cgr-01", "order": 1, "label": "Wide Shot Active", "templateId": "clean-dark", "type": "camera" }
+        { "id": "dh-01", "order": 1, "label": "Giải thích dâng hiến", "templateId": "glassmorphism", "type": "announcement" },
+        { "id": "dh-02", "order": 2, "label": "Bài hát dâng hiến", "templateId": "clean-dark", "type": "music" },
+        { "id": "dh-03", "order": 3, "label": "Cầu nguyện dâng hiến", "templateId": "vintage", "type": "prayer" }
       ]
     },
     {
       "id": "thong-bao",
-      "label": "Thông báo",
+      "label": "📢 Thông báo",
       "items": [
-        { "id": "tba-01", "order": 1, "label": "Thông báo 1", "templateId": "glassmorphism", "type": "announcement" },
-        { "id": "tba-02", "order": 2, "label": "Thông báo 2", "templateId": "glassmorphism", "type": "announcement" },
-        { "id": "tba-03", "order": 3, "label": "Thông báo 3", "templateId": "glassmorphism", "type": "announcement" }
+        { "id": "tba-01", "order": 1, "label": "Thông báo 1 — Hoạt động", "templateId": "glassmorphism", "type": "announcement", "sceneTypeId": "thong-bao" },
+        { "id": "tba-02", "order": 2, "label": "Thông báo 2 — Lớp học", "templateId": "glassmorphism", "type": "announcement", "sceneTypeId": "thong-bao" },
+        { "id": "tba-03", "order": 3, "label": "Thông báo 3 — Sự kiện", "templateId": "glassmorphism", "type": "announcement", "sceneTypeId": "thong-bao" },
+        { "id": "tba-04", "order": 4, "label": "Tin tức nhà thờ", "templateId": "glassmorphism", "type": "announcement" }
       ]
     },
     {
       "id": "tat-le",
-      "label": "Tất lễ",
+      "label": "🌟 Tất lễ",
       "items": [
         { "id": "tatl-01", "order": 1, "label": "Bài hát kết thúc", "templateId": "clean-dark", "type": "music" },
-        { "id": "tatl-02", "order": 2, "label": "Cầu nguyện tất lễ", "templateId": "vintage", "type": "prayer" }
+        { "id": "tatl-02", "order": 2, "label": "Cầu nguyện tất lễ", "templateId": "vintage", "type": "prayer" },
+        { "id": "tatl-03", "order": 3, "label": "Chúc lành", "templateId": "glassmorphism", "type": "announcement" }
       ]
     },
     {
       "id": "cuoi-gio",
-      "label": "Cuối giờ",
+      "label": "🎵 Cuối giờ",
       "items": [
-        { "id": "cg-01", "order": 1, "label": "Nhạc nền cuối giờ", "templateId": "clean-dark", "type": "music" }
+        { "id": "cg-01", "order": 1, "label": "Nhạc nền cuối giờ", "templateId": "clean-dark", "type": "music" },
+        { "id": "cg-02", "order": 2, "label": "Slide thông tin liên hệ", "templateId": "glassmorphism", "type": "announcement" }
       ]
     }
   ]
