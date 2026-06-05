@@ -30,6 +30,8 @@ const PATHS = {
   sceneTypes:   path.join(DATA_DIR, 'scene-types.json'),
   bindings:     path.join(DATA_DIR, 'widget-bindings.json'),
   config:       path.join(DATA_DIR, 'service-config.json'),
+  songs:        path.join(DATA_DIR, 'songs.json'),
+  presets:      path.join(DATA_DIR, 'overlay-presets.json'),
   categories:   path.join(WIDGETS_PATH, '_categories.json'),
 };
 
@@ -44,6 +46,10 @@ const appState = {
   activeOverlayId: null,
   overlayVisible:  false,
   currentPayload:  {},
+  tickerVisible:   false,
+  tickerMessages:  [],
+  isRecording:     false,
+  isStreaming:     false,
 };
 
 // ─── HTTP Router ─────────────────────────────────────
@@ -61,8 +67,11 @@ function _handleHttpRequest(req, res) {
     '/api/scene-types':       _handleGetSceneTypes,
     '/api/bindings':          _handleGetBindings,
     '/api/config':            _handleGetConfig,
+    '/api/songs':             (_, r) => _readJson(PATHS.songs, r),
+    '/api/presets':           (_, r) => _readJson(PATHS.presets, r),
     '/api/widget-categories': _handleGetWidgetCategories,
     '/api/widgets':           _handleGetWidgets,
+    '/api/widget-categories': _handleGetWidgetCategories,
   };
 
   if (method === 'GET' && getMap[url]) {
@@ -76,7 +85,10 @@ function _handleHttpRequest(req, res) {
     '/api/scene-types': (r, s) => _handleSaveJson(r, s, PATHS.sceneTypes),
     '/api/bindings':    (r, s) => _handleSaveJson(r, s, PATHS.bindings),
     '/api/config':      (r, s) => _handleSaveJson(r, s, PATHS.config),
+    '/api/songs':       (r, s) => _handleSaveJson(r, s, PATHS.songs),
+    '/api/presets':     (r, s) => _handleSaveJson(r, s, PATHS.presets),
   };
+
 
   if (method === 'POST' && postMap[url]) {
     postMap[url](req, res); return;
@@ -414,6 +426,14 @@ function _updateState(msg) {
     case 'OBS_RECORD_STOP':  appState.isRecording = false; break;
     case 'OBS_STREAM_START': appState.isStreaming = true;  break;
     case 'OBS_STREAM_STOP':  appState.isStreaming = false; break;
+    case 'TICKER_SHOW':
+      appState.tickerVisible  = true;
+      appState.tickerMessages = msg.payload?.messages || [];
+      break;
+    case 'TICKER_HIDE':
+      appState.tickerVisible  = false;
+      appState.tickerMessages = [];
+      break;
   }
 }
 

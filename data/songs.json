@@ -1,0 +1,114 @@
+{
+  "songs": [
+    {
+      "id": "song-001",
+      "title": "Tình Chúa Cao Vời",
+      "author": "Nhạc: Chris Tomlin / Lời Việt: Minh Thư",
+      "category": "tho-phuong",
+      "key": "G",
+      "tags": ["thờ phượng", "tôn ngợi"],
+      "sections": [
+        {
+          "id": "v1", "label": "Câu 1", "type": "verse",
+          "lines": ["Chúa là vầng đá vĩnh cửu", "Mọi thời đại ca ngợi Ngài", "Đấng thánh lành từ muôn đời", "Ngài là Chúa duy nhất tôi thờ"]
+        },
+        {
+          "id": "ch", "label": "Điệp khúc", "type": "chorus",
+          "lines": ["Ôi tình Chúa thật cao vời", "Chẳng có chi sánh bằng được", "Ngài yêu tôi từ mọi thời", "Tình Ngài mãi chẳng đổi thay"]
+        },
+        {
+          "id": "v2", "label": "Câu 2", "type": "verse",
+          "lines": ["Sáng lờ mờ con tìm kiếm Ngài", "Chiều tà về con ngợi khen Ngài", "Mỗi hơi thở con thờ phượng Ngài", "Vạn đời con tôn vinh Danh Ngài"]
+        },
+        {
+          "id": "br", "label": "Bridge", "type": "bridge",
+          "lines": ["Tuổi tác như cỏ hoa ngoài đồng", "Nhưng lời Chúa còn đến đời đời", "Danh Ngài cao cả trên muôn đất", "Và vinh quang Ngài đầy trên trời"]
+        }
+      ]
+    },
+    {
+      "id": "song-002",
+      "title": "Thánh Thần Ơi Hãy Đến",
+      "author": "Cánh Cửa Hẹp",
+      "category": "tho-phuong",
+      "key": "C",
+      "tags": ["thánh linh", "cầu nguyện"],
+      "sections": [
+        {
+          "id": "v1", "label": "Câu 1", "type": "verse",
+          "lines": ["Thánh Thần ơi hãy đến", "Lấp đầy lòng chúng con", "Với ân điển vô biên", "Và quyền năng từ trên"]
+        },
+        {
+          "id": "ch", "label": "Điệp khúc", "type": "chorus",
+          "lines": ["Đổ xuống như mưa mùa thu", "Làm mới lại tâm linh con", "Thổi đến như gió phương Nam", "Dẫn con đến với Cha yêu"]
+        },
+        {
+          "id": "v2", "label": "Câu 2", "type": "verse",
+          "lines": ["Lửa tình yêu thiêu đốt con", "Cho con cháy với tình Cha", "Dẫn con ra nơi vô tận", "Trong sự vinh hiển của Ngài"]
+        }
+      ]
+    },
+    {
+      "id": "song-003",
+      "title": "Ân Điển Bao La",
+      "author": "John Newton / Lời Việt: Hội Thánh",
+      "category": "tho-phuong",
+      "key": "F",
+      "tags": ["ân điển", "kinh điển"],
+      "sections": [
+        {
+          "id": "v1", "label": "Câu 1", "type": "verse",
+          "lines": ["Ân điển bao la thay", "Giải thoát con tội nhân", "Xưa con đã lạc bầy", "Nay con đã trở về"]
+        },
+        {
+          "id": "v2", "label": "Câu 2", "type": "verse",
+          "lines": ["Muôn ân điển Ngài dạy", "Lòng con phải biết sợ", "Chính ân điển đó ban", "Bình an trong tâm hồn"]
+        },
+        {
+          "id": "v3", "label": "Câu 3", "type": "verse",
+          "lines": ["Khi vạn năm đã trôi", "Sáng trường sinh rực rỡ", "Chúng con sẽ ca ngợi", "Danh Chúa đến muôn đời"]
+        }
+      ]
+    },
+    {
+      "id": "song-004",
+      "title": "Chúa Là Chỗ Nương Náu",
+      "author": "Hội Thánh",
+      "category": "ton-vinh",
+      "key": "D",
+      "tags": ["tôn ngợi", "nương náu"],
+      "sections": [
+        {
+          "id": "v1", "label": "Câu 1", "type": "verse",
+          "lines": ["Chúa là chỗ nương náu tôi", "Là sức mạnh và niềm tin", "Khi khó khăn con ẩn náu", "Trong bàn tay Ngài yêu thương"]
+        },
+        {
+          "id": "ch", "label": "Điệp khúc", "type": "chorus",
+          "lines": ["Ngài là Đức Chúa Trời của con", "Ngài là tháp cao trong hoạn nạn", "Ngài giữ gìn con ngày đêm", "Ngài là Cha hằng yêu con"]
+        },
+        {
+          "id": "br", "label": "Bridge", "type": "bridge",
+          "lines": ["Tôi sẽ không sợ hãi", "Dù đất rung chuyển đổi dời", "Chúa tôi luôn ngự trị", "Trên ngàn muôn vạn đời"]
+        }
+      ]
+    },
+    {
+      "id": "song-005",
+      "title": "Có Một Ngày",
+      "author": "Hội Thánh Việt Nam",
+      "category": "tho-phuong",
+      "key": "Bb",
+      "tags": ["hi vọng", "thiên đàng"],
+      "sections": [
+        {
+          "id": "v1", "label": "Câu 1", "type": "verse",
+          "lines": ["Có một ngày sẽ đến", "Con gặp Chúa mặt đối mặt", "Mọi nước mắt được lau sạch", "Và đau khổ không còn nữa"]
+        },
+        {
+          "id": "ch", "label": "Điệp khúc", "type": "chorus",
+          "lines": ["Vinh quang Chúa bừng sáng", "Trên ngàn muôn vạn thánh đồ", "Cùng nhau hát bài ca mới", "Trước ngôi Chiên Con Đức Chúa Trời"]
+        }
+      ]
+    }
+  ]
+}

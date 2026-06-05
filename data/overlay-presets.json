@@ -1,0 +1,40 @@
+{
+  "presets": [
+    {
+      "id": "p001",
+      "label": "Mục Sư Giảng",
+      "templateId": "clean-dark",
+      "primary": "Mục Sư Nguyễn Văn A",
+      "secondary": "Hội Thánh",
+      "textX": 5,
+      "textY": 80
+    },
+    {
+      "id": "p002",
+      "label": "Câu Gốc Giăng 3:16",
+      "templateId": "scripture-fullscreen",
+      "scriptureRef": "Giăng 3:16",
+      "scriptureVerse": "Vì Đức Chúa Trời yêu thương thế gian...",
+      "textX": 10,
+      "textY": 35
+    },
+    {
+      "id": "p003",
+      "label": "Chào Mừng",
+      "templateId": "glassmorphism",
+      "primary": "Chào Mừng Đến Thờ Phượng",
+      "secondary": "Hội Thánh Báp Tít",
+      "textX": 20,
+      "textY": 75
+    },
+    {
+      "id": "p004",
+      "label": "Lower Third Diễn Giả",
+      "templateId": "scifi",
+      "speakerName": "Mục Sư",
+      "title": "Giảng Luận Chủ Nhật",
+      "textX": 5,
+      "textY": 82
+    }
+  ]
+}

@@ -101,6 +101,78 @@
       text-align: right;
     }
 
+
+    /* ── Template: Lyric Clean ───────────────────────── */
+    .tpl-lyric-clean {
+      background: linear-gradient(to right, rgba(4,4,20,0.92), rgba(4,4,20,0.7));
+      border-left: 5px solid var(--lyric-accent, #4edea3);
+      padding: 16px 28px;
+      border-radius: 0 8px 8px 0;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+    }
+    .tpl-lyric-clean .lt-primary   { color: #ffffff; font-size: var(--lyric-fs, 32px); font-weight: 700; line-height: 1.3; }
+    .tpl-lyric-clean .lt-secondary { color: rgba(255,255,255,0.45); font-size: calc(var(--lyric-fs, 32px) * 0.55); margin-top: 6px; font-style: italic; display: block; }
+
+    /* ── Template: Lyric Dark ────────────────────────── */
+    .tpl-lyric-dark {
+      background: rgba(0,0,0,0.88);
+      border-top: 3px solid var(--lyric-accent, #4edea3);
+      border-bottom: 3px solid var(--lyric-accent, #4edea3);
+      padding: 18px 36px;
+      backdrop-filter: blur(20px);
+    }
+    .tpl-lyric-dark .lt-primary   { color: var(--lyric-accent, #4edea3); font-size: var(--lyric-fs, 32px); font-weight: 800; letter-spacing: -0.01em; }
+    .tpl-lyric-dark .lt-secondary { color: rgba(255,255,255,0.4); font-size: calc(var(--lyric-fs, 32px) * 0.52); margin-top: 8px; display: block; }
+
+    /* ── Template: Lyric Minimal ─────────────────────── */
+    .tpl-lyric-minimal {
+      background: transparent;
+      padding: 12px 20px;
+    }
+    .tpl-lyric-minimal .lt-primary {
+      color: #ffffff;
+      font-size: var(--lyric-fs, 32px);
+      font-weight: 700;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.9), 0 4px 24px rgba(0,0,0,0.7);
+    }
+    .tpl-lyric-minimal .lt-secondary {
+      color: rgba(255,255,255,0.5);
+      font-size: calc(var(--lyric-fs, 32px) * 0.52);
+      display: block;
+      margin-top: 6px;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.8);
+      font-style: italic;
+    }
+
+    /* ── Template: Lyric Fullscreen ─────────────────── */
+    .tpl-lyric-fullscreen {
+      background: linear-gradient(135deg, rgba(4,4,20,0.85), rgba(10,5,30,0.7));
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(24px);
+      padding: 40px 60px;
+      border-radius: 16px;
+      text-align: center;
+      max-width: 1400px;
+      width: 90%;
+      margin: 0 auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+    .tpl-lyric-fullscreen .lt-primary {
+      color: #ffffff;
+      font-size: calc(var(--lyric-fs, 32px) * 1.5);
+      font-weight: 800;
+      line-height: 1.25;
+      letter-spacing: 0.01em;
+    }
+    .tpl-lyric-fullscreen .lt-secondary {
+      display: block;
+      margin-top: 16px;
+      color: rgba(255,255,255,0.45);
+      font-size: calc(var(--lyric-fs, 32px) * 0.65);
+      font-style: italic;
+    }
+
     /* ── Widget Layer Container ──────────────────────── */
     #widget-layer {
       position: fixed;
@@ -114,6 +186,70 @@
       background: transparent;
       overflow: hidden;
     }
+
+    /* ── Ticker / Crawl ─────────────────────────────── */
+    #ticker {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 52px;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      transform: translateY(100%);
+      opacity: 0;
+      transition: transform 0.5s cubic-bezier(0.2,0,0,1), opacity 0.4s ease;
+    }
+    #ticker.visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .ticker-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(4,4,20,0.97) 0%, rgba(10,10,30,0.92) 100%);
+      border-top: 2px solid var(--ticker-color, #4d8eff);
+    }
+    .ticker-label {
+      position: relative;
+      z-index: 1;
+      background: var(--ticker-color, #4d8eff);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      padding: 0 18px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      flex-shrink: 0;
+      text-transform: uppercase;
+    }
+    .ticker-track {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      overflow: hidden;
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+    .ticker-text {
+      font-family: 'Inter', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+      display: inline-block;
+      animation: tickerScroll var(--ticker-speed, 20s) linear infinite;
+      padding-left: 100%;
+    }
+    @keyframes tickerScroll {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
   </style>
 </head>
 <body>
@@ -124,6 +260,15 @@
     <div id="lower-third" class="lower-third">
       <span class="lt-primary"  id="lt-primary">—</span>
       <span class="lt-secondary" id="lt-secondary"></span>
+    </div>
+  </div>
+
+  <!-- Ticker / Crawl -->
+  <div id="ticker">
+    <div class="ticker-bg"></div>
+    <div class="ticker-label" id="ticker-label">THÔNG BÁO</div>
+    <div class="ticker-track">
+      <span class="ticker-text" id="ticker-text">Chào mừng đến với buổi lễ.</span>
     </div>
   </div>
 
@@ -156,7 +301,15 @@
       'glassmorphism'       : 'tpl-glassmorphism',
       'sermon-topic'        : 'tpl-sermon-topic',
       'scripture-fullscreen': 'tpl-scripture-fullscreen',
+      // Lyric templates
+      'lyric-clean'         : 'tpl-lyric-clean',
+      'lyric-dark'          : 'tpl-lyric-dark',
+      'lyric-minimal'       : 'tpl-lyric-minimal',
+      'lyric-fullscreen'    : 'tpl-lyric-fullscreen',
     });
+
+    // Templates that center themselves (ignore textX/textY)
+    const CENTERED_TEMPLATES = new Set(['sermon-topic', 'scripture-fullscreen', 'lyric-fullscreen']);
 
     // DOM refs
     const lowerThird  = document.getElementById('lower-third');
@@ -164,6 +317,9 @@
     const ltPrimary   = document.getElementById('lt-primary');
     const ltSecondary = document.getElementById('lt-secondary');
     const widgetLayer = document.getElementById('widget-layer');
+    const tickerEl    = document.getElementById('ticker');
+    const tickerText  = document.getElementById('ticker-text');
+    const tickerLabel = document.getElementById('ticker-label');
 
     // Active widget iframes: { widgetId: HTMLIFrameElement }
     const activeWidgets = {};
@@ -200,10 +356,13 @@
       OVERLAY_TRANS : (p) => triggerTransition(p.effect),
       OVERLAY_SWITCH: (p) => switchOverlayLayout(p),
       WIDGET_UPDATE : (p) => updateWidgetProps(p.widgetId, p.props),
-      CLEAR_ALL     : ()  => { hideOverlay(); clearWidgets(); },
-      SAFETY_CUT    : ()  => { hideOverlay(true); clearWidgets(); },
+      TICKER_SHOW   : (p) => showTicker(p),
+      TICKER_HIDE   : ()  => hideTicker(),
+      CLEAR_ALL     : ()  => { hideOverlay(); clearWidgets(); hideTicker(); },
+      SAFETY_CUT    : ()  => { hideOverlay(true); clearWidgets(); hideTicker(); },
       STATE_SYNC    : (p) => {
         if (p.overlayVisible) showOverlay(p.currentPayload);
+        if (p.tickerVisible)  showTicker({ messages: p.tickerMessages });
       },
     };
 
@@ -216,10 +375,19 @@
     // ─── Overlay Actions ──────────────────────────────
     function showOverlay(payload) {
       lastPayload = payload;
-      const templateClass = TEMPLATE_MAP[payload.templateId] ?? TEMPLATE_MAP['clean-dark'];
+      const tplId = payload.templateId || 'clean-dark';
+      const templateClass = TEMPLATE_MAP[tplId] ?? TEMPLATE_MAP['clean-dark'];
 
       Object.values(TEMPLATE_MAP).forEach((c) => lowerThird.classList.remove(c));
       lowerThird.classList.add(templateClass);
+
+      // Apply lyric-specific CSS vars
+      if (payload.accentColor) {
+        document.documentElement.style.setProperty('--lyric-accent', payload.accentColor);
+      }
+      if (payload.fontSize) {
+        document.documentElement.style.setProperty('--lyric-fs', payload.fontSize + 'px');
+      }
 
       ltPrimary.textContent   = _getPrimaryText(payload);
       ltSecondary.textContent = _getSecondaryText(payload);
@@ -237,7 +405,7 @@
         }
       }
 
-      if (payload.templateId !== 'scripture-fullscreen') {
+      if (!CENTERED_TEMPLATES.has(tplId)) {
         lowerThird.style.left   = `${payload.textX ?? 5}%`;
         lowerThird.style.top    = `${payload.textY ?? 80}%`;
         lowerThird.style.bottom = 'auto';
@@ -390,16 +558,49 @@
       Object.keys(activeWidgets).forEach(k => delete activeWidgets[k]);
     }
 
+    // ─── Ticker Actions ───────────────────────────────
+    function showTicker(payload) {
+      const msgs = payload.messages || [];
+      const text = msgs.length > 0 ? msgs.join('   ✦   ') : (payload.text || 'Thông báo...');
+      const label = payload.label || 'THÔNG BÁO';
+      const color = payload.color || '#4d8eff';
+      const speedSecs = Math.max(10, Math.round(text.length * 0.25));
+
+      tickerText.textContent = text + '   ✦   ';
+      tickerLabel.textContent = label;
+      document.documentElement.style.setProperty('--ticker-color', color);
+      document.documentElement.style.setProperty('--ticker-speed', speedSecs + 's');
+
+      // Restart animation
+      tickerText.style.animation = 'none';
+      tickerText.offsetHeight; // force reflow
+      tickerText.style.animation = '';
+
+      tickerEl.classList.add('visible');
+    }
+
+    function hideTicker() {
+      tickerEl.classList.remove('visible');
+    }
+
     // ─── Text Helpers ─────────────────────────────────
     function _getPrimaryText(p) {
-      return p.songName || p.speakerName || p.announcement || p.scriptureRef || '—';
+      // Lyric templates use 'primary' field directly
+      if (p.primary)       return p.primary;
+      if (p.songName)      return p.songName;
+      if (p.speakerName)   return p.speakerName;
+      if (p.announcement)  return p.announcement;
+      if (p.scriptureRef)  return p.scriptureRef;
+      return '—';
     }
 
     function _getSecondaryText(p) {
+      // Lyric templates use 'secondary' field directly
+      if (p.secondary !== undefined && p.secondary !== null) return p.secondary;
       if (p.scriptureRef && p.scriptureVerse) return `${p.scriptureRef} : ${p.scriptureVerse}`;
       if (p.scriptureRef) return p.scriptureRef;
       if (p.speakerName && p.title) return p.title;
-      return p.speakerName || p.singerName || '';
+      return p.singerName || '';
     }
 
     // ─── Start ────────────────────────────────────────
