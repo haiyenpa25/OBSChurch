@@ -632,14 +632,49 @@
       <input class="wlib-search" id="wlib-search" type="text" placeholder="Tìm widget..." />
       <button class="wlib-close" id="btn-wlib-close">✕</button>
     </div>
-    <div class="wlib-cats" id="wlib-cats">
-      <button class="wlib-cat active" data-cat="all">Tất cả</button>
-      <button class="wlib-cat" data-cat="timing">⏱ Thời gian</button>
-      <button class="wlib-cat" data-cat="text">📝 Văn bản</button>
-      <button class="wlib-cat" data-cat="media">🖼 Media</button>
+    <!-- Tab nav -->
+    <div style="display:flex;gap:0;border-bottom:1px solid var(--bd);flex-shrink:0">
+      <button class="wlib-tab-btn active" data-wtab="library" style="flex:1;height:34px;background:transparent;border:none;border-bottom:2px solid var(--g);color:var(--g);font-size:10px;font-family:var(--fm);cursor:pointer;font-weight:700">📦 Thư viện</button>
+      <button class="wlib-tab-btn" data-wtab="custom" style="flex:1;height:34px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--t3);font-size:10px;font-family:var(--fm);cursor:pointer">⭐ Custom</button>
+      <button class="wlib-tab-btn" data-wtab="import" style="flex:1;height:34px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--t3);font-size:10px;font-family:var(--fm);cursor:pointer">⬆️ Import</button>
     </div>
-    <div class="wlib-grid" id="wlib-grid">
-      <div class="wlib-empty">Đang tải widget...</div>
+    <!-- Tab: Library -->
+    <div id="wlib-tab-library">
+      <div class="wlib-cats" id="wlib-cats">
+        <button class="wlib-cat active" data-cat="all">Tất cả</button>
+        <button class="wlib-cat" data-cat="timing">⏱ Thời gian</button>
+        <button class="wlib-cat" data-cat="text">📝 Văn bản</button>
+        <button class="wlib-cat" data-cat="media">🖼 Media</button>
+      </div>
+      <div class="wlib-grid" id="wlib-grid">
+        <div class="wlib-empty">Đang tải widget...</div>
+      </div>
+    </div>
+    <!-- Tab: Custom -->
+    <div id="wlib-tab-custom" style="display:none">
+      <div class="wlib-grid" id="wlib-custom-grid" style="min-height:160px">
+        <div class="wlib-empty">Chưa có widget custom nào.<br><span style="font-size:8px;color:var(--t4)">Import file ở tab ⬆️ Import</span></div>
+      </div>
+    </div>
+    <!-- Tab: Import -->
+    <div id="wlib-tab-import" style="display:none;padding:16px;display:none;flex-direction:column;gap:12px">
+      <div id="wlib-dropzone" style="border:2px dashed var(--bd);border-radius:10px;padding:28px 16px;text-align:center;cursor:pointer;transition:border-color 0.15s;background:var(--b1)" >
+        <div style="font-size:28px;margin-bottom:8px">🗂️</div>
+        <div style="font-size:11px;color:var(--t2);margin-bottom:4px">Kéo thả <strong>widget.json</strong> + <strong>template.html</strong></div>
+        <div style="font-size:9px;color:var(--t4);margin-bottom:12px">Hoặc chọn file ở bên dưới</div>
+        <input type="file" id="wlib-file-input" accept=".json,.html" multiple style="display:none">
+        <button id="btn-wlib-pick-files" style="height:28px;padding:0 16px;border-radius:6px;border:1px solid var(--bd);background:var(--b3);color:var(--t2);font-size:10px;cursor:pointer">➕ Chọn file</button>
+      </div>
+      <div id="wlib-import-preview" style="display:none;background:var(--b1);border:1px solid var(--bd);border-radius:8px;padding:12px">
+        <div style="font-size:10px;font-weight:700;color:var(--g);margin-bottom:8px">✓ Đã phân tích — xác nhận thêm?</div>
+        <div id="wlib-import-info" style="font-size:9px;color:var(--t2);font-family:var(--fm);line-height:1.6"></div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button id="btn-wlib-import-confirm" style="flex:1;height:28px;border-radius:6px;border:none;background:var(--g);color:#000;font-size:10px;font-weight:700;cursor:pointer">➕ Thêm vào Custom</button>
+          <button id="btn-wlib-import-cancel" style="height:28px;padding:0 12px;border-radius:6px;border:1px solid var(--bd);background:transparent;color:var(--t3);font-size:10px;cursor:pointer">Hủy</button>
+        </div>
+      </div>
+      <!-- List custom widgets -->
+      <div id="wlib-custom-list" style="display:flex;flex-direction:column;gap:4px"></div>
     </div>
   </div>
 </div>
@@ -1384,7 +1419,8 @@ function renderElProps() {
         </div>
         ${el.type === 'cam' ? `<label class="checkbox-row"><input type="checkbox" id="ep-ar" ${el.lockAR?'checked':''}><span>Giữ tỷ lệ 16:9</span></label>` : ''}
       </div>
-    </div>`;
+    </div>
+    ${bindingSectionHtml(el)}`;
 
   // Bind prop sliders
   const bindPropSlider = (id, prop, unit='%') => {
@@ -1431,6 +1467,8 @@ function renderElProps() {
     $('ep-ticker-content').addEventListener('input', () => { el.label = $('ep-ticker-content').value; renderCanvas(); });
     $('ep-ticker-content').addEventListener('change', pushHistory);
   }
+  // Binding section
+  bindBindingSection(el, propsDiv);
 }
 
 // ── Drag ──────────────────────────────────────────────────────────
@@ -2050,6 +2088,9 @@ function renderWidgetElProps(el) {
     if (!key) return;
     cb.addEventListener('change', () => { el.props[key] = cb.checked; pushHistory(); });
   });
+  // Binding section
+  propsDiv.insertAdjacentHTML('beforeend', bindingSectionHtml(el));
+  bindBindingSection(el, propsDiv);
 }
 
 // Patch createElDom to support 'widget' type
@@ -2084,16 +2125,220 @@ const createElDomBase = createElDom;
 function openWidgetLibrary() { $('widget-library').classList.add('open'); }
 function closeWidgetLibrary() { $('widget-library').classList.remove('open'); }
 
+// ══════════════════════════════════════════════════════════════════
+//  WIDGET LIBRARY TABS
+// ══════════════════════════════════════════════════════════════════
+function switchWlibTab(tab) {
+  ['library','custom','import'].forEach(t => {
+    const el = $('wlib-tab-' + t);
+    if (el) el.style.display = (t === tab) ? (t === 'import' ? 'flex' : '') : 'none';
+  });
+  document.querySelectorAll('.wlib-tab-btn').forEach(btn => {
+    const active = btn.dataset.wtab === tab;
+    btn.style.borderBottomColor = active ? 'var(--g)' : 'transparent';
+    btn.style.color = active ? 'var(--g)' : 'var(--t3)';
+    btn.style.fontWeight = active ? '700' : '400';
+  });
+  if (tab === 'custom') renderCustomWidgets();
+  if (tab === 'import') renderCustomWidgetsList();
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  CUSTOM WIDGET REGISTRY (localStorage)
+// ══════════════════════════════════════════════════════════════════
+function getWidgetRegistry() {
+  try { return JSON.parse(localStorage.getItem('obsChurchWidgets') || '{}'); } catch { return {}; }
+}
+function saveWidgetRegistry(reg) {
+  localStorage.setItem('obsChurchWidgets', JSON.stringify(reg));
+}
+
+function renderCustomWidgets() {
+  const reg = getWidgetRegistry();
+  const grid = $('wlib-custom-grid');
+  if (!grid) return;
+  const widgets = Object.values(reg);
+  if (!widgets.length) {
+    grid.innerHTML = '<div class="wlib-empty">Chưa có widget custom nào.<br><span style="font-size:8px;color:var(--t4)">Import file ở tab ⬆️ Import</span></div>';
+    return;
+  }
+  grid.innerHTML = widgets.map(w => `
+    <div class="wcard" data-cwid="${w.id}">
+      <div class="wcard-preview">
+        <span class="wcard-icon">${w.icon || '🧩'}</span>
+        <span class="wcard-cat-badge">custom</span>
+      </div>
+      <div class="wcard-meta">
+        <span class="wcard-name">${w.name}</span>
+        <span class="wcard-desc">${w.description || ''}</span>
+      </div>
+      <div class="wcard-props">
+        ${(w.props||[]).slice(0,3).map(p=>`<span class="wcard-prop-tag">${p.label}</span>`).join('')}
+        <span class="wcard-prop-tag" style="color:var(--a);border-color:rgba(251,191,36,0.3)">📁 local</span>
+      </div>
+    </div>`).join('');
+  grid.querySelectorAll('.wcard').forEach(card => {
+    card.addEventListener('click', () => {
+      const cwid = card.dataset.cwid;
+      const reg = getWidgetRegistry();
+      const w = reg[cwid];
+      if (w) { addWidgetElement(w); closeWidgetLibrary(); toast(`Thêm widget: ${w.name} ✓`, 'ok'); }
+    });
+  });
+}
+
+function renderCustomWidgetsList() {
+  const reg = getWidgetRegistry();
+  const list = $('wlib-custom-list');
+  if (!list) return;
+  const widgets = Object.values(reg);
+  if (!widgets.length) { list.innerHTML = ''; return; }
+  list.innerHTML = '<div style="font-size:9px;color:var(--t3);font-family:var(--fm);margin-bottom:6px">Custom widgets đã lưu:</div>' +
+    widgets.map(w => `
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--b2);border:1px solid var(--bd);border-radius:6px">
+      <span style="font-size:16px">${w.icon||'🧩'}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:10px;font-weight:700;color:var(--t1)">${w.name}</div>
+        <div style="font-size:8px;color:var(--t3);font-family:var(--fm)">${w.id} · ${(w.props||[]).length} props</div>
+      </div>
+      <button data-del-cwid="${w.id}" style="height:22px;padding:0 8px;border-radius:4px;border:1px solid rgba(239,68,68,0.3);background:var(--rd);color:var(--r);font-size:9px;cursor:pointer">Xóa</button>
+    </div>`).join('');
+  list.querySelectorAll('[data-del-cwid]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const reg = getWidgetRegistry();
+      delete reg[btn.dataset.delCwid];
+      saveWidgetRegistry(reg);
+      renderCustomWidgetsList();
+      toast('Đã xóa widget ✓', 'ok');
+    });
+  });
+}
+
+// ── Import widget from files ────────────────────────────────────────
+let _importPending = null; // { manifest, templateHtml }
+
+async function handleWidgetFiles(files) {
+  const fileArr = Array.from(files);
+  let manifest = null, templateHtml = null;
+  for (const f of fileArr) {
+    if (f.name.endsWith('.json')) {
+      try { manifest = JSON.parse(await f.text()); } catch { toast('Lỗi parse widget.json!', 'err'); return; }
+    } else if (f.name.endsWith('.html')) {
+      templateHtml = await f.text();
+    }
+  }
+  if (!manifest) { toast('Cần ít nhất file widget.json!', 'warn'); return; }
+  if (!manifest.id || !manifest.name) { toast('widget.json thiếu id hoặc name!', 'err'); return; }
+
+  _importPending = { manifest, templateHtml };
+
+  // Show preview
+  const info = $('wlib-import-info');
+  info.innerHTML = `
+    <b>ID:</b> ${manifest.id}<br>
+    <b>Tên:</b> ${manifest.name}<br>
+    <b>Icon:</b> ${manifest.icon||'🧩'}<br>
+    <b>Danh mục:</b> ${manifest.category||'widget'}<br>
+    <b>Props:</b> ${(manifest.props||[]).map(p=>p.label).join(', ') || '(không có)'}<br>
+    <b>Template:</b> ${templateHtml ? '✓ Có file template.html' : '⚠ Không có (sẽ dùng iframe URL)'}`;
+  $('wlib-import-preview').style.display = 'block';
+  $('wlib-dropzone').style.borderColor = 'var(--g)';
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  GẮN LAYER VỚI TIẾT MỤC
+// ══════════════════════════════════════════════════════════════════
+function buildItemOptions(currentBoundId) {
+  let opts = '<option value="">— Luôn hiển thị —</option>';
+  S.scenes.forEach(scene => {
+    opts += `<optgroup label="${scene.label||scene.id}">`;
+    (scene.items||[]).forEach(item => {
+      const sel = item.id === currentBoundId ? 'selected' : '';
+      opts += `<option value="${item.id}" ${sel}>${item.label||item.id}</option>`;
+    });
+    opts += '</optgroup>';
+  });
+  return opts;
+}
+
+function bindingSectionHtml(el) {
+  const itemOpts = buildItemOptions(el.boundItemId || '');
+  // Prop mapping section (only for widget type)
+  let propMappingHtml = '';
+  if (el.type === 'widget' && (el.propDefs||[]).length > 0) {
+    const ITEM_FIELDS = [
+      { value:'', label:'— không map —' },
+      { value:'songName', label:'Tên bài hát' },
+      { value:'speakerName', label:'Tên diễn giả' },
+      { value:'scriptureRef', label:'Câu gốc (sách/câu)' },
+      { value:'scriptureVerse', label:'Câu gốc (nội dung)' },
+      { value:'announcement', label:'Thông báo / Tiêu đề' },
+    ];
+    propMappingHtml = `
+      <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--bd)">
+        <div style="font-size:8px;color:var(--t3);font-family:var(--fm);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Prop Mapping (tự điền)</div>
+        ${(el.propDefs||[]).map(p => {
+          const mapped = (el.propMapping||{})[p.key] || '';
+          const opts = ITEM_FIELDS.map(f => `<option value="${f.value}" ${f.value===mapped?'selected':''}>${f.label}</option>`).join('');
+          return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+            <span style="font-size:9px;color:var(--t2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.label}</span>
+            <select class="finput bind-prop-map" data-pkey="${p.key}" style="height:22px;font-size:9px;width:120px">${opts}</select>
+          </div>`;
+        }).join('')}
+      </div>`;
+  }
+
+  return `
+    <div class="prop-section" style="margin-top:8px">
+      <div class="prop-hdr">
+        <div class="prop-hdr-icon b"><span class="ms" style="font-size:11px;font-family:'Material Symbols Outlined'">link</span></div>
+        <span class="prop-hdr-title">Gắn với Tiết Mục</span>
+      </div>
+      <div class="prop-body">
+        <div class="fld">
+          <label class="flbl">Hiển thị khi tiết mục</label>
+          <select class="finput" id="el-bound-item">
+            ${itemOpts}
+          </select>
+        </div>
+        ${propMappingHtml}
+      </div>
+    </div>`;
+}
+
+function bindBindingSection(el, container) {
+  const sel = container.querySelector('#el-bound-item');
+  if (sel) {
+    sel.addEventListener('change', () => {
+      el.boundItemId = sel.value || null;
+      pushHistory();
+      renderLayerList();
+    });
+  }
+  container.querySelectorAll('.bind-prop-map').forEach(s => {
+    s.addEventListener('change', () => {
+      if (!el.propMapping) el.propMapping = {};
+      el.propMapping[s.dataset.pkey] = s.value || null;
+      pushHistory();
+    });
+  });
+}
+
 // ── Bind All ───────────────────────────────────────────────────────
 function bindAll() {
   $('tpl-strip').style.background = TPL_META[S.activeTpl]?.color || '#a855f7';
 
-  // Widget library
+  // Widget library open/close
   $('btn-open-widgets').addEventListener('click', openWidgetLibrary);
   $('btn-wlib-close').addEventListener('click', closeWidgetLibrary);
   $('widget-library').addEventListener('click', e => { if (e.target === $('widget-library')) closeWidgetLibrary(); });
 
-  // Category filter
+  // Widget library tab switching
+  document.querySelectorAll('.wlib-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchWlibTab(btn.dataset.wtab));
+  });
+
+  // Category filter (library tab)
   $('wlib-cats').querySelectorAll('.wlib-cat').forEach(btn => {
     btn.addEventListener('click', () => {
       $('wlib-cats').querySelectorAll('.wlib-cat').forEach(b => b.classList.remove('active'));
@@ -2106,6 +2351,36 @@ function bindAll() {
   $('wlib-search').addEventListener('input', () => {
     const cat = $('wlib-cats').querySelector('.wlib-cat.active')?.dataset.cat || 'all';
     renderWidgetLibrary(cat, $('wlib-search').value.toLowerCase());
+  });
+
+  // Import: file picker button
+  $('btn-wlib-pick-files').addEventListener('click', () => $('wlib-file-input').click());
+  $('wlib-file-input').addEventListener('change', e => handleWidgetFiles(e.target.files));
+
+  // Import: drag & drop
+  const dz = $('wlib-dropzone');
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.style.borderColor = 'var(--g)'; });
+  dz.addEventListener('dragleave', () => dz.style.borderColor = 'var(--bd)');
+  dz.addEventListener('drop', e => { e.preventDefault(); dz.style.borderColor = 'var(--bd)'; handleWidgetFiles(e.dataTransfer.files); });
+
+  // Import confirm/cancel
+  $('btn-wlib-import-confirm').addEventListener('click', () => {
+    if (!_importPending) return;
+    const { manifest, templateHtml } = _importPending;
+    const reg = getWidgetRegistry();
+    reg[manifest.id] = { ...manifest, _templateHtml: templateHtml || null, source: 'custom' };
+    saveWidgetRegistry(reg);
+    _importPending = null;
+    $('wlib-import-preview').style.display = 'none';
+    $('wlib-dropzone').style.borderColor = 'var(--bd)';
+    $('wlib-file-input').value = '';
+    renderCustomWidgetsList();
+    toast(`✓ Đã thêm widget "${manifest.name}" vào Custom!`, 'ok');
+  });
+  $('btn-wlib-import-cancel').addEventListener('click', () => {
+    _importPending = null;
+    $('wlib-import-preview').style.display = 'none';
+    $('wlib-dropzone').style.borderColor = 'var(--bd)';
   });
 }
 
