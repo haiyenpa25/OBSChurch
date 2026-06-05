@@ -88,32 +88,37 @@ if (preg_match_all('#cat_sub=([^"&]+)"[^>]*>([^<]+)<#u', $html ?? '', $csubs)) {
 }
 
 // ── Extract lyrics from div#lyric-content ─────────────────────────
-$sections   = [];
-$rawLines   = [];
-$lyricFound = false;
+// Bước 5: Lấy lời từ div#lyric-content (strpos approach, UTF-8)
+$rawLines = []; $sections = [];
+$lyricPos = strpos($html, 'id="lyric-content"');
+$lyricFound = $lyricPos !== false;
 
-if (preg_match('#<div\s+id="lyric-content"[^>]*>([\s\S]+?)(?=<div class="row row-control|</div>\s*</div>\s*</div>\s*<div class="row)#si', $html ?? '', $m)) {
-    $lyricFound = true;
-    $raw = $m[1];
-    $raw = preg_replace('#</p>\s*<p>#si', "\n", $raw);
-    $raw = preg_replace('#<p>|</p>#si', "\n", $raw);
-    $raw = preg_replace('#<br\s*/?>#si', "\n", $raw);
-    $text = strip_tags($raw);
+if ($lyricFound) {
+    $startPos = strpos($html, '>', $lyricPos) + 1;
+    $chunk = substr($html, $startPos, 6000);
+    $chunk = preg_replace('#</p>\s*<p[^>]*>#si', "\n", $chunk);
+    $chunk = preg_replace('#<p[^>]*>#si', '', $chunk);
+    $chunk = preg_replace('#</p>#si', "\n", $chunk);
+    $chunk = preg_replace('#<br\s*/?>#si', "\n", $chunk);
+    $text = strip_tags($chunk);
     $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     
     foreach (explode("\n", $text) as $line) {
         $line = trim($line);
         if (!$line) continue;
-        if (preg_match('/^[←→\d\s]+$/', $line)) continue; // skip nav
+        // Dừng khi gặp nav/UI junk
+        if (preg_match('/^(Thánh ca\s*$|KTĐ|Kinh Thánh Đối Đáp|Mới truy cập|Cỡ chữ|#\d{3}\.|Fullscreen)/ui', $line)) break;
+        if (preg_match('/^[←→\s\d]+$/', $line)) continue;
+        if (mb_strlen($line, 'UTF-8') < 2) continue;
         $rawLines[] = $line;
     }
-    
-    // Parse into sections
+
+    // Parse sections
     $curLabel = null; $curLines = [];
     foreach ($rawLines as $line) {
-        if (preg_match('/^(Câu\s*\d+|Điệp\s*[Kk]húc|ĐK\s*:|Bridge|Verse\s*\d+)/ui', $line)) {
+        if (preg_match('/^(Câu\s*\d+|Điệp\s*[Kk]húc|ĐK\s*:?)/ui', $line)) {
             if (!empty($curLines)) $sections[] = ['label' => $curLabel ?? 'Câu 1', 'lines' => $curLines];
-            $curLabel = trim(preg_replace('/[:\s]+$/', '', $line));
+            $curLabel = preg_replace('/[:\s]+$/', '', trim($line));
             $curLines = [];
         } else {
             $curLines[] = $line;

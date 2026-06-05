@@ -80,26 +80,35 @@ function getDB() {
 }
 
 // ── Lyrics extraction ─────────────────────────────────────────────
+// Rule: UTF-8. Lời nằm trong <div id="lyric-content">.
+// Dùng strpos thay vì regex closing boundary để tránh nested div lỗi.
 function extractLyrics($html) {
-    // Lyrics live in <div id="lyric-content">...</div>
-    if (!preg_match('#<div\s+id="lyric-content"[^>]*>([\s\S]+?)(?:</div>\s*</div>\s*</div>|<div class="row row-control)#si', $html, $m)) return [];
+    $markerPos = strpos($html, 'id="lyric-content"');
+    if ($markerPos === false) return [];
     
-    $raw = $m[1];
-    $raw = preg_replace('#</p>\s*<p>#si', "\n", $raw);
-    $raw = preg_replace('#<p>#si', '', $raw);
-    $raw = preg_replace('#</p>#si', "\n", $raw);
-    $raw = preg_replace('#<br\s*/?>#si', "\n", $raw);
-    $text = strip_tags($raw);
+    $startPos = strpos($html, '>', $markerPos);
+    if ($startPos === false) return [];
+    $startPos++;
+    
+    // Lấy 6000 chars — đủ cho bài dài nhất
+    $chunk = substr($html, $startPos, 6000);
+    $chunk = preg_replace('#</p>\s*<p[^>]*>#si', "\n", $chunk);
+    $chunk = preg_replace('#<p[^>]*>#si', '', $chunk);
+    $chunk = preg_replace('#</p>#si', "\n", $chunk);
+    $chunk = preg_replace('#<br\s*/?>#si', "\n", $chunk);
+    
+    $text = strip_tags($chunk);
     $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     
     $lines = [];
     foreach (explode("\n", $text) as $line) {
         $line = trim($line);
         if (!$line) continue;
-        // Skip navigation artifacts (← 001  003 →)
-        if (preg_match('/^[←→\d\s]+$/', $line)) continue;
-        // Skip chord-only lines (e.g. "C  G  Am  F")
-        if (preg_match('/^[A-G][#b]?[\w\/]*(\s+[A-G][#b]?[\w\/]*)+\s*$/', $line) && !preg_match('/\p{Ll}{3}/u', $line)) continue;
+        // Dừng khi gặp nav/UI junk
+        if (preg_match('/^(Thánh ca\s*$|KTĐ|Kinh Thánh Đối Đáp|Mới truy cập|Cỡ chữ|#\d{3}\.|Fullscreen)/ui', $line)) break;
+        // Bỏ navigation arrows: ← 001  003 →
+        if (preg_match('/^[←→\s\d]+$/', $line)) continue;
+        if (mb_strlen($line, 'UTF-8') < 2) continue;
         $lines[] = $line;
     }
     return $lines;

@@ -55,55 +55,51 @@ function httlvnFetch($url, $timeout = 20) {
 }
 
 // ── Extract lyrics from song HTML ─────────────────────────────────
+// Rule: UTF-8. Lời nằm trong <div id="lyric-content">.
+// Dùng cách cắt theo vị trí thay vì regex closing (tránh lỗi nested div)
 function extractHTTLVNLyrics($html) {
-    // Lyrics are in <div id="lyric-content">...</div>
-    if (!preg_match('#<div\s+id="lyric-content"[^>]*>([\s\S]+?)</div>\s*</div>\s*</div>#si', $html, $m)) {
-        // Fallback: find lyric-content without strict closing
-        if (!preg_match('#<div\s+id="lyric-content"[^>]*>([\s\S]+?)(?=<div class="row row-control|</div>\s*</div>\s*</div>\s*<div class="row)#si', $html, $m)) {
-            return [];
-        }
-    }
+    // Tìm vị trí bắt đầu của lyric-content
+    $markerPos = strpos($html, 'id="lyric-content"');
+    if ($markerPos === false) return [];
     
-    $raw = $m[1];
+    // Nhảy qua dấu >
+    $startPos = strpos($html, '>', $markerPos);
+    if ($startPos === false) return [];
+    $startPos++;
     
-    // Remove chord annotations: <i class="chord-group">...</i>
-    // BUT keep their text if they are part of lyrics (only remove if they appear mid-word or are chord letters A-G)
-    // Strategy: remove chord-group wrappers but keep text inside
-    // Actually chord-group wraps both chords AND lyric words mixed together
-    // Better: strip all HTML, newlines from <p> tags
+    // Lấy ~6000 ký tự từ đó (đủ cho bài dài nhất)
+    $chunk = substr($html, $startPos, 6000);
     
-    $raw = preg_replace('/<\/p>\s*<p>/si', "\n", $raw);
-    $raw = preg_replace('/<p>/si', '', $raw);
-    $raw = preg_replace('/<\/p>/si', "\n", $raw);
-    $raw = preg_replace('/<br\s*\/?>/si', "\n", $raw);
+    // Convert tags thành newlines
+    $chunk = preg_replace('#</p>\s*<p[^>]*>#si', "\n", $chunk);
+    $chunk = preg_replace('#<p[^>]*>#si', '', $chunk);
+    $chunk = preg_replace('#</p>#si', "\n", $chunk);
+    $chunk = preg_replace('#<br\s*/?>#si', "\n", $chunk);
     
-    // Remove chord markup: <i class="chord-group">CHORD</i>
-    // Chord patterns are typically: C, Dm, G7, Am, F#m, etc.
-    // We want to remove just the chord letters but keep lyric words
-    // Safest: strip ALL tags → gives us plain text with lyrics + chords mixed
-    $text = strip_tags($raw);
+    // Strip tất cả tags còn lại
+    $text = strip_tags($chunk);
     $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     
-    // Split into lines and clean
-    $lines = explode("\n", $text);
-    $cleaned = [];
+    $lines   = [];
+    $junkSeen = false;
     
-    foreach ($lines as $line) {
+    foreach (explode("\n", $text) as $line) {
         $line = trim($line);
+        if (!$line) continue;
         
-        // Skip empty lines
-        if (mb_strlen($line) === 0) continue;
+        // Dừng khi gặp nav/UI junk
+        if (preg_match('/^(Thánh ca\s*$|KTĐ|Kinh Thánh Đối Đáp|Mới truy cập|Cỡ chữ|#\d{3}\.|Fullscreen)/ui', $line)) break;
         
-        // Skip lines that are ONLY chord notation (single words that are chords like C, Dm, G7, Am, F#)
-        if (preg_match('/^[A-G][#b]?(?:m|maj|min|dim|aug|sus|add|M)?(?:\d+)?(?:\/[A-G][#b]?)?$/', $line)) continue;
+        // Bỏ navigation arrows: ← 001  003 →
+        if (preg_match('/^[←→\s\d]+$/', $line)) continue;
         
-        // Skip lines with ONLY chord notation (multiple chords, no Vietnamese text)
-        if (preg_match('/^[A-G][#b]?[\w\/]*(?:\s+[A-G][#b]?[\w\/]*)+\s*$/', $line) && !preg_match('/\p{L}\p{L}/u', $line)) continue;
+        // Bỏ dòng quá ngắn (1 ký tự)
+        if (mb_strlen($line, 'UTF-8') < 2) continue;
         
-        $cleaned[] = $line;
+        $lines[] = $line;
     }
     
-    return $cleaned;
+    return $lines;
 }
 
 // ── Parse sections (Câu 1, Câu 2...) ──────────────────────────────
