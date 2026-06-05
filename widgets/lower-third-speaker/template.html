@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lower Third — Diễn Giả</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 100%; height: 100%;
+    background: transparent;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    overflow: hidden;
+    display: flex; align-items: flex-end; padding: 0 0 8px 0;
+  }
+
+  .lt-wrap {
+    width: 100%;
+    transform: translateX(-100%);
+    transition: transform 0.5s cubic-bezier(0.2, 0, 0, 1);
+    opacity: 0;
+    transition: transform 0.5s cubic-bezier(0.2,0,0,1), opacity 0.4s ease;
+  }
+  .lt-wrap.visible {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  .lt-bar {
+    display: flex; align-items: stretch;
+    overflow: hidden;
+    border-radius: 0 6px 6px 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+
+  /* Modern style */
+  .lt-bar.modern .lt-accent {
+    width: 5px;
+    background: var(--accent, #a855f7);
+    flex-shrink: 0;
+  }
+  .lt-bar.modern .lt-body {
+    background: rgba(8, 8, 20, var(--bg-opacity, 0.85));
+    padding: 10px 18px;
+    flex: 1;
+  }
+  .lt-bar.modern .lt-name {
+    font-size: 1.1em; font-weight: 800; color: #ffffff;
+    display: block; line-height: 1.2;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+  .lt-bar.modern .lt-title {
+    font-size: 0.65em; font-weight: 500;
+    color: var(--accent, #a855f7);
+    display: block; margin-top: 2px;
+    text-transform: uppercase; letter-spacing: 0.1em;
+  }
+  .lt-bar.modern .lt-topic {
+    font-size: 0.72em; color: rgba(255,255,255,0.75);
+    display: block; margin-top: 4px;
+    font-style: italic;
+  }
+
+  /* Classic style */
+  .lt-bar.classic .lt-accent {
+    width: 0;
+    background: var(--accent, #a855f7);
+  }
+  .lt-bar.classic .lt-body {
+    background: var(--accent, #a855f7);
+    padding: 8px 16px;
+  }
+  .lt-bar.classic .lt-name { font-size: 1em; font-weight: 700; color: #fff; }
+  .lt-bar.classic .lt-title { font-size: 0.65em; color: rgba(255,255,255,0.85); margin-top: 2px; letter-spacing: 0.05em; }
+  .lt-bar.classic .lt-topic { display: none; }
+
+  /* Minimal style */
+  .lt-bar.minimal .lt-accent { width: 3px; background: var(--accent, #a855f7); }
+  .lt-bar.minimal .lt-body { background: transparent; padding: 6px 12px; }
+  .lt-bar.minimal .lt-name { font-size: 1em; font-weight: 700; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
+  .lt-bar.minimal .lt-title { font-size: 0.65em; color: var(--accent, #a855f7); letter-spacing: 0.08em; }
+  .lt-bar.minimal .lt-topic { display: none; }
+</style>
+</head>
+<body>
+<div class="lt-wrap" id="lt-wrap">
+  <div class="lt-bar modern" id="lt-bar">
+    <div class="lt-accent" id="lt-accent"></div>
+    <div class="lt-body">
+      <span class="lt-name" id="lt-name">Mục Sư Nguyễn Văn A</span>
+      <span class="lt-title" id="lt-title">Mục Sư Quản Nhiệm</span>
+      <span class="lt-topic" id="lt-topic" style="display:none"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+const P = window.__WIDGET_PROPS || {};
+
+function apply(props) {
+  const accent = props.accentColor || '#a855f7';
+  const bgOp   = ((props.bgOpacity ?? 85) / 100).toFixed(2);
+  const style  = props.style || 'modern';
+
+  document.documentElement.style.setProperty('--accent', accent);
+  document.documentElement.style.setProperty('--bg-opacity', bgOp);
+
+  document.getElementById('lt-name').textContent  = props.speakerName || 'Tên Diễn Giả';
+  document.getElementById('lt-title').textContent = props.title || '';
+
+  const topicEl = document.getElementById('lt-topic');
+  if (props.showTopic && props.sermonTopic) {
+    topicEl.textContent = '📖 ' + props.sermonTopic;
+    topicEl.style.display = 'block';
+  } else {
+    topicEl.style.display = 'none';
+  }
+
+  // Apply style class
+  const bar = document.getElementById('lt-bar');
+  bar.className = 'lt-bar ' + style;
+}
+
+// Initial render
+apply(P);
+setTimeout(() => document.getElementById('lt-wrap').classList.add('visible'), 100);
+
+// Live reload
+window.__widgetReload = (newProps) => {
+  Object.assign(P, newProps);
+  apply(P);
+};
+</script>
+</body>
+</html>

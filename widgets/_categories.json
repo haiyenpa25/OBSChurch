@@ -1,0 +1,39 @@
+{
+  "categories": [
+    {
+      "id": "giang-luan",
+      "label": "Giảng Luận",
+      "icon": "📖",
+      "color": "#a855f7",
+      "description": "Overlays cho phần giảng luận: lower third, scripture, topic"
+    },
+    {
+      "id": "tho-phuong",
+      "label": "Thờ Phượng",
+      "icon": "🎵",
+      "color": "#4edea3",
+      "description": "Overlays cho bài hát, tôn vinh, lyric"
+    },
+    {
+      "id": "thong-bao",
+      "label": "Thông Báo",
+      "icon": "📢",
+      "color": "#fbbf24",
+      "description": "Ticker, slide thông báo, tin tức"
+    },
+    {
+      "id": "timing",
+      "label": "Thời Gian",
+      "icon": "⏱",
+      "color": "#4d8eff",
+      "description": "Countdown, đồng hồ, timer"
+    },
+    {
+      "id": "media",
+      "label": "Media",
+      "icon": "🖼",
+      "color": "#ef4444",
+      "description": "Hình ảnh, video frame, logo"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "song-lyric-display",
+  "name": "Lyric Bài Hát",
+  "icon": "🎵",
+  "version": "1.0.0",
+  "author": "OBSChurch",
+  "category": "tho-phuong",
+  "description": "Hiển thị lời bài hát với animation cuộn. Hỗ trợ đổi màu và phong cách.",
+  "tags": ["lyric", "bài hát", "thờ phượng", "ca khúc"],
+  "defaultSize": { "w": 60, "h": 20 },
+  "minSize": { "w": 30, "h": 12 },
+  "resizable": true,
+  "lockAR": false,
+  "props": [
+    { "key": "songName",    "label": "Tên bài hát",   "type": "text",    "default": "Tình Chúa Cao Vời" },
+    { "key": "singerName",  "label": "Người hát",     "type": "text",    "default": "Ban thờ phượng" },
+    { "key": "currentLine", "label": "Câu hiện tại",  "type": "textarea","default": "Tình yêu Chúa cao vời..." },
+    { "key": "nextLine",    "label": "Câu tiếp theo", "type": "textarea","default": "" },
+    { "key": "accentColor", "label": "Màu nhấn",      "type": "color",   "default": "#4edea3" },
+    { "key": "bgOpacity",   "label": "Độ mờ nền",     "type": "range",   "min": 0, "max": 100, "default": 80 },
+    { "key": "fontSize",    "label": "Cỡ chữ (px)",   "type": "range",   "min": 14, "max": 60, "default": 28 },
+    { "key": "showSongName","label": "Hiện tên bài",  "type": "boolean", "default": true }
+  ]
+}

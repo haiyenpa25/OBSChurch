@@ -1,0 +1,11 @@
+{
+  "churchName": "Hội Thánh",
+  "serviceDate": "",
+  "serviceTime": "09:00",
+  "livestreamUrl": "",
+  "obsHost": "localhost:4455",
+  "obsPassword": "",
+  "defaultTheme": "clean-dark",
+  "autoStartOnConnect": false,
+  "overlayUrl": "http://localhost/OBSChurch/overlay/index.html"
+}

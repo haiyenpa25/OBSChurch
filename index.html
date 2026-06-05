@@ -1117,6 +1117,10 @@
         <span class="material-symbols-outlined">settings_input_hdmi</span>
         OBS Studio
       </button>
+      <a href="scene-types.html" target="_blank" class="tb-btn">
+        <span class="material-symbols-outlined">movie_creation</span>
+        Scene Types
+      </a>
       <a href="builder.html" target="_blank" class="tb-btn">
         <span class="material-symbols-outlined">design_services</span>
         Layout Builder
@@ -1175,6 +1179,15 @@
 
 
       <div id="cmd-body">
+
+        <!-- OVERLAY SWITCHER (shows when item has scene type) -->
+        <div id="overlay-switcher-wrap" style="display:none;margin-bottom:10px">
+          <div class="section-hdr" style="display:flex;align-items:center;justify-content:space-between">
+            <span>Overlay Nhanh</span>
+            <span id="ov-sw-st-label" style="font-size:9px;font-family:var(--font-mono);color:var(--text-3)"></span>
+          </div>
+          <div id="overlay-switcher-bar" style="display:flex;gap:6px;flex-wrap:wrap;padding:4px 0"></div>
+        </div>
 
         <!-- CURRENT ITEM DETAIL -->
         <div>
@@ -1374,17 +1387,22 @@
    Kiến trúc: Single-page vanilla JS, không dependencies
    ═════════════════════════════════════════════════════════════════════ */
 
-const WS_URL      = 'ws://localhost:3000';
-const API_SCENES  = 'http://localhost:3000/api/scenes';
-const API_LAYOUTS = 'http://localhost:3000/api/layouts';
+const WS_URL        = 'ws://localhost:3000';
+const API_SCENES    = 'http://localhost:3000/api/scenes';
+const API_LAYOUTS   = 'http://localhost:3000/api/layouts';
+const API_STYPES    = 'http://localhost:3000/api/scene-types';
+const API_BINDINGS  = 'http://localhost:3000/api/bindings';
 
 // ── State ──────────────────────────────────────────────────────────
 const state = {
   ws: null,
   scenes: [],
   layouts: {},
+  sceneTypes: {},      // from /api/scene-types
+  bindings: {},        // from /api/bindings
   activeSceneIdx: 0,
   activeItemIdx: 0,
+  activeOverlayId: null,
   onAirItemId: null,
   overlayVisible: false,
   obsConnected: false,
@@ -1417,8 +1435,11 @@ const $ = (id) => document.getElementById(id);
   connectWS();
   await loadScenes();
   await loadLayouts();
+  await loadSceneTypes();
+  await loadBindings();
   renderTimeline();
   renderCurrentItem();
+  renderOverlaySwitcher();
 })();
 
 // ── Timecode ───────────────────────────────────────────────────────
@@ -1500,6 +1521,34 @@ async function loadLayouts() {
   }
 }
 
+async function loadSceneTypes() {
+  try {
+    const r = await fetch(API_STYPES);
+    if (!r.ok) throw new Error();
+    const data = await r.json();
+    state.sceneTypes = data.sceneTypes || {};
+  } catch(_) { state.sceneTypes = {}; }
+}
+
+async function loadBindings() {
+  try {
+    const r = await fetch(API_BINDINGS);
+    if (!r.ok) throw new Error();
+    const data = await r.json();
+    state.bindings = data.bindings || {};
+  } catch(_) { state.bindings = {}; }
+}
+
+async function saveBindings() {
+  try {
+    await fetch(API_BINDINGS, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bindings: state.bindings }),
+    });
+  } catch(_) {}
+}
+
 // ── Timeline rendering ─────────────────────────────────────────────
 function renderTimeline() {
   const list = $('timeline-list');
@@ -1563,12 +1612,84 @@ function selectItem(si, ii) {
   state.activeItemIdx  = ii;
   renderTimeline();
   renderCurrentItem();
+  renderOverlaySwitcher();
   // Scroll into view
   const scene = state.scenes[si];
   if (scene?.items?.[ii]) {
     const el = $(`item-${scene.items[ii].id}`);
     if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }
+}
+
+// ── Overlay Switcher ───────────────────────────────────────────────
+function renderOverlaySwitcher() {
+  const scene = state.scenes[state.activeSceneIdx];
+  const item  = scene?.items?.[state.activeItemIdx];
+  const wrap  = $('overlay-switcher-wrap');
+  const bar   = $('overlay-switcher-bar');
+  const lbl   = $('ov-sw-st-label');
+
+  if (!item || !wrap || !bar) return;
+
+  // Find binding for this item
+  const binding    = state.bindings[item.id];
+  const stypeId    = binding?.sceneTypeId;
+  const stype      = state.sceneTypes[stypeId];
+  const overlays   = stype?.overlays || [];
+
+  if (!stype || !overlays.length) {
+    wrap.style.display = 'none';
+    return;
+  }
+
+  wrap.style.display = '';
+  lbl.textContent    = `${stype.icon || ''} ${stype.label}`;
+
+  const activeOv = binding?.activeOverlayId || (overlays[0]?.id);
+  state.activeOverlayId = activeOv;
+
+  bar.innerHTML = overlays.map(ov => `
+    <button class="ov-switch-btn ${ov.id === activeOv ? 'active' : ''}" data-ov-id="${ov.id}" data-stid="${stypeId}"
+      title="${ov.description || ov.label}"
+      style="height:32px;padding:0 12px;border-radius:7px;border:1px solid ${
+        ov.id === activeOv ? stype.color || '#a855f7' : 'rgba(255,255,255,0.1)'
+      };background:${
+        ov.id === activeOv ? (stype.color || '#a855f7') + '22' : 'transparent'
+      };color:${
+        ov.id === activeOv ? stype.color || '#a855f7' : 'var(--text-3)'
+      };font-size:10px;font-family:var(--font-ui);font-weight:${ov.id === activeOv ? '700' : '500'};cursor:pointer;display:flex;align-items:center;gap:4px;transition:all 0.15s">
+      <span style="font-size:14px">${ov.icon || '🔲'}</span>${ov.label}
+    </button>`).join('');
+
+  bar.querySelectorAll('.ov-switch-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchOverlay(btn.dataset.stid, btn.dataset.ovId, item.id));
+  });
+}
+
+function switchOverlay(stypeId, overlayId, itemId) {
+  state.activeOverlayId = overlayId;
+
+  // Update binding
+  if (!state.bindings[itemId]) state.bindings[itemId] = { itemId };
+  state.bindings[itemId].activeOverlayId = overlayId;
+  state.bindings[itemId].sceneTypeId     = stypeId;
+  saveBindings();
+
+  // Push WS message
+  const stype   = state.sceneTypes[stypeId];
+  const overlay = stype?.overlays?.find(o => o.id === overlayId);
+  wsSend({
+    type: 'OVERLAY_SWITCH',
+    payload: {
+      sceneTypeId: stypeId,
+      overlayId,
+      overlayLabel: overlay?.label,
+      layers: overlay?.layers || [],
+    },
+  });
+
+  renderOverlaySwitcher();
+  toast(`Overlay: ${overlay?.label || overlayId}`, 'ok');
 }
 
 // ── Current Item rendering ─────────────────────────────────────────

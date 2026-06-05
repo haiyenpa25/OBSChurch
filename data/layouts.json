@@ -1,0 +1,62 @@
+{
+  "clean-dark": {
+    "camX": 66,
+    "camY": 36,
+    "camW": 25,
+    "camH": 25,
+    "camR": 8,
+    "textX": 6,
+    "textY": 77,
+    "customCss": "/* Clean Dark custom styles */"
+  },
+  "vintage": {
+    "camX": 5,
+    "camY": 5,
+    "camW": 30,
+    "camH": 30,
+    "camR": 4,
+    "textX": 5,
+    "textY": 85,
+    "customCss": "/* Vintage custom styles */"
+  },
+  "scifi": {
+    "camX": 70,
+    "camY": 5,
+    "camW": 25,
+    "camH": 25,
+    "camR": 0,
+    "textX": 5,
+    "textY": 80,
+    "customCss": "/* SciFi custom styles */"
+  },
+  "glassmorphism": {
+    "camX": 5,
+    "camY": 5,
+    "camW": 25,
+    "camH": 25,
+    "camR": 12,
+    "textX": 5,
+    "textY": 80,
+    "customCss": "/* Glassmorphism custom styles */"
+  },
+  "sermon-topic": {
+    "camX": 0,
+    "camY": 0,
+    "camW": 0,
+    "camH": 0,
+    "camR": 0,
+    "textX": 25,
+    "textY": 45,
+    "customCss": "/* Sermon Topic custom styles */"
+  },
+  "scripture-fullscreen": {
+    "camX": 0,
+    "camY": 0,
+    "camW": 0,
+    "camH": 0,
+    "camR": 0,
+    "textX": 0,
+    "textY": 0,
+    "customCss": "/* Scripture Fullscreen custom styles */"
+  }
+}

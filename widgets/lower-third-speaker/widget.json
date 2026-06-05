@@ -1,0 +1,23 @@
+{
+  "id": "lower-third-speaker",
+  "name": "Lower Third — Diễn Giả",
+  "icon": "🎤",
+  "version": "1.0.0",
+  "author": "OBSChurch",
+  "category": "giang-luan",
+  "description": "Hiển thị tên diễn giả, chức danh và đề tài bài giảng.",
+  "tags": ["lower third", "diễn giả", "tên", "giảng luận"],
+  "defaultSize": { "w": 40, "h": 14 },
+  "minSize": { "w": 25, "h": 10 },
+  "resizable": true,
+  "lockAR": false,
+  "props": [
+    { "key": "speakerName",  "label": "Tên diễn giả",   "type": "text",    "default": "Mục Sư Nguyễn Văn A" },
+    { "key": "title",        "label": "Chức danh",       "type": "text",    "default": "Mục Sư Quản Nhiệm" },
+    { "key": "sermonTopic",  "label": "Đề tài",          "type": "text",    "default": "" },
+    { "key": "accentColor",  "label": "Màu nhấn",        "type": "color",   "default": "#a855f7" },
+    { "key": "bgOpacity",    "label": "Độ mờ nền",       "type": "range",   "min": 0, "max": 100, "default": 85 },
+    { "key": "showTopic",    "label": "Hiện đề tài",     "type": "boolean", "default": true },
+    { "key": "style",        "label": "Kiểu hiển thị",   "type": "select",  "options": ["modern", "classic", "minimal"], "default": "modern" }
+  ]
+}

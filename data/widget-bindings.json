@@ -1,0 +1,25 @@
+{
+  "bindings": {
+    "gl-01": {
+      "itemId": "gl-01",
+      "sceneTypeId": "giang-luan",
+      "activeOverlayId": "binh-thuong",
+      "data": {
+        "speakerName": "",
+        "sermonTopic": "",
+        "bibleRef": "",
+        "bibleVerse": ""
+      }
+    },
+    "cl-01": {
+      "itemId": "cl-01",
+      "sceneTypeId": "tho-phuong",
+      "activeOverlayId": "cam-toan-canh",
+      "data": {
+        "songName": "",
+        "singerName": "",
+        "lyrics": ""
+      }
+    }
+  }
+}

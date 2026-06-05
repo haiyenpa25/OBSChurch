@@ -1,0 +1,210 @@
+{
+  "sceneTypes": {
+    "giang-luan": {
+      "id": "giang-luan",
+      "label": "Giảng Luận",
+      "icon": "📖",
+      "color": "#a855f7",
+      "description": "Cảnh giảng luận — cam mục sư, pptx bài giảng, kinh thánh, lower third",
+
+      "inputs": [
+        {
+          "id": "cam-mucsu",
+          "label": "Cam Mục Sư",
+          "type": "obs-source",
+          "inputKind": "camera",
+          "obsSourceName": "Camera 1",
+          "icon": "📹"
+        },
+        {
+          "id": "pptx-bgiang",
+          "label": "PPTX Bài Giảng",
+          "type": "obs-source",
+          "inputKind": "window",
+          "obsSourceName": "Window Capture - PowerPoint",
+          "icon": "📊"
+        },
+        {
+          "id": "lower-third",
+          "label": "Lower Third",
+          "type": "widget",
+          "widgetId": "lower-third-speaker",
+          "icon": "Tt"
+        }
+      ],
+
+      "dataFields": [
+        { "key": "speakerName",  "label": "Tên mục sư / diễn giả", "type": "text",     "placeholder": "Mục Sư Nguyễn Văn A" },
+        { "key": "sermonTopic",  "label": "Đề tài bài giảng",      "type": "text",     "placeholder": "Tình Yêu Của Đức Chúa Trời" },
+        { "key": "bibleRef",     "label": "Câu gốc (sách - câu)",   "type": "text",     "placeholder": "Giăng 3:16" },
+        { "key": "bibleVerse",   "label": "Nội dung câu gốc",       "type": "textarea", "placeholder": "Vì Đức Chúa Trời yêu thương thế gian..." }
+      ],
+
+      "overlays": [
+        {
+          "id": "binh-thuong",
+          "label": "Bình Thường",
+          "icon": "🅐",
+          "description": "Cam 58% + PPTX 42% + Lower Third",
+          "layers": [
+            { "inputId": "cam-mucsu",   "x": 0,  "y": 0,  "w": 58, "h": 100, "r": 0, "opacity": 100, "visible": true },
+            { "inputId": "pptx-bgiang", "x": 58, "y": 0,  "w": 42, "h": 100, "r": 0, "opacity": 100, "visible": true },
+            { "inputId": "lower-third", "x": 2,  "y": 78, "w": 55, "h": 14,  "r": 4, "opacity": 95,  "visible": true }
+          ]
+        },
+        {
+          "id": "pptx-lon",
+          "label": "PPTX Lớn",
+          "icon": "🅑",
+          "description": "PPTX 78% + Cam pip + Lower Third",
+          "layers": [
+            { "inputId": "pptx-bgiang", "x": 0,  "y": 0,  "w": 78, "h": 100, "r": 0, "opacity": 100, "visible": true },
+            { "inputId": "cam-mucsu",   "x": 74, "y": 2,  "w": 24, "h": 27,  "r": 8, "opacity": 100, "visible": true },
+            { "inputId": "lower-third", "x": 2,  "y": 82, "w": 74, "h": 12,  "r": 4, "opacity": 90,  "visible": true }
+          ]
+        },
+        {
+          "id": "cam-full",
+          "label": "Cam Toàn Cảnh",
+          "icon": "🅒",
+          "description": "Cam fullscreen + Lower Third nhỏ",
+          "layers": [
+            { "inputId": "cam-mucsu",   "x": 0,  "y": 0,  "w": 100, "h": 100, "r": 0, "opacity": 100, "visible": true },
+            { "inputId": "lower-third", "x": 4,  "y": 80, "w": 55,  "h": 14,  "r": 4, "opacity": 95,  "visible": true },
+            { "inputId": "pptx-bgiang", "x": 0,  "y": 0,  "w": 0,   "h": 0,   "r": 0, "opacity": 0,   "visible": false }
+          ]
+        },
+        {
+          "id": "scripture-full",
+          "label": "Kinh Thánh",
+          "icon": "🅓",
+          "description": "Scripture text fullscreen",
+          "layers": [
+            { "inputId": "cam-mucsu",   "x": 0, "y": 0,  "w": 0,  "h": 0,  "r": 0, "opacity": 0,   "visible": false },
+            { "inputId": "pptx-bgiang", "x": 0, "y": 0,  "w": 0,  "h": 0,  "r": 0, "opacity": 0,   "visible": false },
+            { "inputId": "lower-third", "x": 5, "y": 25, "w": 90, "h": 50, "r": 8, "opacity": 100, "visible": true, "styleOverride": "scripture-fullscreen" }
+          ]
+        }
+      ]
+    },
+
+    "tho-phuong": {
+      "id": "tho-phuong",
+      "label": "Thờ Phượng",
+      "icon": "🎵",
+      "color": "#4edea3",
+      "description": "Cảnh thờ phượng — cam toàn cảnh, lyric bài hát",
+
+      "inputs": [
+        {
+          "id": "cam-toan-canh",
+          "label": "Cam Toàn Cảnh",
+          "type": "obs-source",
+          "inputKind": "camera",
+          "obsSourceName": "Camera Wide",
+          "icon": "📹"
+        },
+        {
+          "id": "lyric-overlay",
+          "label": "Lyric Bài Hát",
+          "type": "widget",
+          "widgetId": "song-lyric-display",
+          "icon": "🎵"
+        }
+      ],
+
+      "dataFields": [
+        { "key": "songName",    "label": "Tên bài hát",    "type": "text",     "placeholder": "Tình Chúa Cao Vời" },
+        { "key": "singerName",  "label": "Người hát",      "type": "text",     "placeholder": "Ban thờ phượng" },
+        { "key": "lyrics",      "label": "Lời bài hát",    "type": "textarea", "placeholder": "Nhập lời bài hát..." }
+      ],
+
+      "overlays": [
+        {
+          "id": "cam-toan-canh",
+          "label": "Cam Toàn Cảnh",
+          "icon": "🅐",
+          "description": "Cam fullscreen + Lyric dưới",
+          "layers": [
+            { "inputId": "cam-toan-canh", "x": 0, "y": 0,  "w": 100, "h": 100, "r": 0, "opacity": 100, "visible": true },
+            { "inputId": "lyric-overlay", "x": 5, "y": 78, "w": 90,  "h": 18,  "r": 6, "opacity": 95,  "visible": true }
+          ]
+        },
+        {
+          "id": "lyric-full",
+          "label": "Lyric Lớn",
+          "icon": "🅑",
+          "description": "Lyric fullscreen (nền tối)",
+          "layers": [
+            { "inputId": "cam-toan-canh", "x": 0, "y": 0,  "w": 0,  "h": 0,  "r": 0, "opacity": 0,   "visible": false },
+            { "inputId": "lyric-overlay", "x": 5, "y": 20, "w": 90, "h": 60, "r": 8, "opacity": 100, "visible": true }
+          ]
+        },
+        {
+          "id": "cam-lyric-split",
+          "label": "Cam + Lyric",
+          "icon": "🅒",
+          "description": "Cam 50% trái + Lyric 50% phải",
+          "layers": [
+            { "inputId": "cam-toan-canh", "x": 0,  "y": 0,  "w": 50, "h": 100, "r": 0, "opacity": 100, "visible": true },
+            { "inputId": "lyric-overlay", "x": 52, "y": 30, "w": 46, "h": 40,  "r": 6, "opacity": 95,  "visible": true }
+          ]
+        }
+      ]
+    },
+
+    "thong-bao": {
+      "id": "thong-bao",
+      "label": "Thông Báo",
+      "icon": "📢",
+      "color": "#fbbf24",
+      "description": "Thông báo, tin tức, slide thông báo",
+
+      "inputs": [
+        {
+          "id": "cam-wide",
+          "label": "Cam Góc Rộng",
+          "type": "obs-source",
+          "inputKind": "camera",
+          "obsSourceName": "Camera Wide",
+          "icon": "📹"
+        },
+        {
+          "id": "ticker",
+          "label": "Ticker Thông Báo",
+          "type": "widget",
+          "widgetId": "announcement-ticker",
+          "icon": "📢"
+        }
+      ],
+
+      "dataFields": [
+        { "key": "title",   "label": "Tiêu đề thông báo", "type": "text",     "placeholder": "Thông Báo Tuần Này" },
+        { "key": "content", "label": "Nội dung",           "type": "textarea", "placeholder": "Nội dung thông báo..." }
+      ],
+
+      "overlays": [
+        {
+          "id": "ticker-bottom",
+          "label": "Ticker Dưới",
+          "icon": "🅐",
+          "description": "Cam + Ticker chạy dưới",
+          "layers": [
+            { "inputId": "cam-wide", "x": 0, "y": 0,  "w": 100, "h": 100, "r": 0, "opacity": 100, "visible": true },
+            { "inputId": "ticker",   "x": 0, "y": 88, "w": 100, "h": 8,   "r": 0, "opacity": 95,  "visible": true }
+          ]
+        },
+        {
+          "id": "fullscreen-slide",
+          "label": "Slide Thông Báo",
+          "icon": "🅑",
+          "description": "Ticker fullscreen, cam ẩn",
+          "layers": [
+            { "inputId": "cam-wide", "x": 0, "y": 0,  "w": 0,   "h": 0,   "r": 0, "opacity": 0,   "visible": false },
+            { "inputId": "ticker",   "x": 5, "y": 20, "w": 90,  "h": 60,  "r": 8, "opacity": 100, "visible": true }
+          ]
+        }
+      ]
+    }
+  }
+}
