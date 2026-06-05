@@ -71,6 +71,7 @@ function _handleHttpRequest(req, res) {
 
   // ── POST endpoints ──
   const postMap = {
+    '/api/scenes':      (r, s) => _handleSaveJson(r, s, PATHS.scenes),
     '/api/layouts':     (r, s) => _handleSaveJson(r, s, PATHS.layouts),
     '/api/scene-types': (r, s) => _handleSaveJson(r, s, PATHS.sceneTypes),
     '/api/bindings':    (r, s) => _handleSaveJson(r, s, PATHS.bindings),
@@ -100,6 +101,9 @@ function _handleHttpRequest(req, res) {
 
   // /api/categories  (POST) — save _categories.json
   if (url === '/api/categories' && method === 'POST') { _handleSaveJson(req, res, PATHS.categories); return; }
+
+  // /api/broadcast  (POST) — send WS message to all clients
+  if (url === '/api/broadcast' && method === 'POST') { _handleBroadcast(req, res); return; }
 
   res.writeHead(404).end('Not Found');
 }
@@ -344,6 +348,21 @@ function _handleDeleteWidget(widgetId, res) {
   _jsonOk(res, { success: true });
 }
 
+function _handleBroadcast(req, res) {
+  let body = '';
+  req.on('data', c => body += c);
+  req.on('end', () => {
+    try {
+      const msg = JSON.parse(body);
+      _updateState(msg);
+      _broadcastAll(msg, null);
+      console.log(`[HTTP→WS] broadcast ${msg.type}`);
+      _jsonOk(res, { success: true, type: msg.type });
+    } catch(e) { res.writeHead(400).end('Invalid JSON: ' + e.message); }
+  });
+}
+
+
 function _setCorsHeaders(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -387,11 +406,14 @@ function _updateState(msg) {
       appState.activeSceneId = msg.payload?.sceneId;
       break;
     case 'OVERLAY_SWITCH':
-      // Switch overlay within a scene type
       appState.activeOverlayId   = msg.payload?.overlayId;
       appState.activeSceneType   = msg.payload?.sceneTypeId;
       appState.currentPayload    = { ...appState.currentPayload, ...msg.payload };
       break;
+    case 'OBS_RECORD_START': appState.isRecording = true;  break;
+    case 'OBS_RECORD_STOP':  appState.isRecording = false; break;
+    case 'OBS_STREAM_START': appState.isStreaming = true;  break;
+    case 'OBS_STREAM_STOP':  appState.isStreaming = false; break;
   }
 }
 
@@ -416,8 +438,10 @@ setInterval(() => {
 
 // ─── Start ───────────────────────────────────────────
 httpServer.listen(PORT, () => {
-  console.log('\n🎛️  OBSChurch WS Server v2.0');
+  console.log('\n🎛️  OBSChurch WS Server v2.1');
   console.log(`   WebSocket  : ws://localhost:${PORT}`);
   console.log(`   REST API   : http://localhost:${PORT}/api/`);
-  console.log('   Endpoints  : scenes | layouts | scene-types | bindings | config | widget-categories | widgets\n');
+  console.log('   GET  : scenes | layouts | scene-types | bindings | config | widgets | widget-categories');
+  console.log('   POST : scenes | layouts | scene-types | bindings | config | categories | broadcast');
+  console.log('   POST : widgets/new | widgets/:id/template | widgets/:id/meta | widgets/:id/delete\n');
 });

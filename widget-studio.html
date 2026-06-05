@@ -783,8 +783,16 @@ function renderPropField(p) {
     <select class="pi" data-pkey="${p.key}" data-ptype="select" style="height:26px">
       ${(p.options || []).map(o => `<option value="${o}" ${o === val ? 'selected' : ''}>${o}</option>`).join('')}
     </select></div>`;
+  if (p.type === 'time') return `
+    <div class="pf"><label class="pl">${p.label}</label>
+    <input class="pi" type="time" data-pkey="${p.key}" data-ptype="text" value="${val || '09:00'}"></div>`;
+  if (p.type === 'textarea') return `
+    <div class="pf"><label class="pl">${p.label}</label>
+    <textarea class="pi" data-pkey="${p.key}" data-ptype="text"
+      style="height:60px;padding:6px 8px;resize:vertical">${escHtml(String(val))}</textarea></div>`;
   return '';
 }
+
 
 function liveReloadPreview() {
   const iframe = $('preview-iframe');

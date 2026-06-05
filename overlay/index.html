@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=1920" />
   <title>OBSChurch — Overlay Source</title>
   <link rel="stylesheet" href="overlay.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     /* ── Template: Clean Dark ────────────────────────── */
     .tpl-clean-dark {
@@ -88,7 +89,6 @@
       font-size: 38px;
       font-weight: 500;
       line-height: 1.6;
-      font-family: 'Noto Sans', sans-serif;
     }
     .tpl-scripture-fullscreen .lt-secondary {
       color: #06b6d4;
@@ -99,6 +99,20 @@
       margin-top: 16px;
       display: block;
       text-align: right;
+    }
+
+    /* ── Widget Layer Container ──────────────────────── */
+    #widget-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 20;
+    }
+    .widget-frame {
+      position: absolute;
+      border: none;
+      background: transparent;
+      overflow: hidden;
     }
   </style>
 </head>
@@ -113,17 +127,28 @@
     </div>
   </div>
 
+  <!-- Widget iframe layer — mỗi widget là 1 iframe riêng -->
+  <div id="widget-layer"></div>
+
   <script>
     /**
-     * OBS Browser Source — Overlay Renderer
+     * OBS Browser Source — Overlay Renderer v2.1
      *
-     * Lắng nghe WS messages từ server và cập nhật DOM overlay.
-     * Không import module vì OBS đôi khi giới hạn ES module.
+     * Nhận WS messages từ server:
+     *  - OVERLAY_SHOW  : hiện lower-third overlay
+     *  - OVERLAY_HIDE  : ẩn overlay
+     *  - OVERLAY_TRANS : transition animation
+     *  - OVERLAY_SWITCH: chuyển layout (layers + widgets)
+     *  - WIDGET_UPDATE : cập nhật props một widget cụ thể
+     *  - CLEAR_ALL     : xóa tất cả
+     *  - SAFETY_CUT    : tắt ngay lập tức
+     *  - STATE_SYNC    : đồng bộ khi mới kết nối
      */
 
-    // ─── Constants ────────────────────────────────────
     const WS_URL       = 'ws://localhost:3000';
     const RECONNECT_MS = 3000;
+    const BASE_URL     = 'http://localhost/OBSChurch';
+
     const TEMPLATE_MAP = Object.freeze({
       'clean-dark'          : 'tpl-clean-dark',
       'vintage'             : 'tpl-vintage',
@@ -133,16 +158,20 @@
       'scripture-fullscreen': 'tpl-scripture-fullscreen',
     });
 
-    // ─── DOM refs ─────────────────────────────────────
+    // DOM refs
     const lowerThird  = document.getElementById('lower-third');
     const camFrame    = document.getElementById('cam-frame');
     const ltPrimary   = document.getElementById('lt-primary');
     const ltSecondary = document.getElementById('lt-secondary');
+    const widgetLayer = document.getElementById('widget-layer');
 
-    // ─── WebSocket ────────────────────────────────────
+    // Active widget iframes: { widgetId: HTMLIFrameElement }
+    const activeWidgets = {};
+
     let ws;
     let lastPayload = null;
 
+    // ─── WebSocket ────────────────────────────────────
     function connect() {
       ws = new WebSocket(WS_URL);
       ws.addEventListener('open',    onOpen);
@@ -164,14 +193,18 @@
       }
     }
 
-    // ─── Dispatcher (Polymorphic via map) ─────────────
+    // ─── Dispatcher ───────────────────────────────────
     const handlers = {
-      OVERLAY_SHOW : (p) => showOverlay(p),
-      OVERLAY_HIDE : ()  => hideOverlay(),
-      OVERLAY_TRANS: (p) => triggerTransition(p.effect),
-      CLEAR_ALL    : ()  => hideOverlay(),
-      SAFETY_CUT   : ()  => hideOverlay(true),
-      STATE_SYNC   : (p) => { if (p.overlayVisible) showOverlay(p.currentPayload); },
+      OVERLAY_SHOW  : (p) => showOverlay(p),
+      OVERLAY_HIDE  : ()  => hideOverlay(),
+      OVERLAY_TRANS : (p) => triggerTransition(p.effect),
+      OVERLAY_SWITCH: (p) => switchOverlayLayout(p),
+      WIDGET_UPDATE : (p) => updateWidgetProps(p.widgetId, p.props),
+      CLEAR_ALL     : ()  => { hideOverlay(); clearWidgets(); },
+      SAFETY_CUT    : ()  => { hideOverlay(true); clearWidgets(); },
+      STATE_SYNC    : (p) => {
+        if (p.overlayVisible) showOverlay(p.currentPayload);
+      },
     };
 
     function dispatch(msg) {
@@ -185,15 +218,12 @@
       lastPayload = payload;
       const templateClass = TEMPLATE_MAP[payload.templateId] ?? TEMPLATE_MAP['clean-dark'];
 
-      // Reset template classes
       Object.values(TEMPLATE_MAP).forEach((c) => lowerThird.classList.remove(c));
       lowerThird.classList.add(templateClass);
 
-      // Cập nhật nội dung
       ltPrimary.textContent   = _getPrimaryText(payload);
       ltSecondary.textContent = _getSecondaryText(payload);
 
-      // Cập nhật vị trí & kích thước khung camera ảo
       if (camFrame) {
         if (payload.camW > 0 && payload.camH > 0) {
           camFrame.style.left         = `${payload.camX}%`;
@@ -207,20 +237,16 @@
         }
       }
 
-      // Cập nhật vị trí khung Chữ (trừ khi là template Kinh Thánh toàn màn hình)
       if (payload.templateId !== 'scripture-fullscreen') {
-        lowerThird.style.left   = `${payload.textX}%`;
-        lowerThird.style.top    = `${payload.textY}%`;
+        lowerThird.style.left   = `${payload.textX ?? 5}%`;
+        lowerThird.style.top    = `${payload.textY ?? 80}%`;
         lowerThird.style.bottom = 'auto';
         lowerThird.style.right  = 'auto';
       } else {
-        lowerThird.style.left   = '';
-        lowerThird.style.top    = '';
-        lowerThird.style.bottom = '';
-        lowerThird.style.right  = '';
+        lowerThird.style.left = lowerThird.style.top = '';
+        lowerThird.style.bottom = lowerThird.style.right = '';
       }
 
-      // Inject Custom CSS
       let styleTag = document.getElementById('obs-custom-style');
       if (!styleTag) {
         styleTag = document.createElement('style');
@@ -229,7 +255,6 @@
       }
       styleTag.textContent = payload.customCss || '';
 
-      // Animate in
       lowerThird.classList.remove('is-hiding');
       lowerThird.classList.add('is-visible');
     }
@@ -253,12 +278,117 @@
       setTimeout(() => {
         lowerThird.classList.remove('is-hiding');
         lowerThird.classList.add('is-visible');
-        if (camFrame && lastPayload && lastPayload.camW > 0 && lastPayload.camH > 0) {
+        if (camFrame && lastPayload && lastPayload.camW > 0) {
           camFrame.classList.add('is-visible');
         }
       }, 350);
     }
 
+    // ─── Overlay Switch (từ Scene Designer layers) ────
+    function switchOverlayLayout(payload) {
+      /**
+       * payload: {
+       *   sceneTypeId, overlayId, overlayLabel,
+       *   layers: [ { inputId, x, y, w, h, r, opacity, visible } ]
+       *   elements: [ { id, type, x, y, w, h, r, opacity, visible, widgetId, ... } ]
+       * }
+       * Hỗ trợ cả format cũ (layers[]) và mới (elements[])
+       */
+      const W = window.innerWidth || 1920;
+      const H = window.innerHeight || 1080;
+
+      // Format mới: elements[] từ Scene Designer
+      const elements = payload.elements || [];
+      if (elements.length > 0) {
+        clearWidgets();
+        elements.forEach(el => {
+          if (!el.visible) return;
+          if (el.type === 'widget' && el.widgetId) {
+            mountWidget(el.widgetId, {
+              x: el.x, y: el.y, w: el.w, h: el.h,
+              r: el.r || 0, opacity: el.opacity ?? 100,
+            }, el.widgetProps || {});
+          }
+        });
+        return;
+      }
+
+      // Format cũ: layers[] từ scene-types.json manual
+      const layers = payload.layers || [];
+      clearWidgets();
+      layers.forEach(layer => {
+        if (!layer.visible) return;
+        // Nếu layer là widget
+        if (layer.widgetId) {
+          mountWidget(layer.widgetId, {
+            x: layer.x, y: layer.y, w: layer.w, h: layer.h,
+            r: layer.r || 0, opacity: layer.opacity ?? 100,
+          }, layer.props || {});
+        }
+      });
+    }
+
+    // ─── Widget Management ────────────────────────────
+    function mountWidget(widgetId, layout, props) {
+      // Nếu đã có iframe cho widget này, cập nhật props
+      if (activeWidgets[widgetId]) {
+        updateWidgetProps(widgetId, props);
+        positionWidget(activeWidgets[widgetId], layout);
+        return;
+      }
+
+      const W = window.innerWidth || 1920;
+      const H = window.innerHeight || 1080;
+
+      const iframe = document.createElement('iframe');
+      iframe.className = 'widget-frame';
+      iframe.src = `${BASE_URL}/widgets/${widgetId}/template.html`;
+      iframe.setAttribute('scrolling', 'no');
+      iframe.setAttribute('frameborder', '0');
+      iframe.style.opacity = (layout.opacity ?? 100) / 100;
+
+      positionWidget(iframe, layout);
+      widgetLayer.appendChild(iframe);
+      activeWidgets[widgetId] = iframe;
+
+      // Inject props after load
+      iframe.addEventListener('load', () => {
+        try {
+          iframe.contentWindow.__WIDGET_PROPS = props;
+          if (typeof iframe.contentWindow.__widgetReload === 'function') {
+            iframe.contentWindow.__widgetReload(props);
+          }
+        } catch(e) {
+          console.warn('[Widget] Cross-origin prop inject failed:', e.message);
+        }
+      });
+    }
+
+    function positionWidget(iframe, layout) {
+      const W = window.innerWidth || 1920;
+      const H = window.innerHeight || 1080;
+      iframe.style.left         = (layout.x / 100 * W) + 'px';
+      iframe.style.top          = (layout.y / 100 * H) + 'px';
+      iframe.style.width        = (layout.w / 100 * W) + 'px';
+      iframe.style.height       = (layout.h / 100 * H) + 'px';
+      iframe.style.borderRadius = (layout.r || 0) + 'px';
+      iframe.style.opacity      = (layout.opacity ?? 100) / 100;
+    }
+
+    function updateWidgetProps(widgetId, props) {
+      const iframe = activeWidgets[widgetId];
+      if (!iframe) return;
+      try {
+        if (typeof iframe.contentWindow.__widgetReload === 'function') {
+          iframe.contentWindow.__widgetReload(props);
+        }
+      } catch(e) {}
+    }
+
+    function clearWidgets() {
+      Object.values(activeWidgets).forEach(iframe => iframe.remove());
+      Object.keys(activeWidgets).forEach(k => delete activeWidgets[k]);
+    }
 
     // ─── Text Helpers ─────────────────────────────────
     function _getPrimaryText(p) {
@@ -266,10 +396,10 @@
     }
 
     function _getSecondaryText(p) {
-      if (p.scriptureRef) {
-        return p.scriptureVerse ? `${p.scriptureRef}:${p.scriptureVerse}` : p.scriptureRef;
-      }
-      return p.speakerName || '';
+      if (p.scriptureRef && p.scriptureVerse) return `${p.scriptureRef} : ${p.scriptureVerse}`;
+      if (p.scriptureRef) return p.scriptureRef;
+      if (p.speakerName && p.title) return p.title;
+      return p.speakerName || p.singerName || '';
     }
 
     // ─── Start ────────────────────────────────────────

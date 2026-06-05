@@ -1392,27 +1392,34 @@
    ═════════════════════════════════════════════════════════════════════ */
 
 const WS_URL        = 'ws://localhost:3000';
-const API_SCENES    = 'http://localhost:3000/api/scenes';
-const API_LAYOUTS   = 'http://localhost:3000/api/layouts';
-const API_STYPES    = 'http://localhost:3000/api/scene-types';
-const API_BINDINGS  = 'http://localhost:3000/api/bindings';
+const API_BASE      = 'http://localhost:3000/api';
+const API_SCENES    = API_BASE + '/scenes';
+const API_LAYOUTS   = API_BASE + '/layouts';
+const API_STYPES    = API_BASE + '/scene-types';
+const API_BINDINGS  = API_BASE + '/bindings';
+const API_CONFIG    = API_BASE + '/config';
+const API_BROADCAST = API_BASE + '/broadcast';
 
 // ── State ──────────────────────────────────────────────────────────
 const state = {
   ws: null,
   scenes: [],
   layouts: {},
-  sceneTypes: {},      // from /api/scene-types
-  bindings: {},        // from /api/bindings
+  sceneTypes: {},
+  bindings: {},
+  config: {},
   activeSceneIdx: 0,
   activeItemIdx: 0,
   activeOverlayId: null,
   onAirItemId: null,
   overlayVisible: false,
   obsConnected: false,
+  obsWs: null,           // direct OBS WebSocket connection
   serviceRunning: false,
   autoPilot: false,
   timecodeStart: null,
+  isRecording: false,
+  isStreaming: false,
 };
 
 const TEMPLATE_COLORS = {
@@ -1441,6 +1448,7 @@ const $ = (id) => document.getElementById(id);
   await loadLayouts();
   await loadSceneTypes();
   await loadBindings();
+  await loadConfig();
   renderTimeline();
   renderCurrentItem();
   renderOverlaySwitcher();
@@ -1543,6 +1551,18 @@ async function loadBindings() {
   } catch(_) { state.bindings = {}; }
 }
 
+async function loadConfig() {
+  try {
+    const r = await fetch(API_CONFIG);
+    if (!r.ok) throw new Error();
+    state.config = await r.json();
+    // Apply config: church name to title if set
+    if (state.config.churchName) {
+      document.title = `OBSChurch — ${state.config.churchName}`;
+    }
+  } catch(_) { state.config = {}; }
+}
+
 async function saveBindings() {
   try {
     await fetch(API_BINDINGS, {
@@ -1551,6 +1571,20 @@ async function saveBindings() {
       body: JSON.stringify({ bindings: state.bindings }),
     });
   } catch(_) {}
+}
+
+// Helper: broadcast a WS message via HTTP (for OBS commands)
+async function sendBroadcast(msg) {
+  try {
+    await fetch(API_BROADCAST, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(msg),
+    });
+  } catch(e) {
+    // Fallback: try direct WS
+    send(msg);
+  }
 }
 
 // ── Timeline rendering ─────────────────────────────────────────────
@@ -1907,12 +1941,12 @@ $('btn-ap-pause').addEventListener('click', () => {
 document.querySelectorAll('[data-action]').forEach(btn => {
   btn.addEventListener('click', () => {
     const a = btn.dataset.action;
-    if (a === 'show')       { showOverlay(); }
-    else if (a === 'hide')  { hideOverlay(); }
+    if (a === 'show')            { showOverlay(); }
+    else if (a === 'hide')       { hideOverlay(); }
     else if (a === 'transition') { triggerTransition(); }
-    else if (a === 'clear') { send({ type: 'CLEAR_ALL', payload: {} }); hideOverlay(); }
-    else if (a === 'record'){ toast('Đã bắt đầu ghi hình', 'info'); }
-    else if (a === 'stream'){ toast('Đã bắt đầu phát trực tiếp', 'success'); }
+    else if (a === 'clear')      { send({ type: 'CLEAR_ALL', payload: {} }); hideOverlay(); }
+    else if (a === 'record')     { toggleRecording(btn); }
+    else if (a === 'stream')     { toggleStreaming(btn); }
     else if (a === 'safety-cut') {
       send({ type: 'SAFETY_CUT', payload: {} });
       hideOverlay();
@@ -1923,6 +1957,45 @@ document.querySelectorAll('[data-action]').forEach(btn => {
     flashBtn(btn);
   });
 });
+
+function toggleRecording(btn) {
+  state.isRecording = !state.isRecording;
+  if (state.isRecording) {
+    btn.style.background = 'rgba(239,68,68,0.3)';
+    btn.style.borderColor = '#ef4444';
+    btn.style.color = '#ef4444';
+    btn.querySelector('span').textContent = 'radio_button_checked';
+    toast('🔴 Bắt đầu ghi hình', 'danger');
+    sendBroadcast({ type: 'OBS_RECORD_START', payload: {} });
+  } else {
+    btn.style.background = '';
+    btn.style.borderColor = '';
+    btn.style.color = '';
+    btn.querySelector('span').textContent = 'radio_button_checked';
+    toast('⏹ Dừng ghi hình', 'info');
+    sendBroadcast({ type: 'OBS_RECORD_STOP', payload: {} });
+  }
+}
+
+function toggleStreaming(btn) {
+  state.isStreaming = !state.isStreaming;
+  if (state.isStreaming) {
+    btn.style.background = 'rgba(78,222,163,0.2)';
+    btn.style.borderColor = '#4edea3';
+    btn.style.color = '#4edea3';
+    btn.querySelector('span').textContent = 'sensors';
+    toast('📡 Đang phát trực tiếp!', 'success');
+    sendBroadcast({ type: 'OBS_STREAM_START', payload: {} });
+  } else {
+    btn.style.background = '';
+    btn.style.borderColor = '';
+    btn.style.color = '';
+    btn.querySelector('span').textContent = 'sensors';
+    toast('⏹ Dừng phát trực tiếp', 'info');
+    sendBroadcast({ type: 'OBS_STREAM_STOP', payload: {} });
+  }
+}
+
 
 function flashBtn(btn) {
   btn.style.opacity = '0.5';
