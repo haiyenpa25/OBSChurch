@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Scene Types — OBSChurch</title>
+<title>Scene Designer — OBSChurch</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
 <style>
@@ -13,417 +13,433 @@
   --b0:#04040c;--b1:#08081a;--b2:#0e0e22;--b3:#141430;--b4:#1a1a3a;
   --bd:rgba(255,255,255,0.08);--bdd:rgba(255,255,255,0.04);
   --p:#a855f7;--pd:rgba(168,85,247,0.15);--pp:rgba(168,85,247,0.3);
-  --b:#4d8eff;--bd2:rgba(77,142,255,0.15);
-  --g:#4edea3;--gd:rgba(78,222,163,0.15);
+  --g:#4edea3;--gd:rgba(78,222,163,0.15);--gp:rgba(78,222,163,0.3);
+  --b:#4d8eff;--bd2:rgba(77,142,255,0.15);--bp:rgba(77,142,255,0.3);
   --a:#fbbf24;--ad:rgba(251,191,36,0.15);
   --r:#ef4444;--rd:rgba(239,68,68,0.15);
+  --c:#00f5ff;--cd:rgba(0,245,255,0.1);
   --t1:#f0f0ff;--t2:#9090b0;--t3:#505070;--t4:#2a2a48;
 }
 html,body{height:100%;background:var(--b0);font-family:var(--f);color:var(--t1);-webkit-font-smoothing:antialiased;overflow:hidden}
-button{font-family:var(--f);cursor:pointer}
-input,select,textarea{font-family:var(--f)}
+button{font-family:var(--f);cursor:pointer;border:none;background:none}
+input,select,textarea{font-family:var(--f);color:var(--t1);background:var(--b1);border:1px solid var(--bd);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--p)}
+.ms{font-family:'Material Symbols Outlined';font-style:normal;font-size:inherit;line-height:1}
 
 /* ── SHELL ── */
-#app{display:grid;grid-template-rows:48px 1fr;height:100vh}
+#app{display:grid;grid-template-rows:44px 1fr;height:100vh}
 
 /* ── TOPBAR ── */
-#topbar{background:rgba(4,4,12,0.97);border-bottom:1px solid var(--bd);backdrop-filter:blur(20px);display:flex;align-items:center;padding:0 14px;gap:10px;z-index:100}
-.brand{display:flex;align-items:center;gap:8px}
-.brand-logo{width:28px;height:28px;background:linear-gradient(135deg,var(--p),#6d28d9);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
-.brand-name{font-size:12px;font-weight:800;letter-spacing:0.05em}
+#topbar{
+  background:rgba(4,4,12,0.98);border-bottom:1px solid var(--bd);
+  backdrop-filter:blur(20px);display:flex;align-items:center;
+  padding:0 10px;gap:8px;z-index:100;flex-shrink:0
+}
+.brand{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.brand-logo{width:24px;height:24px;background:linear-gradient(135deg,var(--p),#6d28d9);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px}
+.brand-name{font-size:11px;font-weight:800;letter-spacing:0.04em}
 .brand-name em{color:var(--p);font-style:normal}
-.tb-sep{width:1px;height:18px;background:var(--bd)}
-.tb-btn{display:flex;align-items:center;gap:5px;height:26px;padding:0 10px;border-radius:5px;border:1px solid var(--bd);background:transparent;color:var(--t2);font-size:10px;transition:all 0.15s;text-decoration:none;white-space:nowrap}
+.tb-sep{width:1px;height:16px;background:var(--bd);flex-shrink:0}
+.tb-btn{
+  display:flex;align-items:center;gap:4px;height:24px;padding:0 9px;
+  border-radius:5px;border:1px solid var(--bd);background:transparent;
+  color:var(--t2);font-size:9px;transition:all 0.15s;text-decoration:none;
+  cursor:pointer;white-space:nowrap;flex-shrink:0
+}
 .tb-btn:hover{background:rgba(255,255,255,0.07);color:var(--t1)}
-.tb-btn .ms{font-size:13px;font-family:'Material Symbols Outlined'}
-.tb-btn.save{background:linear-gradient(135deg,var(--p),#6d28d9);border-color:transparent;color:#fff;box-shadow:0 0 10px rgba(168,85,247,0.3)}
-.topbar-right{margin-left:auto;display:flex;align-items:center;gap:6px}
+.tb-btn .ms{font-size:12px}
+.tb-btn.primary{background:linear-gradient(135deg,var(--p),#6d28d9);border-color:transparent;color:#fff;font-weight:600;box-shadow:0 0 8px rgba(168,85,247,0.3)}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:6px}
 
 /* ── WORKSPACE ── */
-#workspace{display:grid;grid-template-columns:220px 1fr 320px;overflow:hidden}
+#workspace{display:grid;grid-template-columns:200px 1fr 260px;overflow:hidden}
 
-/* ── LEFT: Scene Type List ── */
-#panel-st-list{background:var(--b1);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
-.st-list-hdr{padding:10px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:6px}
-.st-list-hdr-title{font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:0.08em;flex:1}
-.btn-add-st{height:22px;padding:0 8px;border-radius:5px;border:1px solid var(--bd);background:transparent;color:var(--t3);font-size:10px;display:flex;align-items:center;gap:3px;transition:all 0.15s}
-.btn-add-st:hover{background:var(--pd);color:var(--p);border-color:var(--pp)}
-.btn-add-st .ms{font-size:12px;font-family:'Material Symbols Outlined'}
-.st-list{flex:1;overflow-y:auto;padding:6px}
-.st-list::-webkit-scrollbar{width:3px}
+/* ═══ LEFT: Scene Types + Overlays ═══ */
+#panel-left{background:var(--b1);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
+.lp-sect{flex-shrink:0}
+.lp-hdr{padding:7px 10px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:5px}
+.lp-hdr-title{font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;flex:1}
+.lp-add{height:20px;padding:0 7px;border-radius:4px;border:1px solid var(--bd);background:transparent;color:var(--t3);font-size:9px;display:flex;align-items:center;gap:2px;transition:all 0.12s}
+.lp-add:hover{background:var(--pd);color:var(--p);border-color:var(--pp)}
+.lp-add .ms{font-size:10px}
+
+/* Scene type items */
+.st-list{overflow-y:auto;max-height:140px}
+.st-list::-webkit-scrollbar{width:2px}
 .st-list::-webkit-scrollbar-thumb{background:var(--bd)}
-.st-item{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:6px;cursor:pointer;border:1px solid transparent;transition:all 0.12s;margin-bottom:2px}
-.st-item:hover{background:rgba(255,255,255,0.04)}
-.st-item.active{background:var(--pd);border-color:var(--pp)}
-.st-icon{font-size:16px;flex-shrink:0}
-.st-info{flex:1;min-width:0}
-.st-name{font-size:11px;font-weight:600;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.st-desc{font-size:8px;color:var(--t3);font-family:var(--fm);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}
-.st-del{width:18px;height:18px;border-radius:4px;border:none;background:transparent;color:var(--t4);font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.12s}
+.st-item{display:flex;align-items:center;gap:6px;padding:5px 10px;cursor:pointer;border-left:2px solid transparent;transition:all 0.1s}
+.st-item:hover{background:rgba(255,255,255,0.03)}
+.st-item.active{background:var(--pd);border-left-color:var(--p)}
+.st-item-icon{font-size:13px;flex-shrink:0}
+.st-item-info{flex:1;min-width:0}
+.st-item-name{font-size:10px;font-weight:600;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st-item-count{font-size:7px;color:var(--t3);font-family:var(--fm)}
+.st-del{width:16px;height:16px;border-radius:3px;border:none;background:transparent;color:var(--t4);display:flex;align-items:center;justify-content:center;opacity:0;transition:all 0.1s;flex-shrink:0}
+.st-item:hover .st-del{opacity:1}
 .st-del:hover{background:var(--rd);color:var(--r)}
-.st-del .ms{font-size:12px;font-family:'Material Symbols Outlined'}
+.st-del .ms{font-size:11px}
 
-/* ── CENTER: Editor ── */
-#panel-editor{overflow-y:auto;background:var(--b0);padding:16px;display:flex;flex-direction:column;gap:14px}
-#panel-editor::-webkit-scrollbar{width:4px}
-#panel-editor::-webkit-scrollbar-thumb{background:var(--bd)}
-.editor-empty{display:flex;align-items:center;justify-content:center;height:100%;color:var(--t4);font-size:12px;font-family:var(--fm);text-align:center;flex-direction:column;gap:8px}
-.editor-empty .big-icon{font-size:40px}
+/* Overlay tabs */
+.ov-tabs-wrap{border-bottom:1px solid var(--bd);overflow-y:auto;flex:1;min-height:0}
+.ov-tabs-wrap::-webkit-scrollbar{width:2px}
+.ov-tabs-wrap::-webkit-scrollbar-thumb{background:var(--bd)}
+.ov-tab{display:flex;align-items:center;gap:6px;padding:6px 10px;cursor:pointer;border-left:2px solid transparent;transition:all 0.1s;border-bottom:1px solid var(--bdd)}
+.ov-tab:hover{background:rgba(255,255,255,0.03)}
+.ov-tab.active{background:var(--ad);border-left-color:var(--a)}
+.ov-tab-icon{font-size:14px;flex-shrink:0}
+.ov-tab-name{font-size:10px;font-weight:600;color:var(--t1);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ov-tab-del{width:15px;height:15px;border-radius:3px;border:none;background:transparent;color:var(--t4);display:flex;align-items:center;justify-content:center;opacity:0;transition:all 0.1s;flex-shrink:0}
+.ov-tab:hover .ov-tab-del{opacity:1}
+.ov-tab-del:hover{background:var(--rd);color:var(--r)}
+.ov-tab-del .ms{font-size:10px}
 
-/* ── Editor Sections ── */
-.ed-section{background:var(--b2);border:1px solid var(--bd);border-radius:10px;overflow:hidden}
-.ed-hdr{padding:10px 14px;border-bottom:1px solid var(--bd);background:var(--b3);display:flex;align-items:center;gap:8px}
-.ed-hdr-icon{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
-.ed-hdr-icon.p{background:var(--pd);color:var(--p)}
-.ed-hdr-icon.g{background:var(--gd);color:var(--g)}
-.ed-hdr-icon.b{background:var(--bd2);color:var(--b)}
-.ed-hdr-icon.a{background:var(--ad);color:var(--a)}
-.ed-hdr-title{font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:0.08em;flex:1}
-.ed-body{padding:12px}
-.ed-add-btn{height:26px;padding:0 10px;border-radius:5px;border:1px solid var(--bd);background:transparent;color:var(--t3);font-size:10px;display:flex;align-items:center;gap:4px;transition:all 0.12s;flex-shrink:0}
-.ed-add-btn:hover{background:var(--gd);color:var(--g);border-color:rgba(78,222,163,0.3)}
-.ed-add-btn .ms{font-size:12px;font-family:'Material Symbols Outlined'}
+/* Layer list */
+.layers-sect{flex-shrink:0;border-top:1px solid var(--bd)}
+.layer-list{overflow-y:auto;max-height:180px}
+.layer-list::-webkit-scrollbar{width:2px}
+.layer-list::-webkit-scrollbar-thumb{background:var(--bd)}
+.layer-item{display:flex;align-items:center;gap:5px;padding:4px 8px;cursor:pointer;border-left:2px solid transparent;transition:all 0.1s;border-bottom:1px solid var(--bdd)}
+.layer-item:hover{background:rgba(255,255,255,0.03)}
+.layer-item.selected{background:var(--pd);border-left-color:var(--p)}
+.layer-thumb{width:18px;height:18px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0}
+.layer-thumb.cam{background:var(--cd);color:var(--c)}
+.layer-thumb.text{background:var(--pd);color:var(--p)}
+.layer-thumb.image{background:var(--gd);color:var(--g)}
+.layer-thumb.shape{background:rgba(251,191,36,0.15);color:var(--a)}
+.layer-thumb.widget{background:rgba(77,142,255,0.15);color:var(--b)}
+.layer-name{font-size:9px;color:var(--t2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.layer-ctrls{display:flex;gap:2px;flex-shrink:0}
+.lc-btn{width:15px;height:15px;border-radius:3px;border:none;background:transparent;color:var(--t4);display:flex;align-items:center;justify-content:center;transition:all 0.1s}
+.lc-btn:hover{background:rgba(255,255,255,0.08);color:var(--t1)}
+.lc-btn.active{color:var(--t2)}
+.lc-btn .ms{font-size:10px}
 
-/* ── Meta fields ── */
-.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.fld{display:flex;flex-direction:column;gap:4px}
-.fld.full{grid-column:1/-1}
-.flbl{font-size:9px;color:var(--t3);font-family:var(--fm);text-transform:uppercase;letter-spacing:0.06em}
-.finput{height:28px;padding:0 9px;border-radius:5px;border:1px solid var(--bd);background:var(--b1);color:var(--t1);font-size:11px;transition:border-color 0.15s;outline:none}
-.finput:focus{border-color:var(--p)}
-textarea.finput{height:60px;padding:7px 9px;resize:vertical}
+/* ═══ CENTER: Canvas ═══ */
+#panel-center{
+  background:#020208;display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-start;
+  padding:10px 16px 16px;position:relative;overflow:hidden;gap:8px;
+}
+#panel-center::before{
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(168,85,247,0.02) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(168,85,247,0.02) 1px,transparent 1px);
+  background-size:40px 40px;pointer-events:none;
+}
 
-/* ── Inputs list ── */
-.input-list{display:flex;flex-direction:column;gap:6px}
-.input-item{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--b1);border:1px solid var(--bd);border-radius:7px}
-.input-icon{font-size:16px;flex-shrink:0;width:24px;text-align:center}
-.input-info{flex:1;min-width:0}
-.input-label{font-size:11px;font-weight:600;color:var(--t1)}
-.input-sub{font-size:8px;color:var(--t3);font-family:var(--fm);margin-top:1px}
-.input-type-badge{font-size:8px;padding:1px 6px;border-radius:8px;font-family:var(--fm);flex-shrink:0}
-.input-type-badge.obs{background:rgba(77,142,255,0.15);color:var(--b);border:1px solid rgba(77,142,255,0.3)}
-.input-type-badge.widget{background:var(--pd);color:var(--p);border:1px solid var(--pp)}
-.input-del{width:20px;height:20px;border-radius:4px;border:none;background:transparent;color:var(--t4);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.12s}
-.input-del:hover{background:var(--rd);color:var(--r)}
-.input-del .ms{font-size:13px;font-family:'Material Symbols Outlined'}
+/* Add elements toolbar */
+#add-toolbar{display:flex;gap:5px;align-items:center;z-index:10;flex-shrink:0;flex-wrap:wrap}
+.add-btn{
+  height:26px;padding:0 10px;border-radius:5px;border:1px solid var(--bd);
+  background:var(--b2);color:var(--t2);font-size:9px;font-family:var(--fm);
+  display:flex;align-items:center;gap:4px;cursor:pointer;transition:all 0.12s;
+}
+.add-btn:hover{border-color:rgba(255,255,255,0.2);color:var(--t1);background:var(--b3)}
+.add-btn .ms{font-size:13px}
+.add-btn.cam-btn:hover{border-color:var(--c);color:var(--c);background:var(--cd)}
+.add-btn.text-btn:hover{border-color:var(--p);color:var(--p);background:var(--pd)}
+.add-btn.img-btn:hover{border-color:var(--g);color:var(--g);background:var(--gd)}
+.add-btn.shape-btn:hover{border-color:var(--a);color:var(--a);background:var(--ad)}
+.add-btn.widget-btn:hover{border-color:var(--b);color:var(--b);background:var(--bd2)}
+.tb-sep2{width:1px;height:18px;background:var(--bd)}
 
-/* ── Data fields list ── */
-.df-list{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.df-item{display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--b1);border:1px solid var(--bd);border-radius:5px;font-size:10px;color:var(--t2)}
-.df-item .ms{font-size:12px;font-family:'Material Symbols Outlined';color:var(--t3)}
-.df-key{font-family:var(--fm);font-size:9px;color:var(--p);flex-shrink:0}
-.df-del{margin-left:auto;width:16px;height:16px;border:none;background:transparent;color:var(--t4);cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center}
-.df-del:hover{color:var(--r)}
-.df-del .ms{font-size:11px;font-family:'Material Symbols Outlined'}
+/* Canvas wrap */
+#canvas-wrap{position:relative;width:100%;max-width:900px;aspect-ratio:16/9;z-index:5;flex-shrink:0}
+.canvas-label{position:absolute;top:-18px;left:0;font-size:7px;font-family:var(--fm);color:var(--t3);letter-spacing:0.08em}
+.canvas-label span{color:var(--t2)}
+#canvas{
+  width:100%;height:100%;background:#0a0a16;
+  border:1px solid var(--bd);border-radius:6px;position:relative;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(255,255,255,0.03),0 16px 50px rgba(0,0,0,0.9);
+}
+.c-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 35% 65%,rgba(30,10,60,0.4) 0%,rgba(4,4,12,1) 65%)}
+.c-grid{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,0.01) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,0.01) 1px,transparent 1px);
+  background-size:5% 8.333%;
+}
+.c-safe{position:absolute;inset:5%;border:1px solid rgba(255,255,255,0.04);pointer-events:none}
+.c-empty-hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;color:var(--t4);pointer-events:none}
+.c-empty-hint .big{font-size:32px}
+.c-empty-hint .txt{font-size:10px;font-family:var(--fm)}
 
-/* ── Overlays ── */
-.overlay-list{display:flex;flex-direction:column;gap:6px}
-.overlay-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--b1);border:1px solid var(--bd);border-radius:7px;cursor:pointer;transition:all 0.12s}
-.overlay-item:hover{border-color:rgba(255,255,255,0.15)}
-.overlay-item.active{background:var(--pd);border-color:var(--pp)}
-.ov-icon{font-size:18px;flex-shrink:0;width:28px;text-align:center}
-.ov-info{flex:1;min-width:0}
-.ov-label{font-size:11px;font-weight:600;color:var(--t1)}
-.ov-desc{font-size:8px;color:var(--t3);font-family:var(--fm);margin-top:1px}
-.ov-layers-count{font-size:8px;color:var(--t3);font-family:var(--fm);flex-shrink:0}
-.ov-del{width:20px;height:20px;border-radius:4px;border:none;background:transparent;color:var(--t4);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.12s}
-.ov-del:hover{background:var(--rd);color:var(--r)}
-.ov-del .ms{font-size:13px;font-family:'Material Symbols Outlined'}
+/* Canvas elements */
+.c-el{position:absolute;cursor:move;user-select:none;outline:none;transition:box-shadow 0.1s}
+.c-el:hover{z-index:10}
+.c-el.selected{z-index:20}
 
-/* ── RIGHT: Overlay Canvas ── */
-#panel-right{background:var(--b1);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
-.rp-hdr{padding:10px 14px;border-bottom:1px solid var(--bd);font-size:10px;font-weight:700;color:var(--t2);display:flex;align-items:center;gap:6px;flex-shrink:0}
-.rp-hdr .ms{font-size:14px;font-family:'Material Symbols Outlined';color:var(--p)}
-.canvas-area{flex:1;display:flex;align-items:center;justify-content:center;padding:16px;background:radial-gradient(ellipse at center,var(--b2) 0%,var(--b0) 100%)}
-.mini-canvas{width:100%;aspect-ratio:16/9;background:#000;position:relative;overflow:hidden;border:1px solid var(--bd);border-radius:6px;box-shadow:0 8px 30px rgba(0,0,0,0.8)}
-.mc-el{position:absolute;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.2);cursor:move;user-select:none;transition:border-color 0.1s}
-.mc-el:hover{border-color:rgba(255,255,255,0.4)}
-.mc-el.selected{border:2px solid var(--p);box-shadow:0 0 0 1px var(--p)}
-.mc-el-label{font-size:9px;font-family:var(--fm);color:rgba(255,255,255,0.7);text-align:center;pointer-events:none;padding:2px 4px}
-.mc-el-icon{font-size:20px;pointer-events:none}
-.rh-mc{position:absolute;width:8px;height:8px;background:var(--p);border:1px solid #000;border-radius:1px;cursor:nwse-resize}
-.rh-mc.tl{top:-4px;left:-4px;cursor:nw-resize}
-.rh-mc.tr{top:-4px;right:-4px;cursor:ne-resize}
-.rh-mc.bl{bottom:-4px;left:-4px;cursor:sw-resize}
-.rh-mc.br{bottom:-4px;right:-4px;cursor:se-resize}
-.canvas-empty{display:flex;align-items:center;justify-content:center;height:100%;color:var(--t4);font-size:10px;font-family:var(--fm);text-align:center}
+/* Camera */
+.c-cam{
+  border:2px solid var(--c);background:var(--cd);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 16px rgba(0,245,255,0.3),inset 0 0 8px rgba(0,245,255,0.04);
+}
+.c-cam.selected{box-shadow:0 0 28px rgba(0,245,255,0.5),0 0 0 2px var(--c)}
+.c-cam-lbl{font-size:7px;font-family:var(--fm);color:rgba(0,245,255,0.7);letter-spacing:0.1em;pointer-events:none;text-align:center}
 
-/* Layer controls in right panel */
-.rp-layers{padding:10px 12px;border-top:1px solid var(--bd);flex-shrink:0;max-height:200px;overflow-y:auto}
-.rp-layers-title{font-size:8px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
-.rp-layer-row{display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:5px;cursor:pointer;transition:all 0.1s;margin-bottom:2px}
-.rp-layer-row:hover{background:rgba(255,255,255,0.04)}
-.rp-layer-row.selected{background:var(--pd)}
-.rp-layer-dot{width:8px;height:8px;border-radius:50%;background:var(--t4);flex-shrink:0}
-.rp-layer-row.selected .rp-layer-dot{background:var(--p)}
-.rp-layer-name{font-size:10px;color:var(--t2);flex:1}
-.rp-layer-vis{width:16px;height:16px;border:none;background:transparent;color:var(--t3);cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center}
-.rp-layer-vis .ms{font-size:13px;font-family:'Material Symbols Outlined'}
+/* Text */
+.c-text-inner{
+  border-left:3px solid var(--el-color,var(--p));
+  background:linear-gradient(to right,rgba(10,10,20,0.95),rgba(10,10,20,0.65));
+  border-radius:0 5px 5px 0;padding:5px 8px;height:100%;
+}
+.c-text.selected .c-text-inner{box-shadow:0 0 0 2px var(--el-color,var(--p))}
+.ct-primary{font-size:11px;font-weight:700;color:#fff;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ct-secondary{font-size:7px;color:var(--el-color,var(--p));font-family:var(--fm);text-transform:uppercase;letter-spacing:0.08em;display:block;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* ── MODALS ── */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);z-index:9000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s}
-.modal-bg.open{opacity:1;pointer-events:all}
-.modal-box{background:var(--b2);border:1px solid var(--bd);border-radius:12px;width:480px;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.9);transform:translateY(10px);transition:transform 0.2s}
-.modal-bg.open .modal-box{transform:translateY(0)}
-.modal-hdr{padding:14px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
-.modal-title{font-size:13px;font-weight:700}
-.modal-close{background:none;border:none;color:var(--t3);font-size:18px;cursor:pointer;line-height:1}
-.modal-body{padding:16px;display:flex;flex-direction:column;gap:12px}
-.modal-footer{padding:12px 16px;border-top:1px solid var(--bd);display:flex;gap:8px;justify-content:flex-end}
-.mbtn{height:30px;padding:0 14px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all 0.15s}
-.mbtn.primary{background:linear-gradient(135deg,var(--p),#6d28d9);border:none;color:#fff}
-.mbtn.cancel{background:transparent;border:1px solid var(--bd);color:var(--t2)}
-.mbtn.cancel:hover{background:rgba(255,255,255,0.06)}
-.input-type-tabs{display:flex;gap:6px;margin-bottom:4px}
-.it-tab{flex:1;height:60px;border-radius:8px;border:1px solid var(--bd);background:var(--b1);color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;transition:all 0.15s}
-.it-tab:hover{border-color:rgba(255,255,255,0.2)}
-.it-tab.active{background:var(--pd);border-color:var(--pp);color:var(--p)}
-.it-tab-icon{font-size:20px}
+/* Image */
+.c-image{border:1px dashed rgba(78,222,163,0.4);border-radius:4px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--gd)}
+.c-image img{width:100%;height:100%;object-fit:cover;pointer-events:none}
+.c-image.selected{box-shadow:0 0 0 2px var(--g)}
+.c-image-placeholder{font-size:8px;color:rgba(78,222,163,0.5);font-family:var(--fm);text-align:center;padding:4px}
+
+/* Shape */
+.c-shape{display:flex;align-items:center;justify-content:center}
+.c-shape.selected{outline:2px solid var(--a)}
+
+/* Widget */
+.c-widget{border:1px solid rgba(77,142,255,0.3);border-radius:5px;background:var(--bd2);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3px}
+.c-widget.selected{box-shadow:0 0 0 2px var(--b)}
+.c-widget-icon{font-size:18px}
+.c-widget-name{font-size:7px;color:rgba(77,142,255,0.7);font-family:var(--fm);text-align:center}
+
+/* Element label */
+.c-el-label{position:absolute;bottom:2px;right:4px;font-size:6px;font-family:var(--fm);opacity:0.5;pointer-events:none;color:var(--t2)}
+
+/* Resize handles */
+.rh{
+  position:absolute;width:7px;height:7px;background:var(--p);
+  border:1px solid #000;border-radius:1px;z-index:30;
+  display:none;
+}
+.c-el.selected .rh{display:block}
+.rh.tl{top:-4px;left:-4px;cursor:nw-resize}
+.rh.tr{top:-4px;right:-4px;cursor:ne-resize}
+.rh.bl{bottom:-4px;left:-4px;cursor:sw-resize}
+.rh.br{bottom:-4px;right:-4px;cursor:se-resize}
+
+/* ═══ RIGHT: Props Panel ═══ */
+#panel-right{
+  background:var(--b1);border-left:1px solid var(--bd);
+  display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;
+}
+#panel-right::-webkit-scrollbar{width:3px}
+#panel-right::-webkit-scrollbar-thumb{background:var(--bd)}
+.rp-empty{display:flex;align-items:center;justify-content:center;height:100%;color:var(--t4);font-size:10px;font-family:var(--fm);flex-direction:column;gap:6px;padding:20px;text-align:center}
+.rp-empty .bi{font-size:28px}
+
+.prop-hdr{padding:8px 12px;border-bottom:1px solid var(--bd);background:var(--b2);flex-shrink:0;display:flex;align-items:center;gap:6px}
+.prop-hdr-icon{font-size:16px}
+.prop-hdr-title{font-size:10px;font-weight:700;color:var(--t1);flex:1}
+.prop-hdr-type{font-size:7px;color:var(--t3);font-family:var(--fm);padding:2px 6px;border-radius:8px;background:var(--b3)}
+.prop-body{padding:10px 12px;display:flex;flex-direction:column;gap:10px}
+
+/* Property groups */
+.pg{display:flex;flex-direction:column;gap:6px}
+.pg-title{font-size:8px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid var(--bd);padding-bottom:4px}
+.pf{display:flex;flex-direction:column;gap:3px}
+.pf.row{flex-direction:row;align-items:center;gap:6px}
+.pl{font-size:8px;color:var(--t3);font-family:var(--fm)}
+.pi{height:26px;padding:0 8px;border-radius:5px;font-size:10px;width:100%}
+textarea.pi{height:50px;padding:6px 8px;resize:vertical}
+.pi.color-pi{width:40px;height:26px;padding:2px;cursor:pointer}
+.pi.small{width:60px}
+
+/* Position grid */
+.pos-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.pos-item{display:flex;align-items:center;gap:4px}
+.pos-item .pl{width:14px;flex-shrink:0}
+.pos-item .pi{width:100%}
+
+/* Range slider */
+.pf-range{display:flex;align-items:center;gap:6px}
+.pi-range{-webkit-appearance:none;height:3px;border-radius:2px;background:var(--bd);border:none;flex:1;cursor:pointer}
+.pi-range::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--p);cursor:pointer}
+.range-val{font-size:8px;color:var(--t3);font-family:var(--fm);width:28px;text-align:right;flex-shrink:0}
+
+/* Image file pick */
+.img-pick-area{border:1px dashed var(--bd);border-radius:6px;padding:8px;text-align:center;cursor:pointer;transition:all 0.15s;position:relative;overflow:hidden}
+.img-pick-area:hover{border-color:var(--g);background:var(--gd)}
+.img-pick-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.img-pick-icon{font-size:18px;display:block;margin-bottom:3px}
+.img-pick-text{font-size:8px;color:var(--t3);font-family:var(--fm)}
+.img-preview{width:100%;border-radius:4px;max-height:60px;object-fit:cover;margin-top:4px}
+
+/* Widget list in props */
+.widget-pick-list{display:flex;flex-direction:column;gap:3px;max-height:120px;overflow-y:auto}
+.widget-pick-list::-webkit-scrollbar{width:2px}
+.widget-pick-list::-webkit-scrollbar-thumb{background:var(--bd)}
+.wpl-item{display:flex;align-items:center;gap:6px;padding:4px 7px;border-radius:5px;border:1px solid var(--bd);background:transparent;cursor:pointer;transition:all 0.1s}
+.wpl-item:hover,.wpl-item.selected{background:var(--bd2);border-color:var(--bp)}
+.wpl-item-icon{font-size:14px;flex-shrink:0}
+.wpl-item-name{font-size:9px;color:var(--t2);flex:1}
+.wpl-item-cat{font-size:7px;color:var(--t3);font-family:var(--fm)}
+
+/* Action buttons in props */
+.pa-row{display:flex;gap:5px;flex-wrap:wrap}
+.pa-btn{height:24px;padding:0 10px;border-radius:5px;border:1px solid var(--bd);background:var(--b2);color:var(--t2);font-size:9px;display:flex;align-items:center;gap:4px;cursor:pointer;transition:all 0.12s}
+.pa-btn:hover{background:var(--b3);color:var(--t1)}
+.pa-btn.danger{border-color:var(--rd);color:var(--r)}
+.pa-btn.danger:hover{background:var(--rd)}
+.pa-btn .ms{font-size:11px}
 
 /* ── Toast ── */
-#toast-box{position:fixed;bottom:16px;right:16px;display:flex;flex-direction:column;gap:4px;z-index:9999;pointer-events:none}
-.toast{background:var(--b3);border:1px solid var(--bd);border-radius:6px;padding:8px 12px;font-size:10px;font-family:var(--fm);color:var(--t2);opacity:0;transform:translateY(6px);transition:opacity 0.2s,transform 0.2s}
-.toast.show{opacity:1;transform:translateY(0)}
+#toast-box{position:fixed;bottom:12px;right:12px;z-index:9999;pointer-events:none;display:flex;flex-direction:column;gap:4px}
+.toast{background:var(--b3);border:1px solid var(--bd);border-radius:6px;padding:6px 10px;font-size:9px;font-family:var(--fm);color:var(--t2);opacity:0;transform:translateY(6px);transition:opacity 0.2s,transform 0.2s}
+.toast.show{opacity:1;transform:none}
 .toast.ok{border-color:rgba(78,222,163,0.35);color:var(--g)}
 .toast.err{border-color:rgba(239,68,68,0.4);color:var(--r)}
 .toast.inf{border-color:rgba(77,142,255,0.35);color:var(--b)}
+
+/* ── Modals ── */
+.m-bg{position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);z-index:8000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s}
+.m-bg.open{opacity:1;pointer-events:all}
+.m-box{background:var(--b2);border:1px solid var(--bd);border-radius:10px;width:360px;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.9)}
+.m-hdr{padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.m-title{font-size:12px;font-weight:700}
+.m-close{color:var(--t3);font-size:16px;cursor:pointer}
+.m-body{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.m-footer{padding:10px 16px;border-top:1px solid var(--bd);display:flex;gap:6px;justify-content:flex-end}
+.m-btn{height:28px;padding:0 12px;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;border:none}
+.m-btn.p{background:linear-gradient(135deg,var(--p),#6d28d9);color:#fff}
+.m-btn.c{background:transparent;border:1px solid var(--bd);color:var(--t2)}
 </style>
 </head>
 <body>
 <div id="toast-box"></div>
 
-<!-- Modal: Add Input -->
-<div class="modal-bg" id="modal-add-input">
-  <div class="modal-box">
-    <div class="modal-hdr">
-      <span class="modal-title">➕ Thêm Input</span>
-      <button class="modal-close" id="btn-close-add-input">✕</button>
+<!-- Modal: New Scene Type -->
+<div class="m-bg" id="m-st">
+  <div class="m-box">
+    <div class="m-hdr">
+      <span class="m-title">🎬 Scene Type Mới</span>
+      <button class="m-close" onclick="closeM('m-st')">✕</button>
     </div>
-    <div class="modal-body">
-      <div class="input-type-tabs">
-        <button class="it-tab active" data-itype="obs-source" id="itab-obs">
-          <span class="it-tab-icon">📺</span>OBS Source
-        </button>
-        <button class="it-tab" data-itype="widget" id="itab-widget">
-          <span class="it-tab-icon">🧩</span>Widget SDK
-        </button>
-      </div>
-      <!-- OBS Source fields -->
-      <div id="itype-obs-fields">
-        <div class="fld">
-          <label class="flbl">Nhãn hiển thị</label>
-          <input class="finput" id="inp-obs-label" type="text" placeholder="VD: Cam Mục Sư">
-        </div>
-        <div class="fld">
-          <label class="flbl">Loại OBS source</label>
-          <select class="finput" id="inp-obs-kind">
-            <option value="camera">📹 Camera (dshow_input)</option>
-            <option value="window">🪟 Window Capture</option>
-            <option value="game">🎮 Game Capture</option>
-            <option value="media">📹 Media Source (Video)</option>
-            <option value="browser">🌐 Browser Source</option>
-            <option value="color">🎨 Color/Background</option>
-            <option value="image">🖼 Image</option>
-          </select>
-        </div>
-        <div class="fld">
-          <label class="flbl">Tên source trong OBS (chính xác)</label>
-          <input class="finput" id="inp-obs-source" type="text" placeholder="VD: Camera 1">
-        </div>
-        <div class="fld">
-          <label class="flbl">Icon (emoji)</label>
-          <input class="finput" id="inp-obs-icon" type="text" placeholder="📹" value="📹" style="width:80px">
-        </div>
-      </div>
-      <!-- Widget SDK fields -->
-      <div id="itype-widget-fields" style="display:none">
-        <div class="fld">
-          <label class="flbl">Nhãn hiển thị</label>
-          <input class="finput" id="inp-widget-label" type="text" placeholder="VD: Lower Third">
-        </div>
-        <div class="fld">
-          <label class="flbl">Chọn Widget</label>
-          <select class="finput" id="inp-widget-id">
-            <option value="">— Đang tải... —</option>
-          </select>
-        </div>
-        <div class="fld">
-          <label class="flbl">Icon (emoji)</label>
-          <input class="finput" id="inp-widget-icon" type="text" placeholder="🧩" value="🧩" style="width:80px">
-        </div>
+    <div class="m-body">
+      <div class="pf"><label class="pl">Tên</label><input class="pi" id="m-st-name" placeholder="Giảng Luận"></div>
+      <div class="pf row">
+        <label class="pl" style="width:60px">Icon</label>
+        <input class="pi small" id="m-st-icon" placeholder="📖" value="🎬">
+        <label class="pl" style="width:40px">Màu</label>
+        <input class="pi color-pi" id="m-st-color" type="color" value="#a855f7">
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="mbtn cancel" id="btn-cancel-add-input">Hủy</button>
-      <button class="mbtn primary" id="btn-confirm-add-input">✓ Thêm Input</button>
+    <div class="m-footer">
+      <button class="m-btn c" onclick="closeM('m-st')">Hủy</button>
+      <button class="m-btn p" id="m-st-ok">✓ Tạo</button>
     </div>
   </div>
 </div>
 
-<!-- Modal: Add Scene Type -->
-<div class="modal-bg" id="modal-add-st">
-  <div class="modal-box" style="width:380px">
-    <div class="modal-hdr">
-      <span class="modal-title">➕ Scene Type Mới</span>
-      <button class="modal-close" id="btn-close-add-st">✕</button>
+<!-- Modal: New Overlay -->
+<div class="m-bg" id="m-ov">
+  <div class="m-box">
+    <div class="m-hdr">
+      <span class="m-title">➕ Overlay Mới</span>
+      <button class="m-close" onclick="closeM('m-ov')">✕</button>
     </div>
-    <div class="modal-body">
-      <div class="fld">
-        <label class="flbl">Tên scene type</label>
-        <input class="finput" id="inp-st-name" type="text" placeholder="VD: Giảng Luận">
-      </div>
-      <div class="fld">
-        <label class="flbl">Icon (emoji)</label>
-        <input class="finput" id="inp-st-icon" type="text" placeholder="📖" value="📖" style="width:80px">
-      </div>
-      <div class="fld">
-        <label class="flbl">Màu nhận diện</label>
-        <input class="finput" id="inp-st-color" type="color" value="#a855f7" style="height:32px;padding:2px;width:80px">
-      </div>
-      <div class="fld">
-        <label class="flbl">Mô tả ngắn</label>
-        <input class="finput" id="inp-st-desc" type="text" placeholder="Cảnh giảng luận...">
+    <div class="m-body">
+      <div class="pf"><label class="pl">Tên overlay</label><input class="pi" id="m-ov-name" placeholder="Bình Thường"></div>
+      <div class="pf row">
+        <label class="pl" style="width:60px">Icon</label>
+        <input class="pi small" id="m-ov-icon" placeholder="🅐" value="🔲">
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="mbtn cancel" id="btn-cancel-add-st">Hủy</button>
-      <button class="mbtn primary" id="btn-confirm-add-st">✓ Tạo</button>
+    <div class="m-footer">
+      <button class="m-btn c" onclick="closeM('m-ov')">Hủy</button>
+      <button class="m-btn p" id="m-ov-ok">✓ Tạo</button>
     </div>
   </div>
 </div>
 
-<!-- Modal: Add Data Field -->
-<div class="modal-bg" id="modal-add-df">
-  <div class="modal-box" style="width:360px">
-    <div class="modal-hdr">
-      <span class="modal-title">➕ Thêm Data Field</span>
-      <button class="modal-close" id="btn-close-add-df">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="fld">
-        <label class="flbl">Key (tên biến)</label>
-        <input class="finput" id="inp-df-key" type="text" placeholder="speakerName">
-      </div>
-      <div class="fld">
-        <label class="flbl">Nhãn hiển thị</label>
-        <input class="finput" id="inp-df-label" type="text" placeholder="Tên diễn giả">
-      </div>
-      <div class="fld">
-        <label class="flbl">Loại field</label>
-        <select class="finput" id="inp-df-type">
-          <option value="text">Text (1 dòng)</option>
-          <option value="textarea">Textarea (nhiều dòng)</option>
-          <option value="time">Thời gian</option>
-          <option value="url">URL</option>
-        </select>
-      </div>
-      <div class="fld">
-        <label class="flbl">Placeholder</label>
-        <input class="finput" id="inp-df-placeholder" type="text" placeholder="Nhập placeholder...">
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="mbtn cancel" id="btn-cancel-add-df">Hủy</button>
-      <button class="mbtn primary" id="btn-confirm-add-df">✓ Thêm</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal: Add Overlay -->
-<div class="modal-bg" id="modal-add-overlay">
-  <div class="modal-box" style="width:360px">
-    <div class="modal-hdr">
-      <span class="modal-title">➕ Overlay Mới</span>
-      <button class="modal-close" id="btn-close-add-overlay">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="fld">
-        <label class="flbl">Tên overlay</label>
-        <input class="finput" id="inp-ov-label" type="text" placeholder="VD: Bình Thường">
-      </div>
-      <div class="fld">
-        <label class="flbl">Icon (emoji)</label>
-        <input class="finput" id="inp-ov-icon" type="text" placeholder="🅐" style="width:80px">
-      </div>
-      <div class="fld">
-        <label class="flbl">Mô tả ngắn</label>
-        <input class="finput" id="inp-ov-desc" type="text" placeholder="VD: Cam 60% + PPTX 40%">
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="mbtn cancel" id="btn-cancel-add-overlay">Hủy</button>
-      <button class="mbtn primary" id="btn-confirm-add-overlay">✓ Tạo</button>
-    </div>
-  </div>
-</div>
-
-<!-- MAIN APP -->
+<!-- MAIN -->
 <div id="app">
-  <!-- Topbar -->
   <div id="topbar">
     <div class="brand">
       <div class="brand-logo">🎬</div>
-      <div class="brand-name">SCENE <em>TYPES</em></div>
+      <div class="brand-name">SCENE <em>DESIGNER</em></div>
     </div>
     <div class="tb-sep"></div>
-    <span style="font-size:9px;color:var(--t3);font-family:var(--fm)">Quản lý loại cảnh + bố cục overlay</span>
-    <div class="topbar-right">
-      <button class="tb-btn save" id="btn-save-all">
-        <span class="ms">save</span>Lưu tất cả
-      </button>
+    <span id="tb-crumb" style="font-size:9px;color:var(--t3);font-family:var(--fm)">Chọn scene type</span>
+    <div class="tb-right">
+      <button class="tb-btn primary" id="btn-save"><span class="ms">save</span>Lưu</button>
       <div class="tb-sep"></div>
-      <a href="builder.html" class="tb-btn">
-        <span class="ms">dashboard</span>Builder
-      </a>
-      <a href="index.html" class="tb-btn">
-        <span class="ms">arrow_back</span>Broadcast
-      </a>
+      <a href="index.html" class="tb-btn"><span class="ms">arrow_back</span>Broadcast</a>
+      <a href="builder.html" class="tb-btn"><span class="ms">dashboard</span>Builder</a>
     </div>
   </div>
 
-  <!-- Workspace -->
   <div id="workspace">
-
-    <!-- LEFT: Scene type list -->
-    <div id="panel-st-list">
-      <div class="st-list-hdr">
-        <span class="st-list-hdr-title">Scene Types</span>
-        <button class="btn-add-st" id="btn-new-st">
-          <span class="ms">add</span>Mới
-        </button>
+    <!-- LEFT -->
+    <div id="panel-left">
+      <!-- Scene Types -->
+      <div class="lp-sect">
+        <div class="lp-hdr">
+          <span class="lp-hdr-title">Scene Types</span>
+          <button class="lp-add" id="btn-new-st"><span class="ms">add</span>Mới</button>
+        </div>
+        <div class="st-list" id="st-list"></div>
       </div>
-      <div class="st-list" id="st-list">
-        <!-- rendered by JS -->
+
+      <!-- Overlays for active ST -->
+      <div class="lp-sect" style="border-top:1px solid var(--bd)">
+        <div class="lp-hdr">
+          <span class="lp-hdr-title">Overlays</span>
+          <button class="lp-add" id="btn-new-ov"><span class="ms">add</span>Mới</button>
+        </div>
+        <div class="ov-tabs-wrap" id="ov-tabs"></div>
+      </div>
+
+      <!-- Layers -->
+      <div class="layers-sect">
+        <div class="lp-hdr">
+          <span class="lp-hdr-title">Layers</span>
+        </div>
+        <div class="layer-list" id="layer-list"></div>
       </div>
     </div>
 
-    <!-- CENTER: Editor -->
-    <div id="panel-editor" id="panel-editor">
-      <div class="editor-empty" id="editor-empty">
-        <span class="big-icon">🎬</span>
-        <div>Chọn Scene Type để chỉnh sửa</div>
-        <div style="font-size:9px;color:var(--t4);font-family:var(--fm)">hoặc bấm "Mới" để tạo mới</div>
+    <!-- CENTER: Canvas -->
+    <div id="panel-center">
+      <!-- Add toolbar -->
+      <div id="add-toolbar">
+        <button class="add-btn cam-btn" id="btn-add-cam"><span class="ms">videocam</span>Camera</button>
+        <button class="add-btn text-btn" id="btn-add-text"><span class="ms">title</span>Text</button>
+        <button class="add-btn img-btn" id="btn-add-img"><span class="ms">image</span>Hình</button>
+        <button class="add-btn shape-btn" id="btn-add-shape"><span class="ms">rectangle</span>Shape</button>
+        <button class="add-btn widget-btn" id="btn-add-widget"><span class="ms">widgets</span>Widget</button>
+        <div class="tb-sep2"></div>
+        <button class="add-btn" id="btn-undo" title="Undo"><span class="ms">undo</span></button>
+        <button class="add-btn" id="btn-redo" title="Redo"><span class="ms">redo</span></button>
+        <button class="add-btn" id="btn-del-el" title="Xóa element" style="color:var(--r)"><span class="ms">delete</span></button>
       </div>
-      <!-- Editor content rendered by JS -->
-    </div>
 
-    <!-- RIGHT: Overlay mini-canvas -->
-    <div id="panel-right">
-      <div class="rp-hdr">
-        <span class="ms">layers</span>
-        <span id="rp-overlay-name">Chọn overlay để design</span>
-      </div>
-      <div class="canvas-area">
-        <div class="mini-canvas" id="mini-canvas">
-          <div class="canvas-empty" id="canvas-empty">Chọn overlay →<br>thiết kế bố cục</div>
+      <!-- Canvas -->
+      <div id="canvas-wrap">
+        <div class="canvas-label">1920 × 1080 · <span id="lbl-overlay">—</span></div>
+        <div id="canvas">
+          <div class="c-bg"></div>
+          <div class="c-grid" id="c-grid"></div>
+          <div class="c-safe"></div>
+          <div class="c-empty-hint" id="c-hint">
+            <span class="big">🎬</span>
+            <span class="txt">Chọn scene type → chọn overlay → thêm elements</span>
+          </div>
         </div>
       </div>
-      <div class="rp-layers" id="rp-layers" style="display:none">
-        <div class="rp-layers-title">Layers</div>
-        <div id="rp-layer-list"></div>
-      </div>
     </div>
 
+    <!-- RIGHT: Props -->
+    <div id="panel-right">
+      <div class="rp-empty" id="rp-empty">
+        <span class="bi">👆</span>
+        <span>Chọn element để<br>chỉnh sửa thuộc tính</span>
+      </div>
+      <div id="rp-props" style="display:none">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
   </div>
 </div>
 
@@ -431,657 +447,703 @@ textarea.finput{height:60px;padding:7px 9px;resize:vertical}
 const API = 'http://localhost:3000';
 const $ = id => document.getElementById(id);
 
-// ── State ──────────────────────────────────────────────
+// ─── State ─────────────────────────────────────────
 const S = {
-  sceneTypes: {},       // all scene types
-  widgets: [],          // all widgets from server
-  activeStId: null,     // active scene type id
-  activeOverlayId: null,
-  activeLayerId: null,  // selected input in canvas
-  dirty: false,
-  // mini-canvas drag
+  sceneTypes: {},
+  widgets: [],
+  activeStId: null,
+  activeOvId: null,
+  elements: [],     // current overlay elements
+  selectedId: null,
   dragging: null,
   resizing: null,
+  history: [],
+  histIdx: -1,
+  dirty: false,
 };
+let idCounter = 0;
+const genId = () => 'el-' + (++idCounter);
 
-// ── Boot ──────────────────────────────────────────────
+// ─── Boot ──────────────────────────────────────────
 (async function init() {
   await Promise.all([loadSceneTypes(), loadWidgets()]);
   bindAll();
+  renderStList();
+  new ResizeObserver(renderCanvas).observe($('canvas'));
 })();
 
+// ─── Data Loading ──────────────────────────────────
 async function loadSceneTypes() {
   try {
     const r = await fetch(`${API}/api/scene-types`);
-    const data = await r.json();
-    S.sceneTypes = data.sceneTypes || {};
-    renderStList();
+    const d = await r.json();
+    S.sceneTypes = d.sceneTypes || {};
     // Auto-select first
-    const firstId = Object.keys(S.sceneTypes)[0];
-    if (firstId) selectSceneType(firstId);
-  } catch { toast('Không kết nối được server!', 'err'); }
+    const ids = Object.keys(S.sceneTypes);
+    if (ids.length) selectSt(ids[0]);
+  } catch { toast('Server offline', 'err'); }
 }
 
 async function loadWidgets() {
   try {
     const r = await fetch(`${API}/api/widgets`);
     S.widgets = await r.json();
-    populateWidgetSelect();
   } catch { S.widgets = []; }
 }
 
-function populateWidgetSelect() {
-  const sel = $('inp-widget-id');
-  sel.innerHTML = '<option value="">— Chọn widget —</option>' +
-    S.widgets.map(w => `<option value="${w.id}">${w.icon||'🧩'} ${w.name} [${w.category||'?'}]</option>`).join('');
-}
-
-// ── Save ──────────────────────────────────────────────
 async function saveAll() {
+  // Persist current overlay elements before saving
+  persistCurrentOverlay();
   try {
-    const r = await fetch(`${API}/api/scene-types`, {
+    await fetch(`${API}/api/scene-types`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ sceneTypes: S.sceneTypes }),
     });
-    if (!r.ok) throw new Error();
     S.dirty = false;
-    toast('Đã lưu Scene Types ✓', 'ok');
+    toast('Đã lưu ✓', 'ok');
   } catch { toast('Lỗi lưu!', 'err'); }
 }
 
-// ── Scene Type List ───────────────────────────────────
+function persistCurrentOverlay() {
+  const ov = getActiveOverlay();
+  if (ov) ov.elements = JSON.parse(JSON.stringify(S.elements));
+}
+
+// ─── Scene Type List ───────────────────────────────
 function renderStList() {
   const list = $('st-list');
   const types = Object.values(S.sceneTypes);
   if (!types.length) {
-    list.innerHTML = '<div style="padding:12px;text-align:center;font-size:9px;color:var(--t4);font-family:var(--fm)">Chưa có scene type nào</div>';
+    list.innerHTML = '<div style="padding:10px;text-align:center;font-size:8px;color:var(--t4);font-family:var(--fm)">Chưa có — bấm Mới</div>';
     return;
   }
   list.innerHTML = types.map(st => `
     <div class="st-item ${st.id === S.activeStId ? 'active' : ''}" data-stid="${st.id}">
-      <span class="st-icon">${st.icon || '🎬'}</span>
-      <div class="st-info">
-        <div class="st-name">${st.label}</div>
-        <div class="st-desc">${(st.inputs||[]).length} inputs · ${(st.overlays||[]).length} overlays</div>
+      <span class="st-item-icon">${st.icon || '🎬'}</span>
+      <div class="st-item-info">
+        <div class="st-item-name">${st.label}</div>
+        <div class="st-item-count">${(st.overlays||[]).length} overlays</div>
       </div>
-      <button class="st-del" data-del-stid="${st.id}" title="Xóa"><span class="ms">close</span></button>
+      <button class="st-del" data-del-st="${st.id}" title="Xóa"><span class="ms">close</span></button>
     </div>`).join('');
 
   list.querySelectorAll('.st-item').forEach(el => {
     el.addEventListener('click', e => {
-      if (e.target.closest('[data-del-stid]')) return;
-      selectSceneType(el.dataset.stid);
+      if (e.target.closest('[data-del-st]')) return;
+      selectSt(el.dataset.stid);
     });
   });
-  list.querySelectorAll('[data-del-stid]').forEach(btn => {
+  list.querySelectorAll('[data-del-st]').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
-      if (!confirm(`Xóa "${S.sceneTypes[btn.dataset.delStid]?.label}"?`)) return;
-      delete S.sceneTypes[btn.dataset.delStid];
-      if (S.activeStId === btn.dataset.delStid) { S.activeStId = null; renderEditor(); }
+      if (!confirm(`Xóa "${S.sceneTypes[btn.dataset.delSt]?.label}"?`)) return;
+      delete S.sceneTypes[btn.dataset.delSt];
+      if (S.activeStId === btn.dataset.delSt) { S.activeStId = null; S.activeOvId = null; clearCanvas(); }
       S.dirty = true;
       renderStList();
     });
   });
 }
 
-function selectSceneType(id) {
+function selectSt(id) {
+  persistCurrentOverlay();
   S.activeStId = id;
-  S.activeOverlayId = null;
-  S.activeLayerId = null;
+  S.activeOvId = null;
   renderStList();
-  renderEditor();
-  renderCanvas();
+  renderOvTabs();
+  // Auto-select first overlay
+  const st = S.sceneTypes[id];
+  const firstOv = st?.overlays?.[0];
+  if (firstOv) selectOv(firstOv.id);
+  updateCrumb();
 }
 
-// ── Editor ────────────────────────────────────────────
-function renderEditor() {
-  const editor = $('panel-editor');
+// ─── Overlay Tabs ──────────────────────────────────
+function renderOvTabs() {
   const st = S.sceneTypes[S.activeStId];
-  if (!st) {
-    editor.innerHTML = `<div class="editor-empty" id="editor-empty">
-      <span class="big-icon">🎬</span>
-      <div>Chọn Scene Type để chỉnh sửa</div>
-      <div style="font-size:9px;color:var(--t4);font-family:var(--fm)">hoặc bấm "Mới" để tạo mới</div>
-    </div>`;
+  const wrap = $('ov-tabs');
+  if (!st) { wrap.innerHTML = ''; return; }
+  const ovs = st.overlays || [];
+  if (!ovs.length) {
+    wrap.innerHTML = '<div style="padding:8px;text-align:center;font-size:8px;color:var(--t4);font-family:var(--fm)">Chưa có overlay</div>';
     return;
   }
-
-  editor.innerHTML = `
-    <!-- Meta -->
-    <div class="ed-section">
-      <div class="ed-hdr">
-        <div class="ed-hdr-icon p"><span style="font-size:14px">${st.icon||'🎬'}</span></div>
-        <span class="ed-hdr-title">Thông Tin</span>
-      </div>
-      <div class="ed-body">
-        <div class="meta-grid">
-          <div class="fld">
-            <label class="flbl">Tên</label>
-            <input class="finput" id="ef-label" type="text" value="${st.label||''}">
-          </div>
-          <div class="fld">
-            <label class="flbl">Icon</label>
-            <input class="finput" id="ef-icon" type="text" value="${st.icon||'🎬'}" style="width:80px">
-          </div>
-          <div class="fld">
-            <label class="flbl">Màu</label>
-            <input class="finput" id="ef-color" type="color" value="${st.color||'#a855f7'}" style="height:28px;padding:2px;width:80px">
-          </div>
-          <div class="fld full">
-            <label class="flbl">Mô tả</label>
-            <input class="finput" id="ef-desc" type="text" value="${st.description||''}">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Inputs -->
-    <div class="ed-section">
-      <div class="ed-hdr">
-        <div class="ed-hdr-icon b"><span class="ms" style="font-size:11px;font-family:'Material Symbols Outlined'">input</span></div>
-        <span class="ed-hdr-title">Inputs (nguồn nội dung)</span>
-        <button class="ed-add-btn" id="btn-add-input"><span class="ms">add</span>Thêm Input</button>
-      </div>
-      <div class="ed-body">
-        <div class="input-list" id="input-list">
-          ${renderInputListHtml(st.inputs||[])}
-        </div>
-      </div>
-    </div>
-
-    <!-- Data Fields -->
-    <div class="ed-section">
-      <div class="ed-hdr">
-        <div class="ed-hdr-icon g"><span class="ms" style="font-size:11px;font-family:'Material Symbols Outlined'">dataset</span></div>
-        <span class="ed-hdr-title">Data Fields (nội dung nhập)</span>
-        <button class="ed-add-btn" id="btn-add-df"><span class="ms">add</span>Thêm Field</button>
-      </div>
-      <div class="ed-body">
-        <div class="df-list" id="df-list">
-          ${renderDfListHtml(st.dataFields||[])}
-        </div>
-      </div>
-    </div>
-
-    <!-- Overlays -->
-    <div class="ed-section">
-      <div class="ed-hdr">
-        <div class="ed-hdr-icon a"><span class="ms" style="font-size:11px;font-family:'Material Symbols Outlined'">layers</span></div>
-        <span class="ed-hdr-title">Overlays (bố cục)</span>
-        <button class="ed-add-btn" id="btn-add-overlay"><span class="ms">add</span>Thêm Overlay</button>
-      </div>
-      <div class="ed-body">
-        <div class="overlay-list" id="overlay-list">
-          ${renderOverlayListHtml(st.overlays||[], st.inputs||[])}
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Bind meta fields
-  ['label','icon','color','desc'].forEach(k => {
-    const el = $(`ef-${k}`);
-    if (!el) return;
-    el.addEventListener('input', () => {
-      if (k === 'desc') st.description = el.value;
-      else st[k] = el.value;
-      S.dirty = true;
-      if (k === 'label' || k === 'icon') renderStList();
-    });
-  });
-
-  bindEditorEvents(st);
-}
-
-function renderInputListHtml(inputs) {
-  if (!inputs.length) return '<div style="text-align:center;padding:10px;font-size:9px;color:var(--t4);font-family:var(--fm)">Chưa có input nào — bấm Thêm Input</div>';
-  return inputs.map(inp => `
-    <div class="input-item" data-inp-id="${inp.id}">
-      <span class="input-icon">${inp.icon||'📌'}</span>
-      <div class="input-info">
-        <div class="input-label">${inp.label}</div>
-        <div class="input-sub">${inp.type === 'obs-source' ? inp.obsSourceName || inp.inputKind : `widget: ${inp.widgetId}`}</div>
-      </div>
-      <span class="input-type-badge ${inp.type === 'widget' ? 'widget' : 'obs'}">${inp.type === 'widget' ? 'Widget' : 'OBS'}</span>
-      <button class="input-del" data-del-inp="${inp.id}" title="Xóa"><span class="ms">close</span></button>
+  wrap.innerHTML = ovs.map(ov => `
+    <div class="ov-tab ${ov.id === S.activeOvId ? 'active' : ''}" data-ovid="${ov.id}">
+      <span class="ov-tab-icon">${ov.icon || '🔲'}</span>
+      <span class="ov-tab-name">${ov.label}</span>
+      <button class="ov-tab-del" data-del-ov="${ov.id}" title="Xóa"><span class="ms">close</span></button>
     </div>`).join('');
-}
 
-function renderDfListHtml(fields) {
-  if (!fields.length) return '<div style="grid-column:1/-1;text-align:center;padding:10px;font-size:9px;color:var(--t4);font-family:var(--fm)">Chưa có field nào</div>';
-  return fields.map(f => `
-    <div class="df-item">
-      <span class="ms" style="font-size:12px;font-family:\'Material Symbols Outlined\'">${{text:'text_fields',textarea:'notes',time:'schedule',url:'link'}[f.type]||'text_fields'}</span>
-      <span class="df-key">${f.key}</span>
-      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.label}</span>
-      <button class="df-del" data-del-df="${f.key}"><span class="ms">close</span></button>
-    </div>`).join('');
-}
-
-function renderOverlayListHtml(overlays, inputs) {
-  if (!overlays.length) return '<div style="text-align:center;padding:10px;font-size:9px;color:var(--t4);font-family:var(--fm)">Chưa có overlay nào — bấm Thêm Overlay</div>';
-  return overlays.map(ov => {
-    const visLayers = (ov.layers||[]).filter(l => l.visible !== false).length;
-    return `
-      <div class="overlay-item ${ov.id === S.activeOverlayId ? 'active' : ''}" data-ov-id="${ov.id}">
-        <span class="ov-icon">${ov.icon||'🔲'}</span>
-        <div class="ov-info">
-          <div class="ov-label">${ov.label}</div>
-          <div class="ov-desc">${ov.description||''}</div>
-        </div>
-        <span class="ov-layers-count">${visLayers}/${inputs.length} layers</span>
-        <button class="ov-del" data-del-ov="${ov.id}" title="Xóa"><span class="ms">close</span></button>
-      </div>`;
-  }).join('');
-}
-
-function bindEditorEvents(st) {
-  // Add input
-  $('btn-add-input')?.addEventListener('click', () => openModal('modal-add-input'));
-
-  // Delete input
-  document.querySelectorAll('[data-del-inp]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      st.inputs = (st.inputs||[]).filter(i => i.id !== btn.dataset.delInp);
-      // Also remove from all overlays
-      (st.overlays||[]).forEach(ov => {
-        ov.layers = (ov.layers||[]).filter(l => l.inputId !== btn.dataset.delInp);
-      });
-      S.dirty = true;
-      renderEditor();
-      renderCanvas();
-    });
-  });
-
-  // Add data field
-  $('btn-add-df')?.addEventListener('click', () => openModal('modal-add-df'));
-
-  // Delete data field
-  document.querySelectorAll('[data-del-df]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      st.dataFields = (st.dataFields||[]).filter(f => f.key !== btn.dataset.delDf);
-      S.dirty = true;
-      renderEditor();
-    });
-  });
-
-  // Add overlay
-  $('btn-add-overlay')?.addEventListener('click', () => openModal('modal-add-overlay'));
-
-  // Select overlay for canvas
-  document.querySelectorAll('.overlay-item').forEach(el => {
+  wrap.querySelectorAll('.ov-tab').forEach(el => {
     el.addEventListener('click', e => {
       if (e.target.closest('[data-del-ov]')) return;
-      selectOverlay(el.dataset.ovId);
+      selectOv(el.dataset.ovid);
     });
   });
-
-  // Delete overlay
-  document.querySelectorAll('[data-del-ov]').forEach(btn => {
+  wrap.querySelectorAll('[data-del-ov]').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
+      const st = S.sceneTypes[S.activeStId];
+      if (!st) return;
       st.overlays = (st.overlays||[]).filter(o => o.id !== btn.dataset.delOv);
-      if (S.activeOverlayId === btn.dataset.delOv) { S.activeOverlayId = null; renderCanvas(); }
+      if (S.activeOvId === btn.dataset.delOv) { S.activeOvId = null; S.elements = []; clearCanvas(); }
       S.dirty = true;
-      renderEditor();
+      renderOvTabs();
     });
   });
 }
 
-function selectOverlay(ovId) {
-  S.activeOverlayId = ovId;
-  S.activeLayerId = null;
-  renderEditor();
+function selectOv(id) {
+  persistCurrentOverlay();
+  S.activeOvId = id;
+  const ov = getActiveOverlay();
+  S.elements = ov ? JSON.parse(JSON.stringify(ov.elements || [])) : [];
+  S.selectedId = null;
+  S.history = []; S.histIdx = -1;
+  pushHistory();
+  renderOvTabs();
   renderCanvas();
-  $('rp-overlay-name').textContent = getActiveOverlay()?.label || 'Overlay';
+  renderLayerList();
+  renderProps();
+  updateCrumb();
+  $('lbl-overlay').textContent = ov?.label || '—';
 }
 
 function getActiveOverlay() {
   const st = S.sceneTypes[S.activeStId];
-  return st?.overlays?.find(o => o.id === S.activeOverlayId) || null;
+  return st?.overlays?.find(o => o.id === S.activeOvId) || null;
 }
 
-// ── Mini Canvas ───────────────────────────────────────
+function updateCrumb() {
+  const st = S.sceneTypes[S.activeStId];
+  const ov = getActiveOverlay();
+  $('tb-crumb').textContent = st ? `${st.icon||''} ${st.label}${ov ? ' → ' + ov.label : ''}` : 'Chọn scene type';
+}
+
+// ─── Canvas ────────────────────────────────────────
+function clearCanvas() {
+  S.elements = [];
+  S.selectedId = null;
+  renderCanvas();
+  renderLayerList();
+  renderProps();
+  $('lbl-overlay').textContent = '—';
+  updateCrumb();
+}
+
 function renderCanvas() {
-  const canvas = $('mini-canvas');
-  const empty = $('canvas-empty');
-  const rplayers = $('rp-layers');
-  const ov = getActiveOverlay();
-  const st = S.sceneTypes[S.activeStId];
+  const canvas = $('canvas');
+  const W = canvas.offsetWidth, H = canvas.offsetHeight;
+  if (!W || !H) return;
 
-  // Remove existing els
-  canvas.querySelectorAll('.mc-el').forEach(e => e.remove());
+  canvas.querySelectorAll('.c-el').forEach(e => e.remove());
+  const hint = $('c-hint');
+  if (hint) hint.style.display = S.elements.length ? 'none' : 'flex';
 
-  if (!ov || !st) {
-    if (empty) empty.style.display = 'flex';
-    if (rplayers) rplayers.style.display = 'none';
-    return;
+  S.elements.forEach(el => {
+    if (!el.visible) return;
+    canvas.appendChild(createElDom(el, W, H));
+  });
+}
+
+function createElDom(el, W, H) {
+  const div = document.createElement('div');
+  div.className = 'c-el';
+  div.dataset.id = el.id;
+  if (el.id === S.selectedId) div.classList.add('selected');
+
+  div.style.left    = (el.x / 100 * W) + 'px';
+  div.style.top     = (el.y / 100 * H) + 'px';
+  div.style.width   = (el.w / 100 * W) + 'px';
+  div.style.height  = (el.h / 100 * H) + 'px';
+  div.style.opacity = (el.opacity ?? 100) / 100;
+  if (el.r) div.style.borderRadius = el.r + 'px';
+
+  if (el.type === 'cam') {
+    div.classList.add('c-cam');
+    const lbl = document.createElement('div');
+    lbl.className = 'c-cam-lbl';
+    lbl.innerHTML = `📹<br>${el.label || 'Camera'}`;
+    div.appendChild(lbl);
+
+  } else if (el.type === 'text') {
+    div.classList.add('c-text');
+    div.style.setProperty('--el-color', el.color || '#a855f7');
+    const inner = document.createElement('div');
+    inner.className = 'c-text-inner';
+    inner.style.borderLeftColor = el.color || '#a855f7';
+    if (el.bgBlur) inner.style.backdropFilter = `blur(${el.bgBlur}px)`;
+    inner.innerHTML = `
+      <span class="ct-primary" style="color:${el.textColor||'#fff'};font-size:${Math.max(8,el.fontSize||14)}px;font-weight:${el.bold?700:400}">${el.primary || 'Tiêu Đề'}</span>
+      <span class="ct-secondary" style="color:${el.color||'#a855f7'}">${el.secondary || 'Phụ đề'}</span>`;
+    div.appendChild(inner);
+
+  } else if (el.type === 'image') {
+    div.classList.add('c-image');
+    if (el.src) {
+      const img = document.createElement('img');
+      img.src = el.src;
+      div.appendChild(img);
+    } else {
+      div.innerHTML = `<div class="c-image-placeholder"><span style="font-size:18px">🖼</span><br>Chọn hình</div>`;
+    }
+
+  } else if (el.type === 'shape') {
+    div.classList.add('c-shape');
+    div.style.background = el.fill || 'rgba(168,85,247,0.2)';
+    div.style.border = el.border ? `${el.borderW||1}px solid ${el.borderColor||'#a855f7'}` : 'none';
+
+  } else if (el.type === 'widget') {
+    div.classList.add('c-widget');
+    div.innerHTML = `<span class="c-widget-icon">${el.icon || '🧩'}</span><span class="c-widget-name">${el.label || 'Widget'}</span>`;
   }
-  if (empty) empty.style.display = 'none';
-  if (rplayers) rplayers.style.display = 'block';
 
-  const W = canvas.offsetWidth, H = canvas.offsetHeight;
+  // Element label
+  const lbl = document.createElement('div');
+  lbl.className = 'c-el-label';
+  lbl.textContent = el.label || el.type;
+  div.appendChild(lbl);
 
-  (ov.layers||[]).forEach(layer => {
-    if (!layer.visible) return;
-    const inp = (st.inputs||[]).find(i => i.id === layer.inputId);
-    if (!inp) return;
-
-    const div = document.createElement('div');
-    div.className = `mc-el ${layer.inputId === S.activeLayerId ? 'selected' : ''}`;
-    div.dataset.inputId = layer.inputId;
-    div.style.left   = (layer.x / 100 * W) + 'px';
-    div.style.top    = (layer.y / 100 * H) + 'px';
-    div.style.width  = (layer.w / 100 * W) + 'px';
-    div.style.height = (layer.h / 100 * H) + 'px';
-    div.style.borderRadius = (layer.r || 0) + 'px';
-    div.style.opacity = (layer.opacity ?? 100) / 100;
-    div.style.background = inp.type === 'widget'
-      ? 'rgba(168,85,247,0.15)' : 'rgba(77,142,255,0.1)';
-
-    div.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none">
-      <span style="font-size:${Math.max(10, Math.min(20, layer.w/5))}px">${inp.icon||'📌'}</span>
-      <span class="mc-el-label">${inp.label}</span>
-    </div>`;
-
-    // Resize handles
-    ['tl','tr','bl','br'].forEach(pos => {
-      const h = document.createElement('div');
-      h.className = `rh-mc ${pos}`;
-      h.dataset.handle = pos;
-      div.appendChild(h);
-    });
-
-    div.addEventListener('mousedown', onMcMouseDown);
-    div.addEventListener('click', e => {
-      e.stopPropagation();
-      S.activeLayerId = layer.inputId;
-      renderCanvas();
-      renderRpLayers();
-    });
-
-    canvas.appendChild(div);
+  // Resize handles
+  ['tl','tr','bl','br'].forEach(pos => {
+    const h = document.createElement('span');
+    h.className = `rh ${pos}`;
+    h.dataset.handle = pos;
+    div.appendChild(h);
   });
 
-  renderRpLayers();
+  div.addEventListener('mousedown', onElMouseDown);
+  div.addEventListener('click', e => { e.stopPropagation(); selectEl(el.id); });
+  return div;
 }
 
-function renderRpLayers() {
-  const ov = getActiveOverlay();
-  const st = S.sceneTypes[S.activeStId];
-  const list = $('rp-layer-list');
-  if (!list || !ov || !st) return;
-
-  list.innerHTML = (st.inputs||[]).map(inp => {
-    const layer = (ov.layers||[]).find(l => l.inputId === inp.id);
-    const vis = layer?.visible !== false;
-    return `
-      <div class="rp-layer-row ${inp.id === S.activeLayerId ? 'selected' : ''}" data-rp-inp="${inp.id}">
-        <div class="rp-layer-dot"></div>
-        <span class="rp-layer-name">${inp.icon||'📌'} ${inp.label}</span>
-        <button class="rp-layer-vis" data-vis-inp="${inp.id}" title="${vis?'Ẩn':'Hiện'}">
-          <span class="ms">${vis?'visibility':'visibility_off'}</span>
-        </button>
-      </div>`;
-  }).join('');
-
-  list.querySelectorAll('.rp-layer-row').forEach(el => {
-    el.addEventListener('click', e => {
-      if (e.target.closest('[data-vis-inp]')) return;
-      S.activeLayerId = el.dataset.rpInp;
-      renderCanvas();
-      renderRpLayers();
-    });
-  });
-
-  list.querySelectorAll('[data-vis-inp]').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      const ov = getActiveOverlay();
-      let layer = (ov.layers||[]).find(l => l.inputId === btn.dataset.visInp);
-      if (!layer) {
-        const inp = (S.sceneTypes[S.activeStId].inputs||[]).find(i => i.id === btn.dataset.visInp);
-        if (!inp) return;
-        layer = { inputId: inp.id, x:5, y:5, w:40, h:40, r:0, opacity:100, visible:true };
-        if (!ov.layers) ov.layers = [];
-        ov.layers.push(layer);
-      }
-      layer.visible = !layer.visible;
-      S.dirty = true;
-      renderCanvas();
-      renderRpLayers();
-    });
-  });
-}
-
-// ── Canvas Drag ───────────────────────────────────────
-function onMcMouseDown(e) {
-  if (e.target.classList.contains('rh-mc')) {
-    onMcResizeStart(e); return;
-  }
-  const div = e.currentTarget;
-  const canvas = $('mini-canvas');
-  const W = canvas.offsetWidth, H = canvas.offsetHeight;
-  const ov = getActiveOverlay();
-  const inputId = div.dataset.inputId;
-  const layer = (ov?.layers||[]).find(l => l.inputId === inputId);
-  if (!layer) return;
+// ─── Drag & Resize ─────────────────────────────────
+function onElMouseDown(e) {
+  if (e.target.classList.contains('rh')) { startResize(e); return; }
   e.preventDefault();
-  S.dragging = { inputId, startX: e.clientX, startY: e.clientY, startLX: layer.x, startLY: layer.y, W, H };
+  const el = S.elements.find(x => x.id === e.currentTarget.dataset.id);
+  if (!el) return;
+  const canvas = $('canvas');
+  const W = canvas.offsetWidth, H = canvas.offsetHeight;
+  S.dragging = { id: el.id, startX: e.clientX, startY: e.clientY, origX: el.x, origY: el.y, W, H };
+  selectEl(el.id);
 }
 
-function onMcResizeStart(e) {
-  e.preventDefault();
-  const handle = e.target;
-  const div = handle.closest('.mc-el');
-  const canvas = $('mini-canvas');
+function startResize(e) {
+  e.preventDefault(); e.stopPropagation();
+  const handle = e.target.dataset.handle;
+  const elDom  = e.target.closest('.c-el');
+  const el     = S.elements.find(x => x.id === elDom.dataset.id);
+  if (!el) return;
+  const canvas = $('canvas');
   const W = canvas.offsetWidth, H = canvas.offsetHeight;
-  const ov = getActiveOverlay();
-  const inputId = div.dataset.inputId;
-  const layer = (ov?.layers||[]).find(l => l.inputId === inputId);
-  if (!layer) return;
-  S.resizing = { inputId, handle: handle.dataset.handle, startX: e.clientX, startY: e.clientY, startLX: layer.x, startLY: layer.y, startLW: layer.w, startLH: layer.h, W, H };
+  S.resizing = { id: el.id, handle, startX: e.clientX, startY: e.clientY, origX: el.x, origY: el.y, origW: el.w, origH: el.h, W, H };
 }
 
 document.addEventListener('mousemove', e => {
   if (S.dragging) {
-    const { inputId, startX, startY, startLX, startLY, W, H } = S.dragging;
-    const ov = getActiveOverlay();
-    const layer = (ov?.layers||[]).find(l => l.inputId === inputId);
-    if (!layer) return;
+    const { id, startX, startY, origX, origY, W, H } = S.dragging;
+    const el = S.elements.find(x => x.id === id);
+    if (!el) return;
     const dx = (e.clientX - startX) / W * 100;
     const dy = (e.clientY - startY) / H * 100;
-    layer.x = Math.max(0, Math.min(100 - layer.w, parseFloat((startLX + dx).toFixed(1))));
-    layer.y = Math.max(0, Math.min(100 - layer.h, parseFloat((startLY + dy).toFixed(1))));
+    el.x = parseFloat(Math.max(0, Math.min(100 - el.w, origX + dx)).toFixed(1));
+    el.y = parseFloat(Math.max(0, Math.min(100 - el.h, origY + dy)).toFixed(1));
     S.dirty = true;
     renderCanvas();
+    updatePosInProps(el);
   }
   if (S.resizing) {
-    const { inputId, handle, startX, startY, startLX, startLY, startLW, startLH, W, H } = S.resizing;
-    const ov = getActiveOverlay();
-    const layer = (ov?.layers||[]).find(l => l.inputId === inputId);
-    if (!layer) return;
+    const { id, handle, startX, startY, origX, origY, origW, origH, W, H } = S.resizing;
+    const el = S.elements.find(x => x.id === id);
+    if (!el) return;
     const dx = (e.clientX - startX) / W * 100;
     const dy = (e.clientY - startY) / H * 100;
-    let nw = startLW, nh = startLH, nx = startLX, ny = startLY;
-    if (handle.includes('r')) nw = Math.max(5, startLW + dx);
-    if (handle.includes('l')) { nw = Math.max(5, startLW - dx); nx = startLX + (startLW - nw); }
-    if (handle.includes('b')) nh = Math.max(5, startLH + dy);
-    if (handle.includes('t')) { nh = Math.max(5, startLH - dy); ny = startLY + (startLH - nh); }
-    layer.w = parseFloat(Math.min(100, nw).toFixed(1));
-    layer.h = parseFloat(Math.min(100, nh).toFixed(1));
-    layer.x = parseFloat(Math.max(0, nx).toFixed(1));
-    layer.y = parseFloat(Math.max(0, ny).toFixed(1));
+    let nx = origX, ny = origY, nw = origW, nh = origH;
+    if (handle.includes('r')) nw = Math.max(3, origW + dx);
+    if (handle.includes('l')) { nw = Math.max(3, origW - dx); nx = origX + (origW - nw); }
+    if (handle.includes('b')) nh = Math.max(3, origH + dy);
+    if (handle.includes('t')) { nh = Math.max(3, origH - dy); ny = origY + (origH - nh); }
+    el.x = parseFloat(Math.max(0,nx).toFixed(1));
+    el.y = parseFloat(Math.max(0,ny).toFixed(1));
+    el.w = parseFloat(Math.min(100,nw).toFixed(1));
+    el.h = parseFloat(Math.min(100,nh).toFixed(1));
     S.dirty = true;
     renderCanvas();
+    updatePosInProps(el);
   }
 });
 
 document.addEventListener('mouseup', () => {
-  S.dragging = null;
-  S.resizing = null;
+  if (S.dragging || S.resizing) { S.dragging = null; S.resizing = null; pushHistory(); }
 });
 
-// ── Modals ────────────────────────────────────────────
-function openModal(id) {
-  $(id).classList.add('open');
-  // Pre-populate widget select when opening add-input
-  if (id === 'modal-add-input') populateWidgetSelect();
+$('canvas').addEventListener('click', e => {
+  if (e.target === $('canvas') || e.target.classList.contains('c-bg') || e.target.classList.contains('c-grid') || e.target.classList.contains('c-safe')) {
+    S.selectedId = null;
+    renderCanvas();
+    renderLayerList();
+    renderProps();
+  }
+});
+
+// ─── Select Element ────────────────────────────────
+function selectEl(id) {
+  S.selectedId = id;
+  renderCanvas();
+  renderLayerList();
+  renderProps();
 }
-function closeModal(id) { $(id).classList.remove('open'); }
 
-// Input type tabs
-document.querySelectorAll('.it-tab').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.it-tab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    $('itype-obs-fields').style.display = btn.dataset.itype === 'obs-source' ? '' : 'none';
-    $('itype-widget-fields').style.display = btn.dataset.itype === 'widget' ? '' : 'none';
+// ─── Add Elements ──────────────────────────────────
+function addElement(type) {
+  if (!S.activeOvId) { toast('Chọn overlay trước!', 'err'); return; }
+  const defaults = {
+    cam:    { type:'cam',    x:5,  y:5,  w:40, h:40, r:8,  opacity:100, visible:true, label:'Camera 1', obsSource:'Camera 1' },
+    text:   { type:'text',  x:5,  y:75, w:50, h:15, r:0,  opacity:95,  visible:true, label:'Lower Third', primary:'Tiêu Đề', secondary:'Phụ đề', color:'#a855f7', textColor:'#fff', fontSize:14, bold:true, bgBlur:8 },
+    image:  { type:'image', x:30, y:30, w:40, h:30, r:4,  opacity:100, visible:true, label:'Hình ảnh', src:'' },
+    shape:  { type:'shape', x:10, y:10, w:30, h:20, r:4,  opacity:80,  visible:true, label:'Shape', fill:'rgba(168,85,247,0.2)', border:true, borderW:1, borderColor:'#a855f7' },
+    widget: { type:'widget',x:5,  y:60, w:40, h:20, r:4,  opacity:100, visible:true, label:'Widget', widgetId:'', icon:'🧩' },
+  };
+  const el = { id: genId(), ...defaults[type] };
+  S.elements.push(el);
+  S.dirty = true;
+  selectEl(el.id);
+  renderLayerList();
+  pushHistory();
+}
+
+// ─── Layer List ────────────────────────────────────
+function renderLayerList() {
+  const list = $('layer-list');
+  if (!S.elements.length) {
+    list.innerHTML = '<div style="padding:8px;text-align:center;font-size:8px;color:var(--t4);font-family:var(--fm)">Chưa có layer</div>';
+    return;
+  }
+  const typeIcon = { cam:'📹', text:'Tt', image:'🖼', shape:'■', widget:'🧩' };
+  list.innerHTML = S.elements.slice().reverse().map(el => `
+    <div class="layer-item ${el.id === S.selectedId ? 'selected' : ''}" data-lid="${el.id}">
+      <div class="layer-thumb ${el.type}">${typeIcon[el.type]||'?'}</div>
+      <span class="layer-name">${el.label || el.type}</span>
+      <div class="layer-ctrls">
+        <button class="lc-btn ${el.visible?'active':''}" data-vis="${el.id}" title="Ẩn/hiện"><span class="ms">${el.visible?'visibility':'visibility_off'}</span></button>
+        <button class="lc-btn" data-del="${el.id}" title="Xóa" style="color:var(--r)"><span class="ms">close</span></button>
+      </div>
+    </div>`).join('');
+
+  list.querySelectorAll('.layer-item').forEach(el => {
+    el.addEventListener('click', e => { if (e.target.closest('button')) return; selectEl(el.dataset.lid); });
   });
-});
+  list.querySelectorAll('[data-vis]').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); const el = S.elements.find(x => x.id === btn.dataset.vis); if (el) { el.visible = !el.visible; S.dirty = true; renderCanvas(); renderLayerList(); } });
+  });
+  list.querySelectorAll('[data-del]').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); deleteEl(btn.dataset.del); });
+  });
+}
 
-function genId(prefix) { return prefix + '-' + Math.random().toString(36).slice(2,7); }
+function deleteEl(id) {
+  S.elements = S.elements.filter(x => x.id !== id);
+  if (S.selectedId === id) { S.selectedId = null; renderProps(); }
+  S.dirty = true;
+  renderCanvas();
+  renderLayerList();
+  pushHistory();
+}
 
-// ── Bind All ─────────────────────────────────────────
-function bindAll() {
-  // New scene type
-  $('btn-new-st').addEventListener('click', () => openModal('modal-add-st'));
-  $('btn-close-add-st').addEventListener('click', () => closeModal('modal-add-st'));
-  $('btn-cancel-add-st').addEventListener('click', () => closeModal('modal-add-st'));
-  $('btn-confirm-add-st').addEventListener('click', () => {
-    const name = $('inp-st-name').value.trim();
-    if (!name) { toast('Nhập tên scene type!', 'err'); return; }
-    const id = genId('st');
-    S.sceneTypes[id] = {
-      id, label: name,
-      icon: $('inp-st-icon').value || '🎬',
-      color: $('inp-st-color').value || '#a855f7',
-      description: $('inp-st-desc').value,
-      inputs: [], dataFields: [], overlays: [],
+// ─── Props Panel ───────────────────────────────────
+function renderProps() {
+  const empty = $('rp-empty');
+  const props = $('rp-props');
+  const el = S.elements.find(x => x.id === S.selectedId);
+  if (!el) {
+    empty.style.display = 'flex'; props.style.display = 'none'; return;
+  }
+  empty.style.display = 'none'; props.style.display = 'block';
+
+  const typeLabel = { cam:'Camera', text:'Text', image:'Hình ảnh', shape:'Shape', widget:'Widget' };
+  const typeIcon  = { cam:'📹', text:'Tt', image:'🖼', shape:'■', widget:'🧩' };
+
+  props.innerHTML = `
+    <div class="prop-hdr">
+      <span class="prop-hdr-icon">${typeIcon[el.type]||'?'}</span>
+      <span class="prop-hdr-title">${el.label || el.type}</span>
+      <span class="prop-hdr-type">${typeLabel[el.type]||el.type}</span>
+    </div>
+    <div class="prop-body" id="prop-body">
+      ${renderPropsForType(el)}
+    </div>`;
+
+  bindPropEvents(el);
+}
+
+function renderPropsForType(el) {
+  const posBlock = `
+    <div class="pg">
+      <div class="pg-title">Vị trí &amp; Kích thước (%)</div>
+      <div class="pos-grid">
+        <div class="pos-item"><span class="pl">X</span><input class="pi small" data-prop="x" type="number" step="0.1" value="${el.x}"></div>
+        <div class="pos-item"><span class="pl">Y</span><input class="pi small" data-prop="y" type="number" step="0.1" value="${el.y}"></div>
+        <div class="pos-item"><span class="pl">W</span><input class="pi small" data-prop="w" type="number" step="0.1" value="${el.w}"></div>
+        <div class="pos-item"><span class="pl">H</span><input class="pi small" data-prop="h" type="number" step="0.1" value="${el.h}"></div>
+        <div class="pos-item"><span class="pl">R</span><input class="pi small" data-prop="r" type="number" step="1" value="${el.r||0}"></div>
+      </div>
+    </div>
+    <div class="pg">
+      <div class="pg-title">Opacity</div>
+      <div class="pf-range">
+        <input class="pi-range" type="range" min="0" max="100" value="${el.opacity??100}" data-prop="opacity">
+        <span class="range-val" id="rv-opacity">${el.opacity??100}%</span>
+      </div>
+    </div>`;
+
+  if (el.type === 'cam') return `
+    ${posBlock}
+    <div class="pg">
+      <div class="pg-title">Camera OBS</div>
+      <div class="pf"><label class="pl">Tên nguồn OBS</label><input class="pi" data-prop="obsSource" type="text" placeholder="Camera 1" value="${el.obsSource||''}"></div>
+      <div class="pf"><label class="pl">Nhãn hiển thị</label><input class="pi" data-prop="label" type="text" value="${el.label||''}"></div>
+    </div>
+    <div class="pg">
+      <div class="pg-title">Actions</div>
+      <div class="pa-row">
+        <button class="pa-btn danger" id="pa-del"><span class="ms">delete</span>Xóa</button>
+      </div>
+    </div>`;
+
+  if (el.type === 'text') return `
+    ${posBlock}
+    <div class="pg">
+      <div class="pg-title">Nội dung văn bản</div>
+      <div class="pf"><label class="pl">Dòng chính (Primary)</label><input class="pi" data-prop="primary" type="text" value="${el.primary||''}"></div>
+      <div class="pf"><label class="pl">Dòng phụ (Secondary)</label><input class="pi" data-prop="secondary" type="text" value="${el.secondary||''}"></div>
+      <div class="pf"><label class="pl">Nhãn layer</label><input class="pi" data-prop="label" type="text" value="${el.label||''}"></div>
+    </div>
+    <div class="pg">
+      <div class="pg-title">Kiểu chữ</div>
+      <div class="pf row">
+        <label class="pl" style="width:60px">Cỡ chữ</label>
+        <input class="pi small" data-prop="fontSize" type="number" min="6" max="80" value="${el.fontSize||14}">
+      </div>
+      <div class="pf row">
+        <label class="pl" style="width:60px">Màu chữ</label>
+        <input class="pi color-pi" data-prop="textColor" type="color" value="${el.textColor||'#ffffff'}">
+        <label class="pl" style="width:50px;margin-left:4px">Màu nhấn</label>
+        <input class="pi color-pi" data-prop="color" type="color" value="${el.color||'#a855f7'}">
+      </div>
+      <div class="pf row">
+        <label class="pl" style="width:60px">Blur nền</label>
+        <input class="pi-range" type="range" style="flex:1" min="0" max="30" value="${el.bgBlur||0}" data-prop="bgBlur">
+        <span class="range-val" id="rv-bgBlur">${el.bgBlur||0}px</span>
+      </div>
+    </div>
+    <div class="pg">
+      <div class="pg-title">Actions</div>
+      <div class="pa-row"><button class="pa-btn danger" id="pa-del"><span class="ms">delete</span>Xóa</button></div>
+    </div>`;
+
+  if (el.type === 'image') return `
+    ${posBlock}
+    <div class="pg">
+      <div class="pg-title">Hình ảnh</div>
+      <div class="img-pick-area" id="img-pick-area">
+        <input type="file" accept="image/*" id="img-file-input">
+        <span class="img-pick-icon">🖼</span>
+        <span class="img-pick-text">Click để chọn hình<br>hoặc kéo thả vào đây</span>
+        ${el.src ? `<img src="${el.src}" class="img-preview">` : ''}
+      </div>
+      <div class="pf" style="margin-top:6px"><label class="pl">Hoặc nhập URL</label><input class="pi" data-prop="src" type="url" placeholder="https://..." value="${el.src||''}"></div>
+      <div class="pf"><label class="pl">Nhãn layer</label><input class="pi" data-prop="label" type="text" value="${el.label||''}"></div>
+    </div>
+    <div class="pg"><div class="pa-row"><button class="pa-btn danger" id="pa-del"><span class="ms">delete</span>Xóa</button></div></div>`;
+
+  if (el.type === 'shape') return `
+    ${posBlock}
+    <div class="pg">
+      <div class="pg-title">Shape</div>
+      <div class="pf row">
+        <label class="pl" style="width:60px">Màu nền</label>
+        <input class="pi color-pi" data-prop="fill" type="color" value="${(el.fill||'#a855f7').replace(/rgba?\([^)]+\)/,()=>rgbaToHex(el.fill)||'#a855f7')}">
+      </div>
+      <div class="pf row">
+        <label class="pl" style="width:60px">Viền</label>
+        <input class="pi color-pi" data-prop="borderColor" type="color" value="${el.borderColor||'#a855f7'}">
+        <input class="pi small" data-prop="borderW" type="number" min="0" max="20" value="${el.borderW||1}" style="margin-left:4px">
+      </div>
+      <div class="pf"><label class="pl">Nhãn layer</label><input class="pi" data-prop="label" type="text" value="${el.label||''}"></div>
+    </div>
+    <div class="pg"><div class="pa-row"><button class="pa-btn danger" id="pa-del"><span class="ms">delete</span>Xóa</button></div></div>`;
+
+  if (el.type === 'widget') return `
+    ${posBlock}
+    <div class="pg">
+      <div class="pg-title">Chọn Widget</div>
+      <div class="widget-pick-list" id="widget-pick-list">
+        ${S.widgets.map(w => `
+          <div class="wpl-item ${w.id === el.widgetId ? 'selected' : ''}" data-wid="${w.id}">
+            <span class="wpl-item-icon">${w.icon||'🧩'}</span>
+            <span class="wpl-item-name">${w.name}</span>
+            <span class="wpl-item-cat">${w.category||'?'}</span>
+          </div>`).join('')}
+      </div>
+      <div class="pf" style="margin-top:6px"><label class="pl">Nhãn layer</label><input class="pi" data-prop="label" type="text" value="${el.label||''}"></div>
+    </div>
+    <div class="pg"><div class="pa-row"><button class="pa-btn danger" id="pa-del"><span class="ms">delete</span>Xóa</button></div></div>`;
+
+  return posBlock;
+}
+
+function bindPropEvents(el) {
+  // All data-prop inputs
+  document.querySelectorAll('#prop-body [data-prop]').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const key = inp.dataset.prop;
+      const val = inp.type === 'number' ? parseFloat(inp.value) : inp.value;
+      el[key] = isNaN(val) && inp.type === 'number' ? 0 : val;
+      S.dirty = true;
+      // Update range readout
+      if (key === 'opacity') { const rv = $('rv-opacity'); if (rv) rv.textContent = Math.round(val) + '%'; }
+      if (key === 'bgBlur')  { const rv = $('rv-bgBlur');  if (rv) rv.textContent = Math.round(val) + 'px'; }
+      renderCanvas();
+    });
+    inp.addEventListener('change', () => pushHistory());
+  });
+
+  // Delete button
+  $('pa-del')?.addEventListener('click', () => deleteEl(el.id));
+
+  // Image file picker
+  $('img-file-input')?.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      el.src = ev.target.result;
+      S.dirty = true;
+      renderCanvas();
+      renderProps();
+      pushHistory();
     };
+    reader.readAsDataURL(file);
+  });
+
+  // Widget picker
+  document.querySelectorAll('.wpl-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const w = S.widgets.find(x => x.id === item.dataset.wid);
+      if (!w) return;
+      el.widgetId = w.id;
+      el.icon = w.icon || '🧩';
+      el.label = el.label || w.name;
+      S.dirty = true;
+      renderCanvas();
+      renderProps();
+      pushHistory();
+    });
+  });
+}
+
+function updatePosInProps(el) {
+  ['x','y','w','h','r'].forEach(k => {
+    const inp = document.querySelector(`#prop-body [data-prop="${k}"]`);
+    if (inp) inp.value = el[k];
+  });
+}
+
+// ─── History ───────────────────────────────────────
+function pushHistory() {
+  S.history = S.history.slice(0, S.histIdx + 1);
+  S.history.push(JSON.stringify(S.elements));
+  if (S.history.length > 30) S.history.shift();
+  S.histIdx = S.history.length - 1;
+}
+
+function undo() {
+  if (S.histIdx > 0) { S.histIdx--; S.elements = JSON.parse(S.history[S.histIdx]); renderCanvas(); renderLayerList(); renderProps(); }
+}
+function redo() {
+  if (S.histIdx < S.history.length - 1) { S.histIdx++; S.elements = JSON.parse(S.history[S.histIdx]); renderCanvas(); renderLayerList(); renderProps(); }
+}
+
+// ─── Modals ────────────────────────────────────────
+function openM(id) { $(id).classList.add('open'); }
+function closeM(id) { $(id).classList.remove('open'); }
+
+// ─── Bind All ──────────────────────────────────────
+function bindAll() {
+  $('btn-save').addEventListener('click', saveAll);
+  $('btn-undo').addEventListener('click', undo);
+  $('btn-redo').addEventListener('click', redo);
+  $('btn-del-el').addEventListener('click', () => { if (S.selectedId) deleteEl(S.selectedId); });
+
+  $('btn-add-cam').addEventListener('click', () => addElement('cam'));
+  $('btn-add-text').addEventListener('click', () => addElement('text'));
+  $('btn-add-img').addEventListener('click', () => addElement('image'));
+  $('btn-add-shape').addEventListener('click', () => addElement('shape'));
+  $('btn-add-widget').addEventListener('click', () => addElement('widget'));
+
+  // New scene type
+  $('btn-new-st').addEventListener('click', () => openM('m-st'));
+  $('m-st-ok').addEventListener('click', () => {
+    const name = $('m-st-name').value.trim();
+    if (!name) { toast('Nhập tên!', 'err'); return; }
+    const id = 'st-' + Math.random().toString(36).slice(2,7);
+    S.sceneTypes[id] = { id, label: name, icon: $('m-st-icon').value||'🎬', color: $('m-st-color').value||'#a855f7', overlays: [] };
     S.dirty = true;
     renderStList();
-    selectSceneType(id);
-    closeModal('modal-add-st');
-    $('inp-st-name').value = '';
+    selectSt(id);
+    closeM('m-st');
+    $('m-st-name').value = '';
     toast(`Đã tạo "${name}" ✓`, 'ok');
   });
 
-  // Close add-input modal
-  $('btn-close-add-input').addEventListener('click', () => closeModal('modal-add-input'));
-  $('btn-cancel-add-input').addEventListener('click', () => closeModal('modal-add-input'));
-  $('btn-confirm-add-input').addEventListener('click', () => {
-    const st = S.sceneTypes[S.activeStId];
-    if (!st) return;
-    const activeTab = document.querySelector('.it-tab.active')?.dataset.itype;
-    let newInput;
-    if (activeTab === 'obs-source') {
-      const label = $('inp-obs-label').value.trim();
-      if (!label) { toast('Nhập nhãn!', 'err'); return; }
-      newInput = {
-        id: genId('inp'),
-        label,
-        type: 'obs-source',
-        inputKind: $('inp-obs-kind').value,
-        obsSourceName: $('inp-obs-source').value.trim() || label,
-        icon: $('inp-obs-icon').value || '📺',
-      };
-    } else {
-      const label = $('inp-widget-label').value.trim();
-      const widgetId = $('inp-widget-id').value;
-      if (!label || !widgetId) { toast('Nhập đủ thông tin!', 'err'); return; }
-      const wdef = S.widgets.find(w => w.id === widgetId);
-      newInput = {
-        id: genId('inp'),
-        label,
-        type: 'widget',
-        widgetId,
-        icon: $('inp-widget-icon').value || wdef?.icon || '🧩',
-      };
-    }
-    if (!st.inputs) st.inputs = [];
-    st.inputs.push(newInput);
-    // Also add default layer in all overlays (hidden by default)
-    (st.overlays||[]).forEach(ov => {
-      if (!ov.layers) ov.layers = [];
-      ov.layers.push({ inputId: newInput.id, x:5, y:5, w:30, h:30, r:0, opacity:100, visible:false });
-    });
-    S.dirty = true;
-    renderEditor();
-    renderCanvas();
-    closeModal('modal-add-input');
-    $('inp-obs-label').value = ''; $('inp-obs-source').value = '';
-    $('inp-widget-label').value = '';
-    toast(`Đã thêm input "${newInput.label}" ✓`, 'ok');
+  // New overlay
+  $('btn-new-ov').addEventListener('click', () => {
+    if (!S.activeStId) { toast('Chọn scene type trước!', 'err'); return; }
+    openM('m-ov');
   });
-
-  // Add data field
-  $('btn-close-add-df').addEventListener('click', () => closeModal('modal-add-df'));
-  $('btn-cancel-add-df').addEventListener('click', () => closeModal('modal-add-df'));
-  $('btn-confirm-add-df').addEventListener('click', () => {
+  $('m-ov-ok').addEventListener('click', () => {
+    const name = $('m-ov-name').value.trim();
+    if (!name) { toast('Nhập tên!', 'err'); return; }
     const st = S.sceneTypes[S.activeStId];
     if (!st) return;
-    const key = $('inp-df-key').value.trim().replace(/\s+/g,'');
-    const label = $('inp-df-label').value.trim();
-    if (!key || !label) { toast('Nhập key và nhãn!', 'err'); return; }
-    if (!st.dataFields) st.dataFields = [];
-    if (st.dataFields.find(f => f.key === key)) { toast('Key đã tồn tại!', 'err'); return; }
-    st.dataFields.push({ key, label, type: $('inp-df-type').value, placeholder: $('inp-df-placeholder').value });
-    S.dirty = true;
-    renderEditor();
-    closeModal('modal-add-df');
-    $('inp-df-key').value = ''; $('inp-df-label').value = ''; $('inp-df-placeholder').value = '';
-    toast(`Đã thêm field "${key}" ✓`, 'ok');
-  });
-
-  // Add overlay
-  $('btn-close-add-overlay').addEventListener('click', () => closeModal('modal-add-overlay'));
-  $('btn-cancel-add-overlay').addEventListener('click', () => closeModal('modal-add-overlay'));
-  $('btn-confirm-add-overlay').addEventListener('click', () => {
-    const st = S.sceneTypes[S.activeStId];
-    if (!st) return;
-    const label = $('inp-ov-label').value.trim();
-    if (!label) { toast('Nhập tên overlay!', 'err'); return; }
-    const id = genId('ov');
-    // Create layers for all existing inputs (all hidden by default)
-    const layers = (st.inputs||[]).map(inp => ({
-      inputId: inp.id, x:5, y:5, w:40, h:40, r:0, opacity:100, visible:false
-    }));
+    const id = 'ov-' + Math.random().toString(36).slice(2,7);
     if (!st.overlays) st.overlays = [];
-    st.overlays.push({
-      id, label,
-      icon: $('inp-ov-icon').value || '🔲',
-      description: $('inp-ov-desc').value,
-      layers,
-    });
+    st.overlays.push({ id, label: name, icon: $('m-ov-icon').value||'🔲', elements: [] });
     S.dirty = true;
-    renderEditor();
-    selectOverlay(id);
-    closeModal('modal-add-overlay');
-    $('inp-ov-label').value = ''; $('inp-ov-icon').value = ''; $('inp-ov-desc').value = '';
-    toast(`Đã tạo overlay "${label}" ✓`, 'ok');
+    renderStList();
+    renderOvTabs();
+    selectOv(id);
+    closeM('m-ov');
+    $('m-ov-name').value = '';
+    toast(`Đã tạo overlay "${name}" ✓`, 'ok');
   });
-
-  // Save
-  $('btn-save-all').addEventListener('click', saveAll);
 
   // Close modals on bg click
-  ['modal-add-input','modal-add-st','modal-add-df','modal-add-overlay'].forEach(id => {
-    $(id).addEventListener('click', e => { if (e.target === $(id)) closeModal(id); });
+  ['m-st','m-ov'].forEach(id => {
+    $(id).addEventListener('click', e => { if (e.target === $(id)) closeM(id); });
   });
 
-  // Canvas click deselect
-  $('mini-canvas').addEventListener('click', e => {
-    if (e.target === $('mini-canvas') || e.target.classList.contains('canvas-empty')) {
-      S.activeLayerId = null;
-      renderCanvas();
-    }
+  // Keyboard shortcuts
+  document.addEventListener('keydown', e => {
+    if (e.target.matches('input, textarea, select')) return;
+    if ((e.ctrlKey||e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
+    if ((e.ctrlKey||e.metaKey) && e.key === 'y') { e.preventDefault(); redo(); }
+    if ((e.ctrlKey||e.metaKey) && e.key === 's') { e.preventDefault(); saveAll(); }
+    if (e.key === 'Delete' || e.key === 'Backspace') { if (S.selectedId) { e.preventDefault(); deleteEl(S.selectedId); } }
   });
 }
 
-// ── Toast ─────────────────────────────────────────────
+// ─── Utils ─────────────────────────────────────────
+function rgbaToHex(s) {
+  if (!s || s.startsWith('#')) return s;
+  const m = s.match(/[\d.]+/g);
+  if (!m) return '#a855f7';
+  return '#' + [m[0],m[1],m[2]].map(x => parseInt(x).toString(16).padStart(2,'0')).join('');
+}
+
 function toast(msg, type='inf') {
   const box = $('toast-box');
   const t = document.createElement('div');
@@ -1089,7 +1151,7 @@ function toast(msg, type='inf') {
   t.textContent = msg;
   box.appendChild(t);
   requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('show')));
-  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 250); }, 2500);
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 250); }, 2200);
 }
 </script>
 </body>
