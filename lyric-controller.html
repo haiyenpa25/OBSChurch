@@ -686,21 +686,39 @@ function renderSongList(songs) {
 // ═══════════════════════════════════════════════════
 // SELECT SONG → BUILD SLIDES
 // ═══════════════════════════════════════════════════
-function selectSong(idx) {
+async function selectSong(idx) {
   // Highlight
   document.querySelectorAll('.song-item').forEach(el => el.classList.remove('selected'));
   const el = document.getElementById('si-' + idx);
   if (el) { el.classList.add('selected'); el.scrollIntoView({ block: 'nearest' }); }
 
-  curSong = filtered[idx];
-  if (!curSong) return;
+  const basic = filtered[idx];
+  if (!basic) return;
 
-  // Build slides from sections
-  // Rule: 1 Enter (blank line) = slide mới
-  // Sections trong JSON: {label, lines:[...]}
-  // Mỗi section → parse thành slides bằng blank line separator
-  slides = buildSlides(curSong);
+  // Hiện loading
+  document.getElementById('song-title-display').textContent = `⏳ Đang tải...`;
+  document.getElementById('slides-container').innerHTML =
+    '<div class="empty-state"><div class="spinner"></div> Đang tải lời bài hát...</div>';
+
+  // Fetch chi tiết đầy đủ (có sections) từ API
+  try {
+    const resp = await fetch(`api/songs.php?action=song&id=${encodeURIComponent(basic.slug)}`);
+    const data = await resp.json();
+    curSong = data.song || basic;
+  } catch(e) {
+    // Fallback: thử load từ JSON file
+    try {
+      const col = basic.source_id;
+      const resp = await fetch(`data/songs-json/${col}.json`);
+      const data = await resp.json();
+      curSong = (data.songs || []).find(s => s.slug === basic.slug || s.number === basic.number) || basic;
+    } catch(e2) {
+      curSong = basic;
+    }
+  }
+
   curSlide = -1;
+  slides = buildSlides(curSong);
 
   // Update UI
   document.getElementById('song-title-display').textContent =
