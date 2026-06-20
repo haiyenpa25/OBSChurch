@@ -1,4 +1,4 @@
-/**
+﻿/**
  * app.js — Bootstrap & Dependency Injection
  * @module app
  *
@@ -19,8 +19,8 @@ import { ServiceRunnerController } from './controllers/ServiceRunnerController.j
 import MonitorView               from './views/MonitorView.js';
 
 // ─── Constants ───────────────────────────────────────
-const API_SCENES_URL  = 'http://localhost:3000/api/scenes';
-const API_LAYOUTS_URL = 'http://localhost:3000/api/layouts';
+const API_SCENES_URL  = 'http://localhost:3001/api/scenes';
+const API_LAYOUTS_URL = 'http://localhost:3001/api/layouts';
 
 // ─── Bootstrap ───────────────────────────────────────
 async function main() {

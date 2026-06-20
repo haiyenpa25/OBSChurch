@@ -18,6 +18,8 @@ const STATE_EVENTS = Object.freeze({
   OVERLAY_CHANGED: 'state:overlay_changed',
   WS_STATUS      : 'state:ws_status',
   OBS_STATUS     : 'state:obs_status',
+  RECORD_STATUS  : 'state:record_status',
+  STREAM_STATUS  : 'state:stream_status',
 });
 
 const _savedObs = (() => {
@@ -33,6 +35,8 @@ const _state = {
   overlayVisible: false,
   wsConnected   : false,
   obsConnected  : false,
+  isRecording   : false,
+  isStreaming   : false,
   obsConfig: {
     host: _savedObs.host || 'localhost',
     port: Number(_savedObs.port) || 4455,
@@ -164,6 +168,16 @@ const StateManager = (() => {
     EventBus.emit(STATE_EVENTS.OBS_STATUS, { connected });
   }
 
+  function setRecordStatus(active) {
+    _state.isRecording = active;
+    EventBus.emit(STATE_EVENTS.RECORD_STATUS, { active });
+  }
+
+  function setStreamStatus(active) {
+    _state.isStreaming = active;
+    EventBus.emit(STATE_EVENTS.STREAM_STATUS, { active });
+  }
+
   // ── Private ──────────────────────────────────────
   /** Tự động điền form khi chọn item. */
   function _autoFillForm(item) {
@@ -203,6 +217,7 @@ const StateManager = (() => {
     setScenes, setActiveScene, setActiveItem,
     updateForm, setForm, setWsStatus, setOverlayVisible,
     getObsConfig, setObsConfig, setObsStatus,
+    setRecordStatus, setStreamStatus,
     setLayouts, getLayouts, getLayoutForTemplate,
     on, off,
     EVENTS: STATE_EVENTS,

@@ -1,0 +1,949 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Theme Builder — OBSChurch</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+<style>
+/* ═══ TOKENS ═══ */
+:root {
+  --f: 'Inter', sans-serif;
+  --fm: 'JetBrains Mono', monospace;
+  --fs: 'Noto Serif', Georgia, serif;
+
+  --bg: #06060e;
+  --b1: #0c0c1a;
+  --b2: #111122;
+  --b3: #181830;
+  --b4: #20203a;
+
+  --bd: rgba(255,255,255,0.07);
+  --bd2: rgba(255,255,255,0.13);
+
+  --g: #4edea3;
+  --gd: rgba(78,222,163,0.1);
+  --gp: rgba(78,222,163,0.3);
+  --b: #4d8eff;
+  --bd3: rgba(77,142,255,0.15);
+  --p: #a855f7;
+  --pd: rgba(168,85,247,0.12);
+  --r: #ef4444;
+  --rd: rgba(239,68,68,0.1);
+  --a: #fbbf24;
+
+  --t1: #f0f0ff;
+  --t2: #a0a0c0;
+  --t3: #606080;
+  --t4: #282845;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; background: var(--bg); font-family: var(--f); color: var(--t1); -webkit-font-smoothing: antialiased; }
+.ms { font-family: 'Material Symbols Outlined'; font-size: 16px; font-weight: 400; line-height: 1; user-select: none; }
+
+/* ═══ LAYOUT ═══ */
+#app { display: grid; grid-template-rows: 48px 1fr; height: 100vh; }
+
+/* TOPBAR */
+#topbar {
+  background: rgba(6,6,14,0.96);
+  border-bottom: 1px solid var(--bd);
+  display: flex; align-items: center;
+  padding: 0 14px; gap: 10px;
+  backdrop-filter: blur(20px);
+  z-index: 100; flex-shrink: 0;
+}
+.brand { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+.brand-logo { width: 28px; height: 28px; background: linear-gradient(135deg,var(--g),var(--b)); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; color: #fff; box-shadow: 0 0 14px rgba(78,222,163,0.3); }
+.brand-name { font-size: 12px; font-weight: 800; color: var(--t1); letter-spacing: .04em; }
+.brand-name em { color: var(--g); font-style: normal; }
+.tb-sep { width: 1px; height: 18px; background: var(--bd); flex-shrink: 0; }
+.tb-badge { display: flex; align-items: center; gap: 6px; background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.2); border-radius: 99px; padding: 4px 10px; font-size: 10px; font-family: var(--fm); color: var(--p); }
+.tb-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--p); box-shadow: 0 0 8px var(--p); }
+.tb-fill { flex: 1; }
+.tb-btn { height: 28px; padding: 0 10px; background: transparent; border: 1px solid var(--bd); border-radius: 5px; color: var(--t3); font-size: 10px; font-family: var(--fm); cursor: pointer; display: flex; align-items: center; gap: 5px; text-decoration: none; transition: all .15s; }
+.tb-btn:hover { color: var(--t1); border-color: var(--bd2); background: rgba(255,255,255,0.04); }
+.tb-btn .ms { font-size: 14px; }
+#ws-status { font-size: 9px; font-family: var(--fm); color: var(--t4); display: flex; align-items: center; gap: 5px; }
+#ws-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--t4); transition: all .3s; }
+#ws-dot.ok { background: var(--g); box-shadow: 0 0 6px var(--g); }
+
+/* ═══ WORKSPACE ═══ */
+#workspace { display: grid; grid-template-columns: 240px 1fr 340px; overflow: hidden; }
+
+/* ─── LEFT: Theme List ─── */
+#panel-themes {
+  background: var(--b1);
+  border-right: 1px solid var(--bd);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.panel-hdr {
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid var(--bd);
+  font-size: 9px; font-family: var(--fm);
+  color: var(--t3); text-transform: uppercase; letter-spacing: .1em;
+  flex-shrink: 0; display: flex; align-items: center; gap: 6px;
+}
+.panel-hdr .ms { font-size: 13px; }
+.theme-list { flex: 1; overflow-y: auto; padding: 6px; }
+.theme-list::-webkit-scrollbar { width: 3px; }
+.theme-list::-webkit-scrollbar-thumb { background: var(--bd); }
+.theme-card {
+  padding: 10px 12px; border-radius: 7px; cursor: pointer;
+  border: 1px solid transparent; margin-bottom: 3px;
+  transition: all .15s;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.theme-card:hover { background: rgba(255,255,255,0.03); border-color: var(--bd); }
+.theme-card.active { background: var(--gd); border-color: var(--gp); }
+.tc-name { font-size: 12px; font-weight: 600; color: var(--t1); }
+.tc-desc { font-size: 9px; color: var(--t3); font-family: var(--fm); }
+.tc-chips { display: flex; gap: 4px; margin-top: 3px; flex-wrap: wrap; }
+.tc-chip { font-size: 7px; font-family: var(--fm); padding: 2px 5px; border-radius: 3px; background: var(--b3); color: var(--t3); }
+.panel-footer { padding: 8px 10px; border-top: 1px solid var(--bd); flex-shrink: 0; display: flex; gap: 5px; }
+.pf-btn { flex: 1; height: 30px; border-radius: 6px; border: 1px solid var(--bd); background: transparent; color: var(--t2); font-size: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: all .12s; }
+.pf-btn:hover { border-color: var(--gp); color: var(--g); background: var(--gd); }
+.pf-btn.danger:hover { border-color: rgba(239,68,68,.3); color: var(--r); background: var(--rd); }
+.pf-btn .ms { font-size: 14px; }
+
+/* ─── CENTER: Editor ─── */
+#panel-edit {
+  background: var(--bg);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.edit-hdr {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--bd);
+  flex-shrink: 0; display: flex; align-items: center; gap: 10px;
+}
+.edit-title { font-size: 14px; font-weight: 700; color: var(--t2); flex: 1; }
+.edit-title.loaded { color: var(--t1); }
+.edit-body { flex: 1; overflow-y: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 14px; }
+.edit-body::-webkit-scrollbar { width: 3px; }
+.edit-body::-webkit-scrollbar-thumb { background: var(--bd); }
+
+/* Form groups */
+.fg { display: flex; flex-direction: column; gap: 5px; }
+.fg-label { font-size: 8px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: .1em; }
+.fg-row { display: grid; gap: 8px; }
+.fg-row.col2 { grid-template-columns: 1fr 1fr; }
+.fg-row.col3 { grid-template-columns: 1fr 1fr 1fr; }
+
+/* Inputs */
+input[type="text"], input[type="number"], select, textarea {
+  width: 100%; padding: 7px 10px;
+  background: var(--b2); border: 1px solid var(--bd);
+  color: var(--t1); font-size: 11px; font-family: var(--f);
+  border-radius: 6px; transition: border-color .15s;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--g); }
+input::placeholder, textarea::placeholder { color: var(--t4); }
+select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23606080'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 9px center; padding-right: 26px; }
+
+input[type="color"] { height: 36px; padding: 3px 6px; cursor: pointer; }
+input[type="range"] { -webkit-appearance: none; height: 4px; border-radius: 2px; background: var(--b3); border: none; cursor: pointer; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--g); cursor: pointer; }
+
+/* Template grid */
+.tpl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.tpl-opt {
+  padding: 8px 10px; border-radius: 6px;
+  border: 1px solid var(--bd); background: var(--b2);
+  cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; gap: 7px;
+}
+.tpl-opt:hover { border-color: var(--bd2); }
+.tpl-opt.sel { border-color: var(--g); background: var(--gd); }
+.tpl-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.tpl-name { font-size: 9px; font-weight: 600; color: var(--t2); }
+.tpl-opt.sel .tpl-name { color: var(--g); }
+
+/* Range row */
+.range-row { display: flex; align-items: center; gap: 8px; }
+.range-row input[type="range"] { flex: 1; }
+.range-val { font-size: 9px; font-family: var(--fm); color: var(--t2); min-width: 36px; text-align: right; }
+
+/* Divider */
+.divider { height: 1px; background: var(--bd); }
+
+/* Edit footer */
+.edit-footer {
+  border-top: 1px solid var(--bd);
+  padding: 10px 16px;
+  flex-shrink: 0; display: flex; gap: 6px; align-items: center;
+}
+.btn-save {
+  height: 34px; padding: 0 16px;
+  background: linear-gradient(135deg, var(--g), #059669);
+  border: none; border-radius: 7px;
+  color: #fff; font-size: 11px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; gap: 6px;
+  transition: all .15s; box-shadow: 0 2px 12px rgba(78,222,163,.25);
+}
+.btn-save:hover { box-shadow: 0 4px 20px rgba(78,222,163,.45); transform: translateY(-1px); }
+.btn-save .ms { font-size: 16px; }
+.btn-dup {
+  height: 34px; padding: 0 12px;
+  background: var(--b3); border: 1px solid var(--bd);
+  border-radius: 7px; color: var(--t2); font-size: 10px; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; gap: 5px; transition: all .15s;
+}
+.btn-dup:hover { border-color: var(--bd2); color: var(--t1); }
+.ef-spacer { flex: 1; }
+
+/* ─── RIGHT: Live Preview ─── */
+#panel-preview {
+  background: var(--b1);
+  border-left: 1px solid var(--bd);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.prev-hdr {
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid var(--bd);
+  font-size: 9px; font-family: var(--fm);
+  color: var(--t3); text-transform: uppercase; letter-spacing: .1em;
+  flex-shrink: 0; display: flex; align-items: center; gap: 6px;
+}
+.prev-hdr .ms { font-size: 13px; }
+
+/* Preview canvas */
+#preview-canvas {
+  flex-shrink: 0;
+  margin: 10px;
+  background: #000;
+  border-radius: 8px;
+  border: 1px solid var(--bd);
+  aspect-ratio: 16/9;
+  overflow: hidden; position: relative;
+}
+#preview-canvas::after {
+  content: 'PGM 1920×1080';
+  position: absolute; top: 6px; right: 8px;
+  font-size: 7px; font-family: var(--fm);
+  color: rgba(255,255,255,0.18); letter-spacing: .1em;
+}
+/* Background layer */
+#prev-bg { position: absolute; inset: 0; }
+/* Lower third layer */
+#prev-lt {
+  position: absolute;
+  transition: all .3s;
+  padding: 14px 22px;
+  max-width: 80%;
+}
+#prev-primary { display: block; font-weight: 700; line-height: 1.3; white-space: pre-wrap; }
+#prev-secondary { display: block; margin-top: 6px; white-space: pre-wrap; }
+
+/* Test text */
+#test-wrap { padding: 10px 12px; border-top: 1px solid var(--bd); flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+#test-wrap::-webkit-scrollbar { width: 3px; }
+#test-wrap::-webkit-scrollbar-thumb { background: var(--bd); }
+.tw-label { font-size: 8px; font-family: var(--fm); color: var(--t3); text-transform: uppercase; letter-spacing: .1em; }
+#test-primary { resize: none; min-height: 60px; font-size: 11px; }
+#test-secondary { font-size: 11px; }
+
+/* Push preview btn */
+.prev-actions { display: flex; gap: 5px; padding: 8px 12px; border-top: 1px solid var(--bd); flex-shrink: 0; }
+.pa-btn { flex: 1; height: 30px; border-radius: 6px; border: 1px solid var(--bd); background: var(--b2); color: var(--t2); font-size: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: all .12s; }
+.pa-btn:hover { border-color: var(--bd2); color: var(--t1); }
+.pa-btn.primary { background: linear-gradient(135deg, var(--b), #2563eb); border-color: transparent; color: #fff; box-shadow: 0 2px 10px rgba(77,142,255,.3); }
+.pa-btn.primary:hover { box-shadow: 0 4px 18px rgba(77,142,255,.5); }
+.pa-btn .ms { font-size: 14px; }
+
+/* Empty state */
+.empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: var(--t4); }
+.empty-state .ms { font-size: 40px; }
+.empty-state p { font-size: 10px; font-family: var(--fm); text-align: center; line-height: 1.7; }
+
+/* Toast */
+#toast { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: var(--b3); border: 1px solid var(--bd2); color: var(--t1); font-size: 11px; font-family: var(--fm); padding: 7px 16px; border-radius: 99px; opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 999; white-space: nowrap; }
+#toast.show { opacity: 1; }
+#toast.ok  { border-color: var(--gp); color: var(--g); }
+#toast.err { border-color: rgba(239,68,68,.4); color: var(--r); }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <a href="index.html" class="brand">
+      <div class="brand-logo">⛪</div>
+      <span class="brand-name">OBS<em>Church</em></span>
+    </a>
+    <div class="tb-sep"></div>
+    <div class="tb-badge">
+      <div class="tb-dot"></div>
+      <span>🎨 Theme Builder</span>
+    </div>
+    <div class="tb-fill"></div>
+    <div id="ws-status">
+      <div id="ws-dot"></div>
+      <span id="ws-label">Đang kết nối...</span>
+    </div>
+    <div class="tb-sep"></div>
+    <a href="lyrics.html" class="tb-btn"><span class="ms">music_note</span>Lyrics</a>
+    <a href="scene-types.html" class="tb-btn"><span class="ms">movie_creation</span>Scenes</a>
+    <a href="index.html" class="tb-btn"><span class="ms">arrow_back</span>Dashboard</a>
+  </div>
+
+  <!-- WORKSPACE -->
+  <div id="workspace">
+
+    <!-- LEFT: Theme List -->
+    <div id="panel-themes">
+      <div class="panel-hdr">
+        <span class="ms">palette</span>
+        Danh Sách Theme
+      </div>
+      <div class="theme-list" id="theme-list">
+        <div class="empty-state" style="flex-direction:column;padding:30px 10px">
+          <span class="ms">hourglass_empty</span>
+          <p>Đang tải...</p>
+        </div>
+      </div>
+      <div class="panel-footer">
+        <button class="pf-btn" id="btn-new">
+          <span class="ms">add</span>Theme Mới
+        </button>
+        <button class="pf-btn danger" id="btn-del" disabled>
+          <span class="ms">delete</span>Xóa
+        </button>
+      </div>
+    </div>
+
+    <!-- CENTER: Editor -->
+    <div id="panel-edit">
+      <div class="edit-hdr">
+        <span class="edit-title" id="edit-title">← Chọn theme để chỉnh sửa</span>
+      </div>
+
+      <div class="edit-body" id="edit-body">
+        <div class="empty-state">
+          <span class="ms">palette</span>
+          <p>Chọn một theme từ danh sách bên trái<br>hoặc nhấn "Theme Mới" để tạo mới</p>
+        </div>
+      </div>
+
+      <div class="edit-footer" id="edit-footer" style="display:none">
+        <button class="btn-dup" id="btn-dup">
+          <span class="ms">content_copy</span>Nhân bản
+        </button>
+        <div class="ef-spacer"></div>
+        <button class="btn-save" id="btn-save">
+          <span class="ms">save</span>Lưu Theme
+        </button>
+      </div>
+    </div>
+
+    <!-- RIGHT: Preview -->
+    <div id="panel-preview">
+      <div class="prev-hdr">
+        <span class="ms">preview</span>
+        Live Preview
+      </div>
+
+      <!-- 16:9 Preview Canvas -->
+      <div id="preview-canvas">
+        <div id="prev-bg"></div>
+        <div id="prev-lt">
+          <span id="prev-primary">Lời bài hát mẫu</span>
+          <span id="prev-secondary">Tên bài hát</span>
+        </div>
+      </div>
+
+      <!-- Test text input -->
+      <div id="test-wrap">
+        <span class="tw-label">Văn bản thử nghiệm</span>
+        <div class="fg">
+          <span class="fg-label">Dòng chính</span>
+          <textarea id="test-primary" placeholder="Gõ lời để xem preview...">Tình Chúa cao vời, không ai đo lường</textarea>
+        </div>
+        <div class="fg">
+          <span class="fg-label">Dòng phụ</span>
+          <input type="text" id="test-secondary" value="Tình Chúa Cao Vời" placeholder="Tên bài hát..." />
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="prev-actions">
+        <button class="pa-btn" id="btn-hide-overlay">
+          <span class="ms">visibility_off</span>Ẩn
+        </button>
+        <button class="pa-btn primary" id="btn-push-overlay">
+          <span class="ms">send</span>Phát Lên OBS
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════
+const API    = 'http://localhost:3001';
+const WS_URL = 'ws://localhost:3001';
+const $      = id => document.getElementById(id);
+
+const TEMPLATES = [
+  { id: 'lyric-clean',         name: 'Lyric Clean',    color: '#4d8eff' },
+  { id: 'lyric-dark',          name: 'Lyric Dark',     color: '#4edea3' },
+  { id: 'lyric-minimal',       name: 'Minimal',        color: '#a855f7' },
+  { id: 'lyric-fullscreen',    name: 'Fullscreen',     color: '#fbbf24' },
+  { id: 'glassmorphism',       name: 'Glass',          color: '#06b6d4' },
+  { id: 'scripture-fullscreen',name: 'Scripture',      color: '#f59e0b' },
+  { id: 'clean-dark',          name: 'Clean Dark',     color: '#60a5fa' },
+  { id: 'sermon-topic',        name: 'Sermon Topic',   color: '#c084fc' },
+];
+
+const FONTS = [
+  'Inter', 'Noto Serif', 'JetBrains Mono',
+  'Roboto', 'Open Sans', 'Lato', 'Montserrat',
+  'Playfair Display', 'Merriweather', 'Raleway'
+];
+
+const ANIMATIONS = [
+  { id: 'fade',  name: '✦ Fade' },
+  { id: 'slide', name: '↑ Slide Up' },
+  { id: 'none',  name: '— Tức thì' },
+];
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let themes  = [];
+let activeId = null;
+let ws, wsReady = false;
+
+// ═══════════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════════
+(async () => {
+  connectWS();
+  await loadThemes();
+  bindAll();
+})();
+
+// ═══════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════
+async function loadThemes() {
+  try {
+    const r = await fetch(`${API}/api/themes`);
+    const d = await r.json();
+    themes = d.themes || [];
+    renderThemeList();
+  } catch {
+    toast('Không tải được themes — server offline?', 'err');
+    themes = [];
+    renderThemeList();
+  }
+}
+
+async function saveThemes() {
+  try {
+    const r = await fetch(`${API}/api/themes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ themes }),
+    });
+    if (!r.ok) throw new Error();
+    toast('✓ Đã lưu theme', 'ok');
+  } catch {
+    toast('Lỗi lưu theme!', 'err');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER LIST
+// ═══════════════════════════════════════════════════════════
+function renderThemeList() {
+  const el = $('theme-list');
+  if (!themes.length) {
+    el.innerHTML = `<div class="empty-state" style="flex-direction:column;padding:30px 10px;color:var(--t4)">
+      <span class="ms" style="font-size:32px">palette</span>
+      <p>Chưa có theme nào.<br>Nhấn "Theme Mới" để bắt đầu.</p>
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = themes.map(t => {
+    const tpl = TEMPLATES.find(x => x.id === t.templateId);
+    const dot  = tpl ? tpl.color : '#888';
+    return `
+    <div class="theme-card ${t.id === activeId ? 'active' : ''}" data-tid="${t.id}">
+      <div class="tc-name">${esc(t.name)}</div>
+      <div class="tc-desc">${esc(t.description || '')}</div>
+      <div class="tc-chips">
+        <span class="tc-chip" style="border-left:2px solid ${dot}">${tpl?.name || t.templateId}</span>
+        <span class="tc-chip">⬛ ${t.fontSize}px</span>
+        <span class="tc-chip">📍 (${t.textX},${t.textY})</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.querySelectorAll('.theme-card').forEach(c =>
+    c.addEventListener('click', () => openTheme(c.dataset.tid)));
+}
+
+// ═══════════════════════════════════════════════════════════
+// EDITOR
+// ═══════════════════════════════════════════════════════════
+function openTheme(id) {
+  activeId = id;
+  const t = themes.find(x => x.id === id);
+  if (!t) return;
+
+  $('btn-del').disabled = false;
+  $('edit-title').textContent = t.name;
+  $('edit-title').className = 'edit-title loaded';
+  $('edit-footer').style.display = '';
+  renderThemeList();
+  renderEditor(t);
+  applyPreview(t);
+}
+
+function renderEditor(t) {
+  $('edit-body').innerHTML = `
+
+    <!-- Basic info -->
+    <div class="fg">
+      <span class="fg-label">Tên Theme</span>
+      <input type="text" id="e-name" value="${esc(t.name)}" placeholder="Lễ Sáng Chủ Nhật" />
+    </div>
+    <div class="fg">
+      <span class="fg-label">Mô tả</span>
+      <input type="text" id="e-desc" value="${esc(t.description||'')}" placeholder="Dành cho buổi lễ sáng..." />
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Template selection -->
+    <div class="fg">
+      <span class="fg-label">Loại Template Overlay</span>
+      <div class="tpl-grid" id="e-tpl-grid">
+        ${TEMPLATES.map(tpl => `
+          <div class="tpl-opt ${t.templateId === tpl.id ? 'sel' : ''}" data-tpl="${tpl.id}">
+            <span class="tpl-dot" style="background:${tpl.color}"></span>
+            <span class="tpl-name">${tpl.name}</span>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Typography -->
+    <div class="fg">
+      <span class="fg-label">Kiểu Chữ</span>
+      <div class="fg-row col2">
+        <div>
+          <span class="fg-label">Font Family</span>
+          <select id="e-font">
+            ${FONTS.map(f => `<option value="${f}" ${t.fontFamily===f?'selected':''}>${f}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <span class="fg-label">Cỡ chữ chính (px)</span>
+          <input type="number" id="e-fs" value="${t.fontSize||32}" min="12" max="80" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Colors -->
+    <div class="fg">
+      <span class="fg-label">Màu Sắc</span>
+      <div class="fg-row col2">
+        <div>
+          <span class="fg-label">Màu nhấn / Border</span>
+          <input type="color" id="e-accent" value="${t.accentColor||'#4edea3'}" />
+        </div>
+        <div>
+          <span class="fg-label">Màu chữ chính</span>
+          <input type="color" id="e-txtcol" value="${t.textColor||'#ffffff'}" />
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Position -->
+    <div class="fg">
+      <span class="fg-label">Vị Trí Trên Màn Hình OBS (%)</span>
+      <div class="fg-row col2">
+        <div>
+          <span class="fg-label">X — Ngang (0–100)</span>
+          <div class="range-row">
+            <input type="range" id="e-x" min="0" max="90" value="${t.textX||5}" oninput="$('e-xv').textContent=this.value+'%';liveUpdate()">
+            <span class="range-val" id="e-xv">${t.textX||5}%</span>
+          </div>
+        </div>
+        <div>
+          <span class="fg-label">Y — Dọc (0–100)</span>
+          <div class="range-row">
+            <input type="range" id="e-y" min="0" max="95" value="${t.textY||78}" oninput="$('e-yv').textContent=this.value+'%';liveUpdate()">
+            <span class="range-val" id="e-yv">${t.textY||78}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Animation -->
+    <div class="fg">
+      <span class="fg-label">Hiệu Ứng Xuất Hiện</span>
+      <select id="e-anim">
+        ${ANIMATIONS.map(a => `<option value="${a.id}" ${(t.animation||'fade')===a.id?'selected':''}>${a.name}</option>`).join('')}
+      </select>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Text alignment -->
+    <div class="fg">
+      <span class="fg-label">Căn Lề Văn Bản</span>
+      <select id="e-align">
+        <option value="left"   ${(t.textAlign||'left')==='left'?'selected':''}>◀ Trái</option>
+        <option value="center" ${t.textAlign==='center'?'selected':''}>▬ Giữa</option>
+        <option value="right"  ${t.textAlign==='right'?'selected':''}>▶ Phải</option>
+      </select>
+    </div>
+  `;
+
+  // Bind live updates
+  const liveIds = ['e-name','e-desc','e-font','e-fs','e-accent','e-txtcol','e-anim','e-align'];
+  liveIds.forEach(id => {
+    const el = $(id);
+    if (el) el.addEventListener('input', liveUpdate);
+  });
+
+  // Template click
+  document.querySelectorAll('.tpl-opt').forEach(el => {
+    el.addEventListener('click', () => {
+      document.querySelectorAll('.tpl-opt').forEach(x => x.classList.remove('sel'));
+      el.classList.add('sel');
+      liveUpdate();
+    });
+  });
+}
+
+function liveUpdate() {
+  applyPreview(buildDraft());
+}
+
+function buildDraft() {
+  const selTpl = document.querySelector('.tpl-opt.sel');
+  return {
+    id:          activeId,
+    name:        ($('e-name')?.value || '').trim(),
+    description: ($('e-desc')?.value || '').trim(),
+    templateId:  selTpl?.dataset.tpl || 'lyric-clean',
+    accentColor: $('e-accent')?.value  || '#4edea3',
+    textColor:   $('e-txtcol')?.value  || '#ffffff',
+    fontSize:    parseInt($('e-fs')?.value) || 32,
+    fontFamily:  $('e-font')?.value    || 'Inter',
+    textAlign:   $('e-align')?.value   || 'left',
+    textX:       parseInt($('e-x')?.value)  || 5,
+    textY:       parseInt($('e-y')?.value)  || 78,
+    animation:   $('e-anim')?.value    || 'fade',
+  };
+}
+
+// ═══════════════════════════════════════════════════════════
+// PREVIEW RENDERER
+// ═══════════════════════════════════════════════════════════
+const TPL_STYLES = {
+  'lyric-clean': {
+    background: 'linear-gradient(to right, rgba(4,4,20,0.92), rgba(4,4,20,0.7))',
+    borderLeft: '4px solid {accent}',
+    padding: '14px 20px', borderRadius: '0 6px 6px 0', backdropFilter: 'blur(12px)',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+  },
+  'lyric-dark': {
+    background: 'rgba(0,0,0,0.85)',
+    borderTop: '3px solid {accent}', borderBottom: '3px solid {accent}',
+    padding: '16px 28px', backdropFilter: 'blur(16px)',
+  },
+  'lyric-minimal': {
+    background: 'transparent', padding: '10px 16px',
+  },
+  'lyric-fullscreen': {
+    background: 'linear-gradient(135deg,rgba(4,4,20,0.85),rgba(10,5,30,0.7))',
+    border: '1px solid rgba(255,255,255,0.08)',
+    backdropFilter: 'blur(20px)', padding: '30px 44px',
+    borderRadius: '12px', textAlign: 'center',
+    width: '85%', margin: '0 auto',
+    boxShadow: '0 16px 50px rgba(0,0,0,0.5)',
+  },
+  'glassmorphism': {
+    background: 'rgba(255,255,255,0.07)',
+    border: '1px solid rgba(255,255,255,0.14)',
+    backdropFilter: 'blur(20px)', padding: '18px 24px',
+    borderRadius: '10px',
+    boxShadow: '0 8px 30px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.1)',
+  },
+  'scripture-fullscreen': {
+    background: 'rgba(255,255,255,0.03)',
+    border: '1px solid rgba(255,255,255,0.14)',
+    backdropFilter: 'blur(24px)', padding: '32px 40px',
+    borderRadius: '14px', textAlign: 'justify',
+    boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+    width: '80%', margin: '0 auto',
+  },
+  'clean-dark': {
+    background: 'linear-gradient(to right,rgba(10,10,10,0.95),rgba(10,10,10,0.75))',
+    borderLeft: '4px solid {accent}', padding: '16px 24px',
+    borderRadius: '0 6px 6px 0', backdropFilter: 'blur(12px)',
+  },
+  'sermon-topic': {
+    background: 'linear-gradient(135deg,rgba(30,10,60,0.95),rgba(15,10,35,0.85))',
+    border: '1px solid rgba(168,85,247,0.3)', borderLeft: '5px solid {accent}',
+    padding: '20px 32px', borderRadius: '7px', textAlign: 'center',
+    backdropFilter: 'blur(12px)', maxWidth: '80%', margin: '0 auto',
+  },
+};
+
+function applyPreview(t) {
+  const pt = $('prev-lt');
+  const ppri = $('prev-primary');
+  const psec = $('prev-secondary');
+  const pbg  = $('prev-bg');
+
+  const primaryText   = ($('test-primary')?.value   || 'Lời bài hát mẫu');
+  const secondaryText = ($('test-secondary')?.value || 'Tên bài hát');
+
+  // Position
+  const canvas = $('preview-canvas');
+  const isCenter = ['lyric-fullscreen', 'scripture-fullscreen', 'sermon-topic'].includes(t.templateId);
+  if (isCenter) {
+    pt.style.left = pt.style.top = pt.style.right = pt.style.bottom = '';
+    pt.style.position = 'absolute';
+    pt.style.top  = '50%';
+    pt.style.left = '50%';
+    pt.style.transform = 'translate(-50%,-50%)';
+    pt.style.width = '90%';
+  } else {
+    pt.style.transform = '';
+    pt.style.width = '';
+    pt.style.left   = `${t.textX || 5}%`;
+    pt.style.top    = `${t.textY || 78}%`;
+    pt.style.right  = 'auto';
+    pt.style.bottom = 'auto';
+    pt.style.position = 'absolute';
+  }
+
+  // Apply template style
+  const style = TPL_STYLES[t.templateId] || TPL_STYLES['lyric-clean'];
+  const applyStyle = (s) => Object.keys(s).forEach(k => {
+    const v = typeof s[k] === 'string' ? s[k].replace('{accent}', t.accentColor || '#4edea3') : s[k];
+    pt.style[k] = v;
+  });
+  // Reset
+  pt.removeAttribute('style');
+  pt.style.position = 'absolute';
+  applyStyle(style);
+  // Reapply position after style reset
+  if (isCenter) {
+    pt.style.top = '50%'; pt.style.left = '50%';
+    pt.style.transform = 'translate(-50%,-50%)';
+    pt.style.width = '90%';
+  } else {
+    pt.style.left = `${t.textX||5}%`;
+    pt.style.top  = `${t.textY||78}%`;
+  }
+
+  // Typography
+  const fs = (t.fontSize || 32);
+  const scaleFactor = canvas.offsetWidth / 1920;
+  ppri.style.fontFamily  = `'${t.fontFamily || 'Inter'}', sans-serif`;
+  ppri.style.fontSize    = `${fs * scaleFactor * 0.9}px`;
+  ppri.style.color       = t.textColor || '#ffffff';
+  ppri.style.textAlign   = t.textAlign || 'left';
+  ppri.style.fontWeight  = '700';
+  if (t.templateId === 'lyric-minimal') {
+    ppri.style.textShadow = '0 2px 12px rgba(0,0,0,0.9), 0 4px 24px rgba(0,0,0,0.7)';
+  } else {
+    ppri.style.textShadow = '';
+  }
+
+  psec.style.fontFamily = `'${t.fontFamily || 'Inter'}', sans-serif`;
+  psec.style.fontSize   = `${fs * scaleFactor * 0.52}px`;
+  psec.style.color      = `${t.accentColor || '#4edea3'}`;
+  psec.style.opacity    = '0.8';
+  psec.style.textAlign  = t.textAlign || 'left';
+  psec.style.display    = 'block';
+  psec.style.marginTop  = `${4 * scaleFactor}px`;
+
+  // Text
+  ppri.textContent = primaryText;
+  psec.textContent = secondaryText;
+
+  // Background (accent color on bg)
+  document.documentElement.style.setProperty('--lyric-accent', t.accentColor || '#4edea3');
+}
+
+// ═══════════════════════════════════════════════════════════
+// SAVE / NEW / DELETE
+// ═══════════════════════════════════════════════════════════
+function saveTheme() {
+  if (!activeId) return;
+  const draft = buildDraft();
+  if (!draft.name) { toast('Nhập tên theme!', 'err'); return; }
+  draft.id = activeId;
+  draft.updatedAt = new Date().toISOString();
+
+  const idx = themes.findIndex(t => t.id === activeId);
+  if (idx >= 0) themes[idx] = { ...themes[idx], ...draft };
+  else themes.push(draft);
+
+  renderThemeList();
+  saveThemes();
+}
+
+function newTheme() {
+  const id = `theme-${Date.now()}`;
+  const t = {
+    id,
+    name: 'Theme Mới',
+    description: '',
+    templateId: 'lyric-clean',
+    accentColor: '#4edea3',
+    textColor: '#ffffff',
+    fontSize: 32,
+    fontFamily: 'Inter',
+    textAlign: 'left',
+    textX: 5,
+    textY: 78,
+    animation: 'fade',
+    createdAt: new Date().toISOString(),
+  };
+  themes.push(t);
+  renderThemeList();
+  openTheme(id);
+  // Focus name field
+  setTimeout(() => $('e-name') && $('e-name').focus(), 100);
+}
+
+function dupTheme() {
+  if (!activeId) return;
+  const src = themes.find(t => t.id === activeId);
+  if (!src) return;
+  const id = `theme-${Date.now()}`;
+  const copy = { ...src, id, name: `${src.name} (copy)`, createdAt: new Date().toISOString() };
+  themes.push(copy);
+  renderThemeList();
+  openTheme(id);
+  toast('Đã nhân bản theme ✓', 'ok');
+}
+
+function delTheme() {
+  if (!activeId) return;
+  const t = themes.find(x => x.id === activeId);
+  if (!t || !confirm(`Xóa theme "${t.name}"?`)) return;
+  themes = themes.filter(x => x.id !== activeId);
+  activeId = null;
+  $('btn-del').disabled = true;
+  $('edit-title').textContent = '← Chọn theme để chỉnh sửa';
+  $('edit-title').className = 'edit-title';
+  $('edit-body').innerHTML = `<div class="empty-state">
+    <span class="ms">palette</span>
+    <p>Chọn một theme từ danh sách bên trái<br>hoặc nhấn "Theme Mới" để tạo mới</p>
+  </div>`;
+  $('edit-footer').style.display = 'none';
+  renderThemeList();
+  saveThemes();
+}
+
+// ═══════════════════════════════════════════════════════════
+// WS + PUSH
+// ═══════════════════════════════════════════════════════════
+function connectWS() {
+  ws = new WebSocket(WS_URL);
+  ws.addEventListener('open', () => {
+    wsReady = true;
+    $('ws-dot').className = 'ok';
+    $('ws-label').textContent = 'Server kết nối';
+  });
+  ws.addEventListener('close', () => {
+    wsReady = false;
+    $('ws-dot').className = '';
+    $('ws-label').textContent = 'Đang kết nối...';
+    setTimeout(connectWS, 3000);
+  });
+  ws.addEventListener('error', () => ws.close());
+}
+
+function pushOverlay() {
+  if (!activeId) { toast('Chọn theme trước!', 'err'); return; }
+  const draft = buildDraft();
+  const payload = {
+    templateId:  draft.templateId,
+    primary:     $('test-primary').value || 'Lời bài hát mẫu',
+    secondary:   $('test-secondary').value || '',
+    accentColor: draft.accentColor,
+    fontSize:    draft.fontSize,
+    textX:       draft.textX,
+    textY:       draft.textY,
+    camW: 0, camH: 0,
+  };
+  if (ws?.readyState === 1) {
+    ws.send(JSON.stringify({ type: 'OVERLAY_SHOW', payload }));
+    toast('▶ Đã phát lên OBS', 'ok');
+  } else {
+    toast('Server chưa kết nối!', 'err');
+  }
+}
+
+function hideOverlay() {
+  if (ws?.readyState === 1) {
+    ws.send(JSON.stringify({ type: 'OVERLAY_HIDE', payload: {} }));
+    toast('⬛ Đã ẩn overlay', '');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// BIND
+// ═══════════════════════════════════════════════════════════
+function bindAll() {
+  $('btn-new').addEventListener('click', newTheme);
+  $('btn-del').addEventListener('click', delTheme);
+  $('btn-save').addEventListener('click', saveTheme);
+  $('btn-dup').addEventListener('click', dupTheme);
+  $('btn-push-overlay').addEventListener('click', pushOverlay);
+  $('btn-hide-overlay').addEventListener('click', hideOverlay);
+
+  ['test-primary', 'test-secondary'].forEach(id => {
+    $(id)?.addEventListener('input', () => {
+      const t = activeId ? (themes.find(x => x.id === activeId) || {}) : {};
+      applyPreview(buildDraft && activeId ? buildDraft() : t);
+    });
+  });
+
+  // Save on Ctrl+S
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveTheme(); }
+    if (e.key === 'Escape' && activeId) hideOverlay();
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+let _toastT;
+function toast(msg, type = '') {
+  const el = $('toast');
+  el.textContent = msg;
+  el.className = type ? `show ${type}` : 'show';
+  clearTimeout(_toastT);
+  _toastT = setTimeout(() => el.classList.remove('show'), 2400);
+}
+</script>
+<script src="/OBSChurch/monitor-pip.js"></script>
+</body>
+</html>

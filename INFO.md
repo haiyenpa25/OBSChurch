@@ -1,4 +1,4 @@
-# OBSChurch — Broadcast Command System
+﻿# OBSChurch — Broadcast Command System
 
 > Hệ thống quản lý trình chiếu thờ phượng thời gian thực qua WebSocket cho OBS Studio.
 
@@ -29,7 +29,7 @@
 │  ├─ Col3: Input Panel + Template Picker      │
 │  └─ Col4: PGM Monitor + Switcher Grid        │
 └─────────────────┬────────────────────────────┘
-                  │ WebSocket ws://localhost:3000
+                  │ WebSocket ws://localhost:8080
         ┌─────────▼──────────┐
         │   WS SERVER         │
         │ server/ws-server.js │  ← Node.js hub
@@ -111,7 +111,7 @@ OBSChurch/
 cd OBSChurch/server
 npm install
 node ws-server.js
-# Server chạy tại ws://localhost:3000
+# Server chạy tại ws://localhost:8080
 ```
 
 ### 2. Mở Control Panel

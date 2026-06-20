@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
@@ -907,10 +907,10 @@
    Advanced features: Multi-layer, Snap, Undo/Redo, Presets,
    Scene Assignment, Animation Config, OBS Export
  ═══════════════════════════════════════════════════════════════════ */
-const API_LAYOUTS = 'http://localhost:3000/api/layouts';
-const API_SCENES  = 'http://localhost:3000/api/scenes';
-const API_WIDGETS = 'http://localhost:3000/api/widgets';
-const WS_URL      = 'ws://localhost:3000';
+const API_LAYOUTS = 'http://localhost:3001/api/layouts';
+const API_SCENES  = 'http://localhost:3001/api/scenes';
+const API_WIDGETS = 'http://localhost:3001/api/widgets';
+const WS_URL      = 'ws://localhost:3001';
 
 // ── Utils ──────────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
@@ -2396,5 +2396,6 @@ function toast(msg, type='inf') {
   setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 250); }, 2500);
 }
 </script>
+<script src="/OBSChurch/monitor-pip.js"></script>
 </body>
 </html>

@@ -16,8 +16,12 @@ const http = require('http');
 const fs   = require('fs');
 const path = require('path');
 
+// OBS WebSocket v5 bridge (obs-websocket-js)
+let OBSWebSocket;
+try { OBSWebSocket = require('obs-websocket-js').default; } catch(_) {}
+
 // ─── Constants ───────────────────────────────────────
-const PORT = 3000;
+const PORT = process.env.PORT || 3001;
 const PING_MS = 20_000;
 
 // Tất cả data đọc từ /data/ (gốc project)
@@ -32,6 +36,7 @@ const PATHS = {
   config:       path.join(DATA_DIR, 'service-config.json'),
   songs:        path.join(DATA_DIR, 'songs.json'),
   presets:      path.join(DATA_DIR, 'overlay-presets.json'),
+  themes:       path.join(DATA_DIR, 'themes.json'),
   categories:   path.join(WIDGETS_PATH, '_categories.json'),
 };
 
@@ -50,7 +55,94 @@ const appState = {
   tickerMessages:  [],
   isRecording:     false,
   isStreaming:     false,
+  obsConnected:    false,
+  obsScenes:       [],
+  obsCurrentScene: null,
 };
+
+// ─── OBS WebSocket Bridge ────────────────────────────
+let obsWS = null;
+const obsState = { connected: false, host: '', password: '' };
+
+async function obsConnect(host = 'localhost:4455', password = '') {
+  if (!OBSWebSocket) {
+    console.warn('[OBS] obs-websocket-js not installed');
+    return { success: false, error: 'Library not installed' };
+  }
+  try {
+    if (obsWS) { try { obsWS.disconnect(); } catch(_) {} }
+    obsWS = new OBSWebSocket();
+
+    obsWS.on('ConnectionOpened',   () => { console.log('[OBS] Connected'); });
+    obsWS.on('ConnectionClosed',   () => {
+      obsState.connected = false;
+      appState.obsConnected = false;
+      appState.obsCurrentScene = null;
+      _broadcastAll({ type: 'OBS_STATE', payload: { connected: false } }, null);
+      console.log('[OBS] Disconnected');
+    });
+    obsWS.on('CurrentProgramSceneChanged', ({ sceneName }) => {
+      appState.obsCurrentScene = sceneName;
+      _broadcastAll({ type: 'OBS_SCENE_CHANGED', payload: { scene: sceneName } }, null);
+    });
+    obsWS.on('RecordStateChanged', ({ outputActive }) => {
+      appState.isRecording = outputActive;
+      _broadcastAll({ type: outputActive ? 'OBS_RECORD_START' : 'OBS_RECORD_STOP', payload: {} }, null);
+    });
+    obsWS.on('StreamStateChanged', ({ outputActive }) => {
+      appState.isStreaming = outputActive;
+      _broadcastAll({ type: outputActive ? 'OBS_STREAM_START' : 'OBS_STREAM_STOP', payload: {} }, null);
+    });
+
+    const url = host.startsWith('ws') ? host : `ws://${host}`;
+    await obsWS.connect(url, password);
+
+    // Fetch initial state
+    const { scenes, currentProgramSceneName } = await obsWS.call('GetSceneList');
+    const sceneNames = scenes.map(s => s.sceneName);
+    appState.obsConnected    = true;
+    appState.obsScenes       = sceneNames;
+    appState.obsCurrentScene = currentProgramSceneName;
+    obsState.connected = true;
+    obsState.host      = host;
+    obsState.password  = password;
+
+    _broadcastAll({
+      type: 'OBS_STATE',
+      payload: { connected: true, scenes: sceneNames, currentScene: currentProgramSceneName },
+    }, null);
+
+    return { success: true, scenes: sceneNames, currentScene: currentProgramSceneName };
+  } catch (e) {
+    console.error('[OBS] Connect error:', e.message);
+    return { success: false, error: e.message };
+  }
+}
+
+async function obsSwitchScene(sceneName) {
+  if (!obsWS || !obsState.connected) return { success: false, error: 'Not connected' };
+  try {
+    await obsWS.call('SetCurrentProgramScene', { sceneName });
+    return { success: true };
+  } catch(e) { return { success: false, error: e.message }; }
+}
+
+async function obsStartRecord() {
+  if (!obsWS || !obsState.connected) return;
+  try { await obsWS.call('StartRecord'); } catch(e) {}
+}
+async function obsStopRecord() {
+  if (!obsWS || !obsState.connected) return;
+  try { await obsWS.call('StopRecord'); } catch(e) {}
+}
+async function obsStartStream() {
+  if (!obsWS || !obsState.connected) return;
+  try { await obsWS.call('StartStream'); } catch(e) {}
+}
+async function obsStopStream() {
+  if (!obsWS || !obsState.connected) return;
+  try { await obsWS.call('StopStream'); } catch(e) {}
+}
 
 // ─── HTTP Router ─────────────────────────────────────
 function _handleHttpRequest(req, res) {
@@ -69,9 +161,9 @@ function _handleHttpRequest(req, res) {
     '/api/config':            _handleGetConfig,
     '/api/songs':             (_, r) => _readJson(PATHS.songs, r),
     '/api/presets':           (_, r) => _readJson(PATHS.presets, r),
+    '/api/themes':            (_, r) => _readJson(PATHS.themes, r),
     '/api/widget-categories': _handleGetWidgetCategories,
     '/api/widgets':           _handleGetWidgets,
-    '/api/widget-categories': _handleGetWidgetCategories,
   };
 
   if (method === 'GET' && getMap[url]) {
@@ -87,6 +179,7 @@ function _handleHttpRequest(req, res) {
     '/api/config':      (r, s) => _handleSaveJson(r, s, PATHS.config),
     '/api/songs':       (r, s) => _handleSaveJson(r, s, PATHS.songs),
     '/api/presets':     (r, s) => _handleSaveJson(r, s, PATHS.presets),
+    '/api/themes':      (r, s) => _handleSaveJson(r, s, PATHS.themes),
   };
 
 
@@ -96,11 +189,13 @@ function _handleHttpRequest(req, res) {
 
   // /api/widgets/:id/template  (GET + POST)
   const tplMatch = url.match(/^\/api\/widgets\/([\w-]+)\/template$/);
+  if (tplMatch && !_isValidWidgetId(tplMatch[1])) { res.writeHead(400).end('Invalid widget id'); return; }
   if (tplMatch && method === 'GET') { _handleGetWidgetTemplate(tplMatch[1], res); return; }
   if (tplMatch && method === 'POST') { _handleSaveWidgetTemplate(tplMatch[1], req, res); return; }
 
   // /api/widgets/:id/meta  (GET + POST)
   const metaMatch = url.match(/^\/api\/widgets\/([\w-]+)\/meta$/);
+  if (metaMatch && !_isValidWidgetId(metaMatch[1])) { res.writeHead(400).end('Invalid widget id'); return; }
   if (metaMatch && method === 'GET') { _handleGetWidgetMeta(metaMatch[1], res); return; }
   if (metaMatch && method === 'POST') { _handleSaveWidgetMeta(metaMatch[1], req, res); return; }
 
@@ -109,6 +204,7 @@ function _handleHttpRequest(req, res) {
 
   // /api/widgets/:id/delete  (POST)
   const delMatch = url.match(/^\/api\/widgets\/([\w-]+)\/delete$/);
+  if (delMatch && !_isValidWidgetId(delMatch[1])) { res.writeHead(400).end('Invalid widget id'); return; }
   if (delMatch && method === 'POST') { _handleDeleteWidget(delMatch[1], res); return; }
 
   // /api/categories  (POST) — save _categories.json
@@ -117,8 +213,54 @@ function _handleHttpRequest(req, res) {
   // /api/broadcast  (POST) — send WS message to all clients
   if (url === '/api/broadcast' && method === 'POST') { _handleBroadcast(req, res); return; }
 
+  // OBS Bridge REST endpoints
+  if (url === '/api/obs/connect' && method === 'POST') { _handleObsConnect(req, res); return; }
+  if (url === '/api/obs/disconnect' && method === 'POST') { _handleObsDisconnect(req, res); return; }
+  if (url === '/api/obs/scenes' && method === 'GET') {
+    _jsonOk(res, { scenes: appState.obsScenes, currentScene: appState.obsCurrentScene, connected: appState.obsConnected });
+    return;
+  }
+  if (url === '/api/obs/switch-scene' && method === 'POST') { _handleObsSwitchScene(req, res); return; }
+  if (url === '/api/obs/record/start'  && method === 'POST') { obsStartRecord(); _jsonOk(res, { success: true }); return; }
+  if (url === '/api/obs/record/stop'   && method === 'POST') { obsStopRecord();  _jsonOk(res, { success: true }); return; }
+  if (url === '/api/obs/stream/start'  && method === 'POST') { obsStartStream(); _jsonOk(res, { success: true }); return; }
+  if (url === '/api/obs/stream/stop'   && method === 'POST') { obsStopStream();  _jsonOk(res, { success: true }); return; }
+
   res.writeHead(404).end('Not Found');
 }
+
+// ─── OBS REST Handlers ───────────────────────────────
+function _handleObsConnect(req, res) {
+  let body = '';
+  req.on('data', c => body += c);
+  req.on('end', async () => {
+    try {
+      const { host, password } = JSON.parse(body);
+      const result = await obsConnect(host || 'localhost:4455', password || '');
+      _jsonOk(res, result);
+    } catch(e) { res.writeHead(400).end('Invalid JSON'); }
+  });
+}
+
+function _handleObsDisconnect(req, res) {
+  try { if (obsWS) { obsWS.disconnect(); obsWS = null; } } catch(_) {}
+  obsState.connected = false;
+  appState.obsConnected = false;
+  _jsonOk(res, { success: true });
+}
+
+function _handleObsSwitchScene(req, res) {
+  let body = '';
+  req.on('data', c => body += c);
+  req.on('end', async () => {
+    try {
+      const { sceneName } = JSON.parse(body);
+      const result = await obsSwitchScene(sceneName);
+      _jsonOk(res, result);
+    } catch(e) { res.writeHead(400).end('Invalid JSON'); }
+  });
+}
+
 
 // ─── Generic Handlers ────────────────────────────────
 function _handleGetScenes(_, res)      { _readJson(PATHS.scenes, res); }
@@ -355,6 +497,8 @@ window.__widgetReload = (np) => { Object.assign(P, np); apply(P); };
 
 function _handleDeleteWidget(widgetId, res) {
   const widgetDir = path.join(WIDGETS_PATH, widgetId);
+  // Double-check resolved path stays inside WIDGETS_PATH (defense in depth)
+  if (!widgetDir.startsWith(WIDGETS_PATH + path.sep)) { res.writeHead(400).end('Invalid path'); return; }
   if (!fs.existsSync(widgetDir)) { res.writeHead(404).end('Not Found'); return; }
   fs.rmSync(widgetDir, { recursive: true, force: true });
   _jsonOk(res, { success: true });
@@ -381,6 +525,15 @@ function _setCorsHeaders(res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 }
 
+/**
+ * Validate widget ID: chỉ chấp nhận ký tự an toàn, ngăn path traversal.
+ * @param {string} id
+ * @returns {boolean}
+ */
+function _isValidWidgetId(id) {
+  return typeof id === 'string' && /^[a-zA-Z0-9_-]{1,64}$/.test(id);
+}
+
 // ─── WebSocket Handlers ───────────────────────────────
 wss.on('connection', socket => {
   console.log(`[WS] Client connected (total: ${wss.clients.size})`);
@@ -393,6 +546,11 @@ wss.on('connection', socket => {
 function _onMessage(socket, raw) {
   try {
     const msg = JSON.parse(raw);
+    // REQUEST_STATE: gửi lại state hiện tại cho client đó thôi
+    if (msg.type === 'REQUEST_STATE') {
+      _sendToClient(socket, { type: 'STATE_SYNC', payload: appState });
+      return;
+    }
     _updateState(msg);
     _broadcastAll(msg, socket);
     console.log(`[WS] → ${msg.type}`);
@@ -422,10 +580,13 @@ function _updateState(msg) {
       appState.activeSceneType   = msg.payload?.sceneTypeId;
       appState.currentPayload    = { ...appState.currentPayload, ...msg.payload };
       break;
-    case 'OBS_RECORD_START': appState.isRecording = true;  break;
-    case 'OBS_RECORD_STOP':  appState.isRecording = false; break;
-    case 'OBS_STREAM_START': appState.isStreaming = true;  break;
-    case 'OBS_STREAM_STOP':  appState.isStreaming = false; break;
+    case 'OBS_RECORD_START': appState.isRecording = true;  obsStartRecord(); break;
+    case 'OBS_RECORD_STOP':  appState.isRecording = false; obsStopRecord();  break;
+    case 'OBS_STREAM_START': appState.isStreaming = true;  obsStartStream(); break;
+    case 'OBS_STREAM_STOP':  appState.isStreaming = false; obsStopStream();  break;
+    case 'OBS_SCENE_SWITCH':
+      if (msg.payload?.sceneName) obsSwitchScene(msg.payload.sceneName);
+      break;
     case 'TICKER_SHOW':
       appState.tickerVisible  = true;
       appState.tickerMessages = msg.payload?.messages || [];
@@ -434,14 +595,28 @@ function _updateState(msg) {
       appState.tickerVisible  = false;
       appState.tickerMessages = [];
       break;
+    // ─ Monitor relay commands (broadcast-only, no appState change) ─
+    case 'MONITOR_NAV':     // { dir: -1 | 1 } — relay to Lyric Station
+    case 'MONITOR_PUSH':    // {} — relay to Lyric Station
+    case 'MONITOR_SELECT':  // { lineIdx: N } — relay to Lyric Station
+      // No state update needed — just pass through via broadcastAll
+      break;
+    case 'REQUEST_STATE':
+      // Client requesting a full state sync — handled in _onMessage
+      break;
   }
 }
 
 // ─── Broadcast ───────────────────────────────────────
-function _broadcastAll(msg, _sender) {
+/**
+ * Broadcast message to all connected clients.
+ * @param {object} msg     - Message to broadcast
+ * @param {WebSocket|null} sender - Exclude this client (null = send to all)
+ */
+function _broadcastAll(msg, sender) {
   const raw = JSON.stringify(msg);
   wss.clients.forEach(client => {
-    if (client.readyState === 1) client.send(raw);
+    if (client !== sender && client.readyState === 1) client.send(raw);
   });
 }
 
@@ -458,10 +633,13 @@ setInterval(() => {
 
 // ─── Start ───────────────────────────────────────────
 httpServer.listen(PORT, () => {
-  console.log('\n🎛️  OBSChurch WS Server v2.1');
+  console.log('\n🎛️  OBSChurch WS Server v2.3');
   console.log(`   WebSocket  : ws://localhost:${PORT}`);
   console.log(`   REST API   : http://localhost:${PORT}/api/`);
-  console.log('   GET  : scenes | layouts | scene-types | bindings | config | widgets | widget-categories');
-  console.log('   POST : scenes | layouts | scene-types | bindings | config | categories | broadcast');
+  console.log('   GET  : scenes | layouts | scene-types | bindings | config | songs | presets | themes | widgets | widget-categories');
+  console.log('   GET  : obs/scenes');
+  console.log('   POST : scenes | layouts | scene-types | bindings | config | songs | presets | themes | categories | broadcast');
+  console.log('   POST : obs/connect | obs/disconnect | obs/switch-scene | obs/record/start | obs/record/stop');
   console.log('   POST : widgets/new | widgets/:id/template | widgets/:id/meta | widgets/:id/delete\n');
 });
+

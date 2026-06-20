@@ -1,4 +1,4 @@
-@echo off
+﻿@echo off
 title OBSChurch - WebSocket Server
 color 0A
 cls
@@ -50,7 +50,7 @@ echo.
 echo  =====================================================
 echo    Server dang chay tai:
 echo.
-echo    WebSocket   : ws://localhost:3000
+echo    WebSocket   : ws://localhost:3001
 echo    Control Panel: http://localhost/OBSChurch/index.html
 echo    OBS Overlay  : http://localhost/OBSChurch/overlay/index.html
 echo.

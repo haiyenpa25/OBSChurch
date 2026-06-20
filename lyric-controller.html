@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
@@ -81,6 +81,27 @@ header h1 {
   transition: all .2s;
 }
 #btn-open-display:hover { background: rgba(124,58,237,.35); }
+/* WS status */
+#ws-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: var(--muted);
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: rgba(255,255,255,.03);
+}
+#ws-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #555;
+  transition: all .3s;
+  flex-shrink: 0;
+}
+#ws-dot.on  { background: #4edea3; box-shadow: 0 0 6px #4edea3; }
+#ws-dot.err { background: #ef4444; }
 
 /* ── LEFT: Song Picker ─────────────────────────────────────────── */
 #panel-left {
@@ -479,6 +500,10 @@ input[type=color] {
   <span class="kbd">Space</span>
   <span style="font-size:10px;color:var(--muted)">Xóa màn hình</span>
   <div class="header-spacer"></div>
+  <div id="ws-status">
+    <span id="ws-dot"></span>
+    <span id="ws-label">Đang kết nối...</span>
+  </div>
   <button id="btn-clear-all" onclick="clearDisplay()">⬛ Clear</button>
   <button id="btn-open-display" onclick="openDisplay()">🖥 Mở Display</button>
 </header>
@@ -630,6 +655,40 @@ let styleBold  = true;
 let styleItalic = false;
 
 const ch = new BroadcastChannel('obs-lyric');
+
+// ═══════════════════════════════════════════════════
+// WEBSOCKET — send to OBS Browser Source
+// ═══════════════════════════════════════════════════
+const WS_URL = 'ws://localhost:3001';
+const API_URL = 'http://localhost:3001';
+let ws = null;
+
+function connectWS() {
+  ws = new WebSocket(WS_URL);
+  ws.addEventListener('open', () => {
+    document.getElementById('ws-dot').className = 'on';
+    document.getElementById('ws-label').textContent = 'Kết nối OBS ✓';
+  });
+  ws.addEventListener('close', () => {
+    document.getElementById('ws-dot').className = 'err';
+    document.getElementById('ws-label').textContent = 'Mất kết nối...';
+    setTimeout(connectWS, 3000);
+  });
+  ws.addEventListener('error', () => ws.close());
+}
+
+function sendWS(msg) {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(msg));
+  } else {
+    // Fallback to HTTP broadcast
+    fetch(`${API_URL}/api/broadcast`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(msg),
+    }).catch(() => {});
+  }
+}
 
 // ═══════════════════════════════════════════════════
 // LOAD SONGS
@@ -844,11 +903,38 @@ function clearDisplay() {
 function sendToDisplay(text) {
   const style = collectStyle();
   const msg = { type: 'slide', text, style };
+
+  // BroadcastChannel → local lyric-display.html
   ch.postMessage(msg);
-  // Also localStorage for cross-window sync
+
+  // localStorage cross-window sync
   try {
     localStorage.setItem('obs-lyric-state', JSON.stringify({ text, style }));
   } catch(e) {}
+
+  // WebSocket → OBS Browser Source (main path)
+  if (text) {
+    const song = curSong;
+    const wsPayload = {
+      type: 'OVERLAY_SHOW',
+      payload: {
+        templateId: 'lyric-fullscreen',   // full-screen lyric template
+        primary:     text,
+        secondary:   '',
+        songName:    song ? (song.number ? song.number + '. ' + song.title : song.title) : '',
+        // Position & style from settings
+        textX:       style.x ?? 5,
+        textY:       style.y ?? 60,
+        fontSize:    style.fontSize,
+        accentColor: '#a855f7',
+        // Full style for lyric-display.html compatible overlay
+        lyricStyle:  style,
+      }
+    };
+    sendWS(wsPayload);
+  } else {
+    sendWS({ type: 'OVERLAY_HIDE', payload: {} });
+  }
 }
 
 function openDisplay() {
@@ -890,13 +976,15 @@ function updateStyle() {
   const style = collectStyle();
   // Update preview
   updatePreviewBox(style);
-  updatePreviewText(curSlide >= 0 ? slides[curSlide]?.text : '');
-  // Send style update (text stays same)
   const curText = curSlide >= 0 ? slides[curSlide]?.text : '';
+  updatePreviewText(curText);
+  // Send style update via BroadcastChannel (local display)
   ch.postMessage({ type: 'style', style, text: curText });
   try {
     localStorage.setItem('obs-lyric-state', JSON.stringify({ text: curText, style }));
   } catch(e) {}
+  // Re-send via WS if live
+  if (curSlide >= 0 && curText) sendToDisplay(curText);
 }
 
 function toggleBtn(el, prop) {
@@ -1068,11 +1156,13 @@ function escapeHtml(t) {
 
 // Init
 window.addEventListener('load', () => {
+  connectWS();
   updateStyle();
   // Load default collection
   document.getElementById('sel-collection').value = 'thanh-ca-tin-lanh';
   loadCollection();
 });
 </script>
+<script src="/OBSChurch/monitor-pip.js"></script>
 </body>
 </html>

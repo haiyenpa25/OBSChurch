@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kinh Thánh Đối Đáp — OBSChurch</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#04040c;--s1:#08081a;--s2:#0e0e22;--s3:#141430;
+  --bd:rgba(255,255,255,0.08);--bdd:rgba(255,255,255,0.04);
+  --gold:#f59e0b;--gd:rgba(245,158,11,0.12);--gp:rgba(245,158,11,0.3);
+  --blue:#4d8eff;--green:#4edea3;--purple:#a855f7;--red:#ef4444;
+  --t1:#f0f0ff;--t2:#9090b0;--t3:#505070;--t4:#2a2a48;
+  --f:'Inter',sans-serif;--fl:'Noto Serif',serif;
+}
+html,body{height:100%;background:var(--bg);font-family:var(--f);color:var(--t1);-webkit-font-smoothing:antialiased;overflow:hidden}
+button{font-family:var(--f);cursor:pointer;border:none;background:none}
+
+/* ── SHELL ── */
+#app{display:grid;grid-template-rows:46px 1fr;height:100vh}
+
+/* ── TOPBAR ── */
+#topbar{background:rgba(4,4,12,0.98);border-bottom:1px solid var(--bd);backdrop-filter:blur(20px);display:flex;align-items:center;padding:0 12px;gap:8px;z-index:100}
+.brand{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.brand-logo{width:26px;height:26px;background:linear-gradient(135deg,var(--gold),#d97706);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.brand-name{font-size:12px;font-weight:800;letter-spacing:0.04em}
+.brand-name em{color:var(--gold);font-style:normal}
+.tb-sep{width:1px;height:16px;background:var(--bd);flex-shrink:0}
+.tb-btn{display:flex;align-items:center;gap:4px;height:26px;padding:0 10px;border-radius:5px;border:1px solid var(--bd);background:transparent;color:var(--t2);font-size:10px;transition:all 0.15s;text-decoration:none;cursor:pointer;white-space:nowrap}
+.tb-btn:hover{background:rgba(255,255,255,0.07);color:var(--t1)}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:6px}
+.ws-dot{width:6px;height:6px;border-radius:50%;background:var(--t4);transition:all 0.3s}
+.ws-dot.ok{background:var(--green);box-shadow:0 0 6px var(--green)}
+.ws-dot.err{background:var(--red)}
+.kbd{background:var(--s2);border:1px solid var(--bd);border-radius:3px;padding:1px 5px;font-size:8px;font-family:monospace;color:var(--t3)}
+
+/* ── WORKSPACE ── */
+#workspace{display:grid;grid-template-columns:220px 1fr 360px;overflow:hidden}
+
+/* ════ LEFT: Scripture List ════ */
+#panel-left{background:var(--s1);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
+.lp-search-wrap{padding:8px;border-bottom:1px solid var(--bd);flex-shrink:0}
+.lp-search{width:100%;height:28px;padding:0 8px 0 28px;border-radius:5px;font-size:10px;background:var(--s2);border:1px solid var(--bd);color:var(--t1);outline:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='%23505070'%3E%3Cpath d='M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:8px center}
+.lp-search:focus{border-color:var(--gold)}
+.scr-list{flex:1;overflow-y:auto}
+.scr-list::-webkit-scrollbar{width:2px}
+.scr-list::-webkit-scrollbar-thumb{background:var(--bd)}
+.scr-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-left:2px solid transparent;border-bottom:1px solid var(--bdd);cursor:pointer;transition:all 0.1s}
+.scr-item:hover{background:rgba(255,255,255,0.03)}
+.scr-item.active{background:var(--gd);border-left-color:var(--gold)}
+.scr-num{min-width:26px;height:18px;border-radius:3px;background:var(--s3);font-size:9px;font-weight:700;color:var(--t3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.scr-item.active .scr-num{background:var(--gd);color:var(--gold)}
+.scr-title{font-size:10px;font-weight:600;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ════ CENTER: Slides ════ */
+#panel-center{background:#020208;display:flex;flex-direction:column;overflow:hidden;position:relative}
+#panel-center::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(245,158,11,0.012) 1px,transparent 1px),linear-gradient(90deg,rgba(245,158,11,0.012) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+
+/* Live bar */
+#live-bar{padding:10px 16px;border-bottom:1px solid var(--bd);flex-shrink:0;display:flex;align-items:center;gap:10px;background:linear-gradient(to bottom,rgba(0,0,0,0.5),transparent);position:relative;z-index:5}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--t4);transition:all 0.3s;flex-shrink:0}
+.live-dot.on{background:var(--red);box-shadow:0 0 8px rgba(239,68,68,0.6);animation:lp 1.2s ease-in-out infinite}
+@keyframes lp{0%,100%{box-shadow:0 0 8px rgba(239,68,68,0.5)}50%{box-shadow:0 0 18px rgba(239,68,68,0.9)}}
+.live-lbl{font-size:8px;font-weight:700;letter-spacing:0.12em;color:var(--t3);text-transform:uppercase}
+.live-lbl.on{color:var(--red)}
+#live-text{font-size:16px;font-weight:700;color:#fff;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-height:22px;margin-left:4px;font-family:var(--fl)}
+.live-role{font-size:9px;padding:3px 8px;border-radius:10px;flex-shrink:0}
+.live-role.le{background:rgba(77,142,255,0.15);border:1px solid rgba(77,142,255,0.3);color:var(--blue)}
+.live-role.chan{background:rgba(78,222,163,0.12);border:1px solid rgba(78,222,163,0.3);color:var(--green)}
+.live-role.all{background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);color:var(--gold)}
+
+/* Slide cards */
+#slides-area{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:3px}
+#slides-area::-webkit-scrollbar{width:3px}
+#slides-area::-webkit-scrollbar-thumb{background:var(--bd)}
+
+/* Quick Push overlay on slide cards */
+.slide-card{padding:10px 14px;border-radius:7px;border:1px solid var(--bd);cursor:pointer;transition:all 0.15s;font-family:var(--fl);font-size:13px;line-height:1.6;color:var(--t1);position:relative}
+.slide-card:hover{border-color:rgba(245,158,11,0.3);background:var(--s3)}
+.slide-card.selected{border-color:rgba(245,158,11,0.5);background:rgba(245,158,11,0.05)}
+.slide-card.live{border-color:var(--gold);background:rgba(245,158,11,0.08);box-shadow:0 0 0 1px rgba(245,158,11,0.2)}
+.slide-card.live::before{content:'▶';position:absolute;right:10px;top:10px;font-size:8px;color:var(--gold)}
+/* Quick-push button appears on hover */
+.qpush-btn{
+  position:absolute;right:8px;bottom:8px;width:28px;height:28px;
+  border-radius:6px;border:1px solid rgba(245,158,11,0.4);background:rgba(245,158,11,0.12);
+  color:var(--gold);font-size:14px;cursor:pointer;display:none;
+  align-items:center;justify-content:center;transition:all 0.12s;
+  line-height:1;
+}
+.qpush-btn:hover{background:rgba(245,158,11,0.25);transform:scale(1.1)}
+.slide-card:hover .qpush-btn{display:flex}
+
+/* Quick scripture search bar */
+#quick-search-wrap{
+  padding:8px 16px;border-bottom:1px solid var(--bd);flex-shrink:0;
+  display:flex;gap:6px;background:rgba(245,158,11,0.03);
+}
+#quick-search{
+  flex:1;height:32px;padding:0 10px;border-radius:6px;
+  background:var(--s2);border:1px solid rgba(245,158,11,0.2);
+  color:var(--t1);font-size:11px;outline:none;font-family:var(--f);
+  transition:border-color 0.15s;
+}
+#quick-search:focus{border-color:var(--gold)}
+#quick-search::placeholder{color:var(--t4)}
+#quick-search-btn{
+  height:32px;padding:0 12px;border-radius:6px;
+  background:var(--gold);border:none;color:#000;font-weight:700;
+  font-size:11px;cursor:pointer;transition:all 0.15s;flex-shrink:0;
+}
+#quick-search-btn:hover{background:#d97706}
+.sc-role{position:absolute;top:7px;left:7px;font-size:7px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:1px 5px;border-radius:8px}
+.sc-role.le{background:rgba(77,142,255,0.15);color:var(--blue)}
+.sc-role.chan{background:rgba(78,222,163,0.12);color:var(--green)}
+.sc-role.all{background:rgba(245,158,11,0.1);color:var(--gold)}
+.sc-role.ref{background:rgba(80,80,112,0.2);color:var(--t3)}
+.sc-text{padding-top:14px;display:block}
+.slide-card.ref-card{background:rgba(255,255,255,0.01);border-style:dashed;padding:6px 14px 6px 40px;font-family:var(--f);font-size:11px;font-style:italic;color:var(--t3)}
+
+/* Nav bar */
+#nav-bar{padding:10px 16px;border-top:1px solid var(--bd);display:flex;align-items:center;gap:8px;flex-shrink:0}
+.nav-btn{height:34px;padding:0 14px;border-radius:6px;border:1px solid var(--bd);background:var(--s2);color:var(--t2);font-size:12px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:5px}
+.nav-btn:hover{border-color:rgba(245,158,11,0.4);color:var(--t1)}
+.nav-btn.primary{background:var(--gold);border-color:var(--gold);color:#000;font-weight:700}
+.nav-btn.primary:hover{background:#d97706}
+#nav-info{flex:1;text-align:center;font-size:11px;color:var(--t3)}
+
+/* Empty state */
+.empty-state{display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:12px;color:var(--t4);pointer-events:none;text-align:center;padding:30px}
+.empty-state .ei{font-size:48px;opacity:0.2}
+.empty-state h3{font-size:13px;font-weight:600;color:var(--t3)}
+.empty-state p{font-size:11px;line-height:1.6;color:var(--t4)}
+
+/* ════ RIGHT: Controls ════ */
+#panel-right{background:var(--s1);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
+
+/* ══ Program Monitor ══ */
+.pm-hdr{padding:8px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:7px;background:var(--s2);flex-shrink:0}
+.pm-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--t3);flex:1}
+.pm-badge{display:flex;align-items:center;gap:4px;font-size:8px;font-weight:700;letter-spacing:0.1em;color:var(--t4);font-family:monospace}
+.pm-badge.on{color:var(--red)}
+.pm-dot{width:7px;height:7px;border-radius:50%;background:var(--t4);transition:all 0.3s;flex-shrink:0}
+.pm-dot.on{background:var(--red);animation:pm-pulse 1.2s ease-in-out infinite}
+@keyframes pm-pulse{0%,100%{box-shadow:0 0 6px rgba(239,68,68,0.5)}50%{box-shadow:0 0 16px rgba(239,68,68,0.9)}}
+.pm-screen{position:relative;background:#000;border-bottom:2px solid var(--bd);flex-shrink:0}
+.pm-screen.on{border-bottom-color:var(--red)}
+.pm-iframe{width:100%;display:block;border:none;aspect-ratio:16/9;background:#000}
+.pm-label{position:absolute;top:5px;left:7px;background:rgba(0,0,0,0.75);border:1px solid rgba(255,255,255,0.08);border-radius:3px;padding:1px 5px;font-size:7px;color:var(--t3);letter-spacing:.06em;pointer-events:none}
+.pm-next{padding:8px 12px;border-bottom:1px solid var(--bd);flex-shrink:0;background:rgba(255,255,255,0.015)}
+.pm-next-lbl{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t4);margin-bottom:3px;font-family:monospace}
+.pm-next-txt{font-size:12px;color:var(--t3);line-height:1.4;font-family:var(--fl)}
+.pm-next-txt.has{color:var(--t2)}
+.pm-next-txt.empty{color:var(--t4);font-style:italic;font-size:10px}
+.pm-ctrl{flex:1;overflow-y:auto}
+.pm-ctrl::-webkit-scrollbar{width:2px}
+.pm-ctrl::-webkit-scrollbar-thumb{background:var(--bd)}
+#panel-right::-webkit-scrollbar{width:3px}
+#panel-right::-webkit-scrollbar-thumb{background:var(--bd)}
+.ctrl-sec{padding:12px;border-bottom:1px solid var(--bd)}
+.ctrl-hdr{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--t3);margin-bottom:8px}
+.ctrl-btn{width:100%;height:36px;border-radius:6px;border:1px solid var(--bd);background:var(--s2);color:var(--t2);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.15s;margin-bottom:4px}
+.ctrl-btn:hover{background:var(--s3);color:var(--t1)}
+.ctrl-btn.push{background:linear-gradient(135deg,#d97706,var(--gold));border-color:transparent;color:#000;font-weight:700;font-size:12px}
+.ctrl-btn.push:hover{background:linear-gradient(135deg,#b45309,#d97706)}
+.ctrl-btn.push:disabled{opacity:0.4;cursor:not-allowed}
+.ctrl-btn.red{border-color:rgba(239,68,68,0.3);color:var(--red)}
+.ctrl-btn.red:hover{background:rgba(239,68,68,0.1)}
+.ctrl-row{display:flex;gap:6px}
+.ctrl-row .ctrl-btn{flex:1;margin:0}
+
+/* Template select */
+.tpl-list{display:flex;flex-direction:column;gap:3px}
+.tpl-btn{width:100%;height:28px;border-radius:5px;border:1px solid var(--bd);background:transparent;color:var(--t2);font-size:9px;cursor:pointer;display:flex;align-items:center;gap:6px;padding:0 8px;transition:all 0.12s}
+.tpl-btn:hover{background:var(--s2)}
+.tpl-btn.active{background:var(--gd);border-color:var(--gp);color:var(--gold)}
+.tpl-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+
+/* Scripture preview in right panel */
+#scrip-preview{padding:12px;border-bottom:1px solid var(--bd)}
+.preview-box{background:#000;aspect-ratio:16/9;border-radius:6px;overflow:hidden;position:relative;display:flex;align-items:flex-end;border:1px solid var(--bd)}
+.preview-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;text-align:center}
+.prev-main{font-size:10px;font-weight:700;color:#fff;line-height:1.4;font-family:var(--fl)}
+.prev-role{font-size:7px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-top:4px;padding:1px 6px;border-radius:8px}
+.prev-role.le{background:rgba(77,142,255,0.2);color:var(--blue)}
+.prev-role.chan{background:rgba(78,222,163,0.2);color:var(--green)}
+.prev-role.all{background:rgba(245,158,11,0.2);color:var(--gold)}
+
+/* Info rows */
+.info-row{display:flex;align-items:center;justify-content:space-between;padding:3px 0;font-size:9px}
+.info-lbl{color:var(--t3)}
+.info-val{color:var(--t2);font-weight:600;text-align:right;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Toast */
+#toast-box{position:fixed;bottom:12px;right:12px;z-index:9999;pointer-events:none;display:flex;flex-direction:column;gap:4px}
+.toast{background:var(--s3);border:1px solid var(--bd);border-radius:6px;padding:7px 12px;font-size:10px;color:var(--t2);opacity:0;transform:translateY(6px);transition:opacity 0.2s,transform 0.2s}
+.toast.show{opacity:1;transform:none}
+.toast.ok{border-color:rgba(245,158,11,0.4);color:var(--gold)}
+.toast.err{border-color:rgba(239,68,68,0.4);color:var(--red)}
+.toast.inf{border-color:rgba(77,142,255,0.35);color:var(--blue)}
+</style>
+</head>
+<body>
+<div id="toast-box"></div>
+
+<div id="app">
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <div class="brand">
+      <div class="brand-logo">📖</div>
+      <div class="brand-name">KINH THÁNH <em>ĐỐI ĐÁP</em></div>
+    </div>
+    <div class="tb-sep"></div>
+    <span class="kbd">↑↓</span><span style="font-size:8px;color:var(--t3)">Chọn</span>
+    <span class="kbd">Enter</span><span style="font-size:8px;color:var(--t3)">Phát</span>
+    <span class="kbd">Tab</span><span style="font-size:8px;color:var(--t3)">Phát+Tiếp</span>
+    <span class="kbd">Esc</span><span style="font-size:8px;color:var(--t3)">Tắt</span>
+    <div class="tb-right">
+      <div style="display:flex;align-items:center;gap:4px">
+        <div class="ws-dot" id="ws-dot"></div>
+        <span id="ws-lbl" style="font-size:8px;color:var(--t3)">Đang kết nối...</span>
+      </div>
+      <div class="tb-sep"></div>
+      <a href="monitor.html" class="tb-btn" target="_blank" style="color:var(--red);border-color:rgba(239,68,68,0.25)">🖥️ Monitor</a>
+      <a href="lyrics.html" class="tb-btn">🎵 Lyric Station</a>
+      <a href="index.html" class="tb-btn">🏠 Dashboard</a>
+    </div>
+  </div>
+
+  <div id="workspace">
+    <!-- LEFT: Scripture List -->
+    <div id="panel-left">
+      <div class="lp-search-wrap">
+        <input type="text" class="lp-search" id="search-input" placeholder="Tìm số hoặc tên...">
+      </div>
+      <div class="scr-list" id="scr-list">
+        <div class="empty-state">
+          <div class="ei">📖</div>
+          <h3>Đang tải...</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTER: Slides -->
+    <div id="panel-center">
+      <!-- Live status bar -->
+      <div id="live-bar">
+        <div class="live-dot" id="live-dot"></div>
+        <span class="live-lbl" id="live-lbl">OFFLINE</span>
+        <div id="live-text">—</div>
+        <div class="live-role le" id="live-role" style="display:none"></div>
+      </div>
+
+      <!-- Quick Scripture Search -->
+      <div id="quick-search-wrap">
+        <input id="quick-search" type="text" placeholder="Gõ 'Giăng 3:16' rồi Enter → push ngay…" autocomplete="off">
+        <button id="quick-search-btn">⚡ Push ngay</button>
+      </div>
+
+      <!-- Slide cards -->
+      <div id="slides-area">
+        <div class="empty-state" id="empty-state">
+          <div class="ei">📖</div>
+          <h3>Chọn bài Kinh Thánh bên trái</h3>
+          <p>100 bài Kinh Thánh đối đáp sẵn sàng chiếu lên OBS.<br>
+          Lẻ = người hướng dẫn · Chẳn = hội chúng đáp</p>
+        </div>
+      </div>
+
+      <!-- Nav -->
+      <div id="nav-bar">
+        <button class="nav-btn" id="btn-prev">◀ Trước</button>
+        <div id="nav-info">— / —</div>
+        <button class="nav-btn primary" id="btn-next">Tiếp ▶</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: Program Monitor + Controls -->
+    <div id="panel-right">
+      <!-- Monitor Header -->
+      <div class="pm-hdr">
+        <span class="pm-title">📺 Program Monitor</span>
+        <div class="pm-badge" id="pm-badge">
+          <div class="pm-dot" id="pm-dot"></div>
+          <span id="pm-txt">OFFLINE</span>
+        </div>
+        <button onclick="document.getElementById('pm-iframe').src=document.getElementById('pm-iframe').src"
+          style="background:transparent;border:1px solid var(--bd);border-radius:4px;padding:2px 6px;font-size:8px;color:var(--t3);cursor:pointer" title="Reload">⟳</button>
+      </div>
+
+      <!-- Overlay preview iframe 16:9 -->
+      <div class="pm-screen" id="pm-screen">
+        <iframe id="pm-iframe"
+          src="http://localhost:8080/OBSChurch/overlay/index.html"
+          class="pm-iframe" scrolling="no"
+          sandbox="allow-scripts allow-same-origin"
+          title="Live Overlay Preview"
+        ></iframe>
+        <div class="pm-label">OVERLAY PREVIEW</div>
+      </div>
+
+      <!-- Next slide preview -->
+      <div class="pm-next">
+        <div class="pm-next-lbl">▷ Tiếp Theo</div>
+        <div class="pm-next-txt empty" id="pm-next">—</div>
+      </div>
+
+      <!-- Controls (scrollable) -->
+      <div class="pm-ctrl">
+        <!-- Push controls -->
+        <div class="ctrl-sec">
+          <div class="ctrl-hdr">Phát Lên OBS</div>
+          <button class="ctrl-btn push" id="btn-push" disabled>📡 Phát Lên OBS [Enter]</button>
+          <div class="ctrl-row" style="margin-top:4px">
+            <button class="ctrl-btn" id="btn-push-adv" disabled title="Phát rồi chuyển tiếp [Tab]">⏭ Phát+Tiếp</button>
+            <button class="ctrl-btn red" id="btn-clear">⬛ Tắt [Esc]</button>
+          </div>
+        </div>
+
+        <!-- Template -->
+        <div class="ctrl-sec">
+          <div class="ctrl-hdr">Template Overlay</div>
+          <div class="tpl-list" id="tpl-list">
+            <button class="tpl-btn active" data-tpl="scripture-fullscreen">
+              <span class="tpl-dot" style="background:#06b6d4"></span>Scripture Fullscreen
+            </button>
+            <button class="tpl-btn" data-tpl="glassmorphism">
+              <span class="tpl-dot" style="background:#a855f7"></span>Glassmorphism
+            </button>
+            <button class="tpl-btn" data-tpl="clean-dark">
+              <span class="tpl-dot" style="background:#4d8eff"></span>Clean Dark
+            </button>
+            <button class="tpl-btn" data-tpl="vintage">
+              <span class="tpl-dot" style="background:#ffb95f"></span>Vintage
+            </button>
+          </div>
+        </div>
+
+        <!-- Scripture info -->
+        <div class="ctrl-sec" id="info-panel" style="display:none">
+          <div class="ctrl-hdr">Bài Đang Chọn</div>
+          <div class="info-row"><span class="info-lbl">Bài:</span><span class="info-val" id="info-title">—</span></div>
+          <div class="info-row"><span class="info-lbl">Số slide:</span><span class="info-val" id="info-slides">—</span></div>
+          <div class="info-row"><span class="info-lbl">Vị trí:</span><span class="info-val" id="info-pos">—</span></div>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="ctrl-sec">
+          <div class="ctrl-hdr">Thao Tác Nhanh</div>
+          <button class="ctrl-btn" onclick="goFirst()">⏮ Về đầu bài</button>
+          <button class="ctrl-btn" onclick="goLast()">⏭ Đến cuối bài</button>
+        </div>
+      </div><!-- end pm-ctrl -->
+    </div><!-- end panel-right -->
+  </div>
+</div>
+
+<script>
+const API_WS  = 'ws://localhost:3001';
+const API_URL = 'http://localhost:3001';
+const SCR_API = '/OBSChurch/api/scripture.php';
+
+// ── State ──────────────────────────────────────────────
+const S = {
+  list:     [],       // [{num, title, file}]
+  filtered: [],
+  slides:   [],       // [{role, text}] for active scripture
+  selIdx:   -1,
+  liveIdx:  -1,
+  activeFile: null,
+  tpl:      'scripture-fullscreen',
+  ws:       null,
+  q:        '',
+};
+
+const $ = id => document.getElementById(id);
+
+// ── Boot ───────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  connectWS();
+  await loadList();
+  bindAll();
+  $('search-input').focus();
+});
+
+// ── WebSocket ──────────────────────────────────────────
+function connectWS() {
+  S.ws = new WebSocket(API_WS);
+  S.ws.addEventListener('open', () => {
+    $('ws-dot').className = 'ws-dot ok';
+    $('ws-lbl').textContent = 'Kết nối OBS ✓';
+  });
+  S.ws.addEventListener('close', () => {
+    $('ws-dot').className = 'ws-dot err';
+    $('ws-lbl').textContent = 'Mất kết nối...';
+    setTimeout(connectWS, 3000);
+  });
+  S.ws.addEventListener('error', () => S.ws.close());
+}
+
+function sendWS(msg) {
+  if (S.ws && S.ws.readyState === WebSocket.OPEN) {
+    S.ws.send(JSON.stringify(msg));
+  } else {
+    fetch(`${API_URL}/api/broadcast`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(msg),
+    }).catch(() => {});
+  }
+}
+
+// ── Load List ──────────────────────────────────────────
+async function loadList() {
+  try {
+    const r = await fetch(`${SCR_API}?action=list`);
+    const d = await r.json();
+    S.list = d.list || [];
+    S.filtered = [...S.list];
+    renderList();
+  } catch(e) {
+    $('scr-list').innerHTML = `<div class="empty-state"><div class="ei">⚠️</div><h3>Lỗi tải danh sách</h3><p>${e.message}</p></div>`;
+  }
+}
+
+function renderList() {
+  const q = S.q.toLowerCase();
+  S.filtered = q
+    ? S.list.filter(s => s.title.toLowerCase().includes(q) || String(s.num).includes(q))
+    : [...S.list];
+
+  const el = $('scr-list');
+  if (!S.filtered.length) {
+    el.innerHTML = '<div class="empty-state"><div class="ei">🔍</div><h3>Không tìm thấy</h3></div>';
+    return;
+  }
+  el.innerHTML = S.filtered.map(s => `
+    <div class="scr-item ${s.file === S.activeFile ? 'active' : ''}" data-file="${esc(s.file)}">
+      <div class="scr-num">${s.num || '?'}</div>
+      <div class="scr-title">${esc(s.title)}</div>
+    </div>`).join('');
+
+  el.querySelectorAll('.scr-item').forEach(e =>
+    e.addEventListener('click', () => openScripture(e.dataset.file)));
+}
+
+// ── Open Scripture ─────────────────────────────────────
+async function openScripture(file) {
+  // Update highlight immediately
+  S.activeFile = file;
+  renderList();
+
+  try {
+    const r = await fetch(`${SCR_API}?action=get&file=${encodeURIComponent(file)}`);
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error);
+
+    S.slides  = d.slides || [];
+    S.selIdx  = -1;
+    S.liveIdx = -1;
+
+    renderSlides();
+    $('info-panel').style.display = 'block';
+    $('info-title').textContent  = d.title || file;
+    $('info-slides').textContent = `${S.slides.length} slides`;
+    updateNavInfo();
+
+    // Enable buttons
+    $('btn-push').disabled     = true;
+    $('btn-push-adv').disabled = true;
+
+    // Auto-select first slide
+    if (S.slides.length) selectSlide(0);
+
+  } catch(e) {
+    toast('Lỗi mở bài: ' + e.message, 'err');
+  }
+}
+
+function renderSlides() {
+  const area = $('slides-area');
+  $('empty-state')?.remove();
+
+  if (!S.slides.length) {
+    area.innerHTML = '<div class="empty-state"><div class="ei">📭</div><h3>Bài này không có nội dung</h3></div>';
+    return;
+  }
+
+  area.innerHTML = S.slides.map((sl, i) => {
+    if (sl.role === 'ref') {
+      return `<div class="slide-card ref-card" id="sc-${i}">
+        <span class="sc-role ref">REF</span>
+        <span class="sc-text">${esc(sl.text)}</span>
+      </div>`;
+    }
+    const roleLabel = sl.role === 'le' ? 'LẺ' : sl.role === 'chan' ? 'CHẲN' : 'TẤT CẢ';
+    return `<div class="slide-card" id="sc-${i}" data-idx="${i}">
+      <span class="sc-role ${sl.role}">${roleLabel}</span>
+      <span class="sc-text">${esc(sl.text)}</span>
+      <button class="qpush-btn" data-qi="${i}" title="Push ngay">&#x2B06;</button>
+    </div>`;
+  }).join('');
+
+  area.querySelectorAll('.slide-card:not(.ref-card)').forEach(el => {
+    const idx = +el.dataset.idx;
+    el.addEventListener('click',    () => selectSlide(idx));
+    el.addEventListener('dblclick', () => { selectSlide(idx); pushSlide(); });
+  });
+}
+
+function selectSlide(idx) {
+  if (idx < 0 || idx >= S.slides.length) return;
+  // Skip ref cards
+  while (idx < S.slides.length && S.slides[idx].role === 'ref') idx++;
+  if (idx >= S.slides.length) return;
+
+  S.selIdx = idx;
+  const sl = S.slides[idx];
+
+  // DOM highlight
+  document.querySelectorAll('.slide-card').forEach(e => e.classList.remove('selected'));
+  const el = $(`sc-${idx}`);
+  if (el) { el.classList.add('selected'); el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+
+  // Update live-bar preview
+  $('live-text').textContent = sl.text;
+  const roleEl = $('live-role');
+  if (sl.role !== 'ref') {
+    roleEl.className = 'live-role ' + sl.role;
+    roleEl.textContent = sl.role === 'le' ? '🎙 LẺ' : sl.role === 'chan' ? '👥 CHẲN' : '🙌 TẤT CẢ';
+    roleEl.style.display = '';
+  } else {
+    roleEl.style.display = 'none';
+  }
+
+  // Preview panel
+  $('prev-text').textContent = sl.text.length > 120 ? sl.text.slice(0, 120) + '…' : sl.text;
+  const pr = $('prev-role');
+  if (sl.role !== 'ref') {
+    pr.className = 'prev-role ' + sl.role;
+    pr.textContent = sl.role === 'le' ? 'LẺ' : sl.role === 'chan' ? 'CHẲN' : 'TẤT CẢ';
+    pr.style.display = '';
+  } else {
+    pr.style.display = 'none';
+  }
+
+  $('btn-push').disabled     = false;
+  $('btn-push-adv').disabled = false;
+  updateNavInfo();
+  $('info-pos').textContent = `${idx + 1} / ${S.slides.length}`;
+
+  // Update PM next text
+  let nextIdx = idx + 1;
+  while (nextIdx < S.slides.length && S.slides[nextIdx]?.role === 'ref') nextIdx++;
+  const pmNext = $('pm-next');
+  if (pmNext) {
+    const nx = S.slides[nextIdx];
+    if (nx) { pmNext.textContent = nx.text.substring(0,60)+(nx.text.length>60?'\u2026':''); pmNext.className='pm-next-txt has'; }
+    else     { pmNext.textContent = '\u2014'; pmNext.className = 'pm-next-txt empty'; }
+  }
+}
+
+function updateNavInfo() {
+  $('nav-info').textContent = S.selIdx >= 0 ? `${S.selIdx + 1} / ${S.slides.length}` : `— / ${S.slides.length}`;
+}
+
+// ── Push / Clear ───────────────────────────────────────
+function pushSlide(advanceToo = false) {
+  if (S.selIdx < 0) return;
+  const sl = S.slides[S.selIdx];
+  if (!sl || sl.role === 'ref') return;
+
+  const roleLabel = sl.role === 'le' ? '🎙 LẺ (Người hướng dẫn)' : sl.role === 'chan' ? '👥 CHẲN (Hội chúng)' : '🙌 TẤT CẢ';
+
+  const payload = {
+    templateId: S.tpl,
+    primary:    sl.text,
+    secondary:  roleLabel,
+    textX: 5, textY: 10,
+  };
+  sendWS({ type: 'OVERLAY_SHOW', payload });
+
+  S.liveIdx = S.selIdx;
+
+  // DOM live indicator
+  document.querySelectorAll('.slide-card').forEach(e => e.classList.remove('live'));
+  $(`sc-${S.selIdx}`)?.classList.add('live');
+
+  $('live-dot').classList.add('on');
+  $('live-lbl').className = 'live-lbl on';
+  $('live-lbl').textContent = 'LIVE';
+  // ═ Program Monitor LIVE ═
+  const _d=$('pm-dot'),_b=$('pm-badge'),_t=$('pm-txt'),_s=$('pm-screen');
+  if(_d)_d.classList.add('on'); if(_b)_b.classList.add('on');
+  if(_t)_t.textContent='ON AIR'; if(_s)_s.classList.add('on');
+  // PiP widget
+  const nextSl = S.slides[S.selIdx + 1];
+  if(window.ObsPip) window.ObsPip.onPush(sl.text, nextSl?.text||'');
+
+  toast(`▶ ${sl.text.substring(0, 40)}${sl.text.length > 40 ? '…' : ''}`, 'ok');
+
+  if (advanceToo) navigate(1);
+}
+
+function clearOverlay() {
+  sendWS({ type: 'OVERLAY_HIDE', payload: {} });
+  S.liveIdx = -1;
+  document.querySelectorAll('.slide-card').forEach(e => e.classList.remove('live'));
+  $('live-dot').classList.remove('on');
+  $('live-lbl').className = 'live-lbl';
+  $('live-lbl').textContent = 'OFFLINE';
+  // ═ Program Monitor OFFLINE ═
+  const _d=$('pm-dot'),_b=$('pm-badge'),_t=$('pm-txt'),_s=$('pm-screen');
+  if(_d)_d.classList.remove('on'); if(_b)_b.classList.remove('on');
+  if(_t)_t.textContent='OFFLINE'; if(_s)_s.classList.remove('on');
+  if(window.ObsPip) window.ObsPip.onClear();
+  toast('Overlay đã tắt', 'inf');
+}
+
+function navigate(dir) {
+  let next = S.selIdx + dir;
+  // Skip ref cards
+  while (next >= 0 && next < S.slides.length && S.slides[next]?.role === 'ref') next += dir;
+  if (next >= 0 && next < S.slides.length) selectSlide(next);
+}
+
+function goFirst() { if (S.slides.length) selectSlide(0); }
+function goLast()  { if (S.slides.length) selectSlide(S.slides.length - 1); }
+
+// ── Bind All ───────────────────────────────────────────
+function bindAll() {
+  $('search-input').addEventListener('input', e => {
+    S.q = e.target.value;
+    renderList();
+  });
+
+  // Quick scripture search: gõ tên bài / câu rồi Enter → mở và push ngay
+  const quickInput = $('quick-search');
+  const quickBtn   = $('quick-search-btn');
+
+  function doQuickSearch() {
+    const q = quickInput.value.trim().toLowerCase();
+    if (!q) return;
+    // Tìm trong danh sách
+    const match = S.list.find(s =>
+      s.title.toLowerCase().includes(q) ||
+      String(s.num).includes(q) ||
+      q.startsWith(String(s.num))
+    );
+    if (!match) { toast(`Không tìm thấy: "${q}"`, 'err'); return; }
+    // Mở bài, sau đó push câu đầu tiên
+    openScripture(match.file).then(() => {
+      if (S.slides.length) { selectSlide(0); pushSlide(); }
+      toast(`⚡ ${match.title}`, 'ok');
+      quickInput.value = '';
+    });
+  }
+
+  quickInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); doQuickSearch(); }
+  });
+  quickBtn.addEventListener('click', doQuickSearch);
+
+  $('btn-push').addEventListener('click',     () => pushSlide());
+  $('btn-push-adv').addEventListener('click', () => pushSlide(true));
+  $('btn-clear').addEventListener('click',    clearOverlay);
+  $('btn-prev').addEventListener('click',     () => navigate(-1));
+  $('btn-next').addEventListener('click',     () => navigate(1));
+
+  // Template buttons
+  $('tpl-list').querySelectorAll('.tpl-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      $('tpl-list').querySelectorAll('.tpl-btn').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      S.tpl = b.dataset.tpl;
+      toast(`Template: ${b.textContent.trim()}`, 'inf');
+    });
+  });
+
+  // Keyboard
+  document.addEventListener('keydown', e => {
+    const tag = document.activeElement.tagName;
+    if (tag === 'INPUT') return;
+
+    switch(e.key) {
+      case 'ArrowDown': case 'j': e.preventDefault(); navigate(1); break;
+      case 'ArrowUp':   case 'k': e.preventDefault(); navigate(-1); break;
+      case 'Enter':    e.preventDefault(); pushSlide(); break;
+      case 'Tab':      e.preventDefault(); pushSlide(true); break;
+      case 'Escape':   e.preventDefault(); clearOverlay(); break;
+      case 'Home':     e.preventDefault(); goFirst(); break;
+      case 'End':      e.preventDefault(); goLast(); break;
+    }
+  });
+}
+
+// ── Utilities ──────────────────────────────────────────
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function toast(msg, type = 'inf') {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  $('toast-box').appendChild(el);
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
+  setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 250); }, 3000);
+}
+</script>
+<script src="/OBSChurch/monitor-pip.js"></script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * WSClient — WebSocket Client Wrapper
  * @module core/WSClient
  *
@@ -13,10 +13,11 @@
 import StateManager from './StateManager.js';
 
 // ─── Constants ───────────────────────────────────────
-const WS_URL             = 'ws://localhost:3000';
+const WS_URL             = 'ws://localhost:3001';
 const RECONNECT_BASE_MS  = 1_000;
 const RECONNECT_MAX_MS   = 30_000;
 const RECONNECT_FACTOR   = 2;
+const QUEUE_TTL_MS       = 30_000;  // Huỷ message đã queue > 30s
 
 /** Enum các message type gửi đi. */
 const WS_EVENTS = Object.freeze({
@@ -34,7 +35,7 @@ const WSClient = (() => {
   let _socket       = null;
   let _reconnectMs  = RECONNECT_BASE_MS;
   let _reconnectTimer = null;
-  /** @type {Array<string>} Hàng đợi khi offline */
+  /** @type {Array<{raw:string, ts:number}>} Hàng đợi khi offline */
   const _queue      = [];
 
   // ── Public API ───────────────────────────────────
@@ -55,7 +56,7 @@ const WSClient = (() => {
     if (_isOpen()) {
       _socket.send(raw);
     } else {
-      _queue.push(raw);
+      _queue.push({ raw, ts: Date.now() });
       console.warn(`[WS] Queued: ${type}`);
     }
   }
@@ -93,8 +94,39 @@ const WSClient = (() => {
   }
 
   function _handleIncoming(msg) {
-    if (msg.type === 'STATE_SYNC') {
-      StateManager.setOverlayVisible(msg.payload.overlayVisible);
+    switch (msg.type) {
+      case 'STATE_SYNC':
+        StateManager.setOverlayVisible(msg.payload.overlayVisible ?? false);
+        if (msg.payload.obsConnected !== undefined) {
+          StateManager.setObsStatus(msg.payload.obsConnected);
+        }
+        break;
+
+      case 'OBS_STATE':
+        StateManager.setObsStatus(msg.payload.connected ?? false);
+        break;
+
+      case 'OBS_SCENE_CHANGED':
+        // Server đã đồng bộ — chỉ log, OBSClient xử lý riêng
+        console.log(`[WS] OBS scene: ${msg.payload.scene}`);
+        break;
+
+      case 'OBS_RECORD_START':
+        StateManager.setRecordStatus?.(true);
+        break;
+      case 'OBS_RECORD_STOP':
+        StateManager.setRecordStatus?.(false);
+        break;
+
+      case 'OBS_STREAM_START':
+        StateManager.setStreamStatus?.(true);
+        break;
+      case 'OBS_STREAM_STOP':
+        StateManager.setStreamStatus?.(false);
+        break;
+
+      default:
+        break;
     }
   }
 
@@ -116,8 +148,17 @@ const WSClient = (() => {
   }
 
   function _flushQueue() {
-    while (_queue.length > 0 && _isOpen()) {
-      _socket.send(_queue.shift());
+    const now = Date.now();
+    // Loại bỏ messages quá TTL trước khi gửi
+    while (_queue.length > 0) {
+      const item = _queue[0];
+      if (now - item.ts > QUEUE_TTL_MS) {
+        _queue.shift();
+        console.warn('[WS] Dropped expired queued message');
+        continue;
+      }
+      if (!_isOpen()) break;
+      _socket.send(_queue.shift().raw);
     }
   }
 

@@ -1,4 +1,4 @@
-# OBSChurch — Widget SDK
+﻿# OBSChurch — Widget SDK
 
 > **Phiên bản:** 1.0.0 &nbsp;·&nbsp; **Cập nhật:** 2026-06 &nbsp;·&nbsp; **Tác giả:** OBSChurch Team
 
@@ -729,7 +729,7 @@ Widget tự động lấy dữ liệu từ server và hiển thị.
 <script>
 (function() {
   const P = window.__WIDGET_PROPS || {
-    apiUrl:       'http://localhost:3000/api/current-song',
+    apiUrl:       'http://localhost:8080/api/current-song',
     refreshRate:  5,   // giây
     showProgress: true,
   };

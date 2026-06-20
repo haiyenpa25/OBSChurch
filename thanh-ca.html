@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
@@ -482,7 +482,7 @@ function sendToOBS() {
   const line = S.activeSong.sections[si]?.lines[li] || '';
   const next = S.activeSong.sections[si]?.lines[li+1] || S.activeSong.sections[si+1]?.lines[0] || '';
   const msg = {type:'OVERLAY_SHOW', payload:{primary:line, secondary:next, songName:S.activeSong.title}};
-  try { fetch('http://localhost:3000/api/broadcast',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(msg)}); } catch{}
+  try { fetch('http://localhost:3001/api/broadcast',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(msg)}); } catch{}
   toast(`📡 Phát: ${line.substring(0,50)}`, 'ok');
 }
 
@@ -596,7 +596,7 @@ function prevLine() {
   else if (si>0) { const prev=S.activeSong.sections[si-1]; selLine(si-1, prev.lines.length-1); }
 }
 function hideOBS() {
-  try { fetch('http://localhost:3000/api/broadcast',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'OVERLAY_HIDE',payload:{}})}); } catch{}
+  try { fetch('http://localhost:3001/api/broadcast',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'OVERLAY_HIDE',payload:{}})}); } catch{}
 }
 
 // ── EXPORT ────────────────────────────────────────────────────────
@@ -619,5 +619,6 @@ function toast(msg, type='info') {
   setTimeout(() => { t.classList.remove('show'); setTimeout(()=>t.remove(),250); }, 3500);
 }
 </script>
+<script src="/OBSChurch/monitor-pip.js"></script>
 </body>
 </html>

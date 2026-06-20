@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
@@ -444,7 +444,7 @@ textarea.pi{height:50px;padding:6px 8px;resize:vertical}
 </div>
 
 <script>
-const API = 'http://localhost:3000';
+const API = 'http://localhost:3001';
 const $ = id => document.getElementById(id);
 
 // ─── State ─────────────────────────────────────────
@@ -1154,5 +1154,6 @@ function toast(msg, type='inf') {
   setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 250); }, 2200);
 }
 </script>
+<script src="/OBSChurch/monitor-pip.js"></script>
 </body>
 </html>

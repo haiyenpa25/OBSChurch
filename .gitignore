@@ -19,3 +19,24 @@ desktop.ini
 # Environment
 .env
 .env.local
+
+# Database files (lớn, không cần track)
+*.db
+*.sqlite
+*.sqlite3
+
+# Debug / test files tạm thời
+data/debug*.html
+data/debug*.php
+data/test-*.php
+data/verify.php
+
+# Scraped cache (dữ liệu tải về, không cần track)
+data/httlvn-cache/
+data/songs-json/
+
+# Docs Kinh Thánh (file text gốc không cần track nếu quá nhiều)
+# docs/
+
+# PHP scraper debug output
+api/test-*.php

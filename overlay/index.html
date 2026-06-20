@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
@@ -290,9 +290,31 @@
      *  - STATE_SYNC    : đồng bộ khi mới kết nối
      */
 
-    const WS_URL       = 'ws://localhost:3000';
+    const WS_URL       = 'ws://localhost:3001';
     const RECONNECT_MS = 3000;
     const BASE_URL     = 'http://localhost/OBSChurch';
+    const API_URL      = 'http://localhost:3001';
+
+    // Theme cache: { themeId: themeObject }
+    const _themeCache = {};
+    let _allThemes = null; // lazy loaded
+
+    async function _fetchThemes() {
+      if (_allThemes) return _allThemes;
+      try {
+        const r = await fetch(`${API_URL}/api/themes`);
+        const d = await r.json();
+        _allThemes = d.themes || [];
+        _allThemes.forEach(t => _themeCache[t.id] = t);
+      } catch(_) { _allThemes = []; }
+      return _allThemes;
+    }
+
+    async function _resolveTheme(themeId) {
+      if (_themeCache[themeId]) return _themeCache[themeId];
+      await _fetchThemes();
+      return _themeCache[themeId] || null;
+    }
 
     const TEMPLATE_MAP = Object.freeze({
       'clean-dark'          : 'tpl-clean-dark',
@@ -373,8 +395,29 @@
     }
 
     // ─── Overlay Actions ──────────────────────────────
-    function showOverlay(payload) {
+    async function showOverlay(payload) {
       lastPayload = payload;
+
+      // --- themeId support: merge theme settings into payload ---
+      if (payload.themeId) {
+        const theme = await _resolveTheme(payload.themeId);
+        if (theme) {
+          // Theme values are defaults; explicit payload values take priority
+          payload = {
+            templateId:  payload.templateId  || theme.templateId,
+            accentColor: payload.accentColor || theme.accentColor,
+            fontSize:    payload.fontSize    || theme.fontSize,
+            textX:       payload.textX       ?? theme.textX,
+            textY:       payload.textY       ?? theme.textY,
+            ...payload,
+            // Force theme values for these (theme overrides payload)
+            __fontFamily: theme.fontFamily,
+            __textAlign:  theme.textAlign,
+            __textColor:  theme.textColor,
+          };
+        }
+      }
+
       const tplId = payload.templateId || 'clean-dark';
       const templateClass = TEMPLATE_MAP[tplId] ?? TEMPLATE_MAP['clean-dark'];
 
@@ -387,6 +430,25 @@
       }
       if (payload.fontSize) {
         document.documentElement.style.setProperty('--lyric-fs', payload.fontSize + 'px');
+      }
+      // Apply theme font + color overrides via custom CSS vars
+      if (payload.__fontFamily) {
+        document.documentElement.style.setProperty('--theme-font', `'${payload.__fontFamily}', Inter, sans-serif`);
+        ltPrimary.style.fontFamily   = `var(--theme-font)`;
+        ltSecondary.style.fontFamily = `var(--theme-font)`;
+      } else {
+        ltPrimary.style.fontFamily   = '';
+        ltSecondary.style.fontFamily = '';
+      }
+      if (payload.__textColor) {
+        ltPrimary.style.color = payload.__textColor;
+      } else {
+        ltPrimary.style.color = '';
+      }
+      if (payload.__textAlign) {
+        lowerThird.style.textAlign = payload.__textAlign;
+      } else {
+        lowerThird.style.textAlign = '';
       }
 
       ltPrimary.textContent   = _getPrimaryText(payload);

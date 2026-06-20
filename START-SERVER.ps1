@@ -1,4 +1,4 @@
-# OBSChurch WebSocket Server - PowerShell Launcher
+﻿# OBSChurch WebSocket Server - PowerShell Launcher
 # Chay file nay bang cach: chuot phai -> Run with PowerShell
 
 $Host.UI.RawUI.WindowTitle = "OBSChurch - WebSocket Server"
@@ -49,7 +49,7 @@ Write-Host ""
 Write-Host "  =====================================================" -ForegroundColor Cyan
 Write-Host "    Server dang chay:" -ForegroundColor White
 Write-Host ""
-Write-Host "    WebSocket    : ws://localhost:3000" -ForegroundColor Green
+Write-Host "    WebSocket    : ws://localhost:3001" -ForegroundColor Green
 Write-Host "    Control Panel: http://localhost/OBSChurch/index.html" -ForegroundColor Green
 Write-Host "    OBS Overlay  : http://localhost/OBSChurch/overlay/index.html" -ForegroundColor Green
 Write-Host ""

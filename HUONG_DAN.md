@@ -1,4 +1,4 @@
-# 📖 Hướng Dẫn Sử Dụng OBSChurch
+﻿# 📖 Hướng Dẫn Sử Dụng OBSChurch
 
 > **Phiên bản:** 2.0 · **Ngày cập nhật:** 06/2026
 > Web app điều khiển buổi lễ trực tiếp — đồng bộ với OBS Studio qua WebSocket
@@ -33,7 +33,7 @@
 │  └──────┬───────┘  └──────┬───────┘  └──────────┬────────────┘  │
 │         │                │                      │               │
 │         └────────────────┴──────────────────────┘               │
-│                          │ WebSocket (ws://localhost:3000)       │
+│                          │ WebSocket (ws://localhost:8080)       │
 │                  ┌───────▼────────┐                             │
 │                  │  ws-server.js  │  ← Hub trung tâm            │
 │                  │  (Node.js)     │  ← REST API + WS Broadcast  │
@@ -109,8 +109,8 @@ node server/ws-server.js
 **Kết quả khi thành công:**
 ```
 🎛️  OBSChurch WS Server v2.0
-   WebSocket  : ws://localhost:3000
-   REST API   : http://localhost:3000/api/
+   WebSocket  : ws://localhost:8080
+   REST API   : http://localhost:8080/api/
    Endpoints  : scenes | layouts | scene-types | bindings | config | ...
 ```
 
@@ -537,7 +537,7 @@ OBSChurch/
 
 ### 8.2 REST API Endpoints
 
-Server chạy tại `http://localhost:3000`:
+Server chạy tại `http://localhost:8080`:
 
 | Method | URL | Mô tả |
 |--------|-----|-------|
@@ -654,7 +654,7 @@ CLONE_SERVER.bat
 
 | Vấn đề | Giải pháp |
 |--------|-----------|
-| Overlay không cập nhật | Kiểm tra server đang chạy? `ws://localhost:3000` |
+| Overlay không cập nhật | Kiểm tra server đang chạy? `ws://localhost:8080` |
 | Browser Source trắng | Refresh Browser Source trong OBS |
 | OBS và web app khác máy | Đổi `localhost` → IP máy chủ |
 | Server crash | Chạy lại `START-SERVER.bat` |

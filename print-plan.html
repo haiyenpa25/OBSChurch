@@ -1,0 +1,479 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>In Chương Trình Buổi Lễ — OBSChurch</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* ── SCREEN STYLES ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#030310;--s1:#08081a;--s2:#0e0e22;--s3:#141430;
+  --bd:rgba(255,255,255,0.08);--bdd:rgba(255,255,255,0.03);
+  --gold:#f59e0b;--gd:rgba(245,158,11,0.1);
+  --blue:#4d8eff;--green:#4edea3;--purple:#a855f7;--red:#ef4444;
+  --t1:#f0f0ff;--t2:#9090b0;--t3:#505070;--t4:#2a2a48;
+  --f:'Inter',system-ui,sans-serif;--fs:'Noto Serif',serif;
+}
+body{font-family:var(--f);color:var(--t1);background:var(--bg);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* ── TOPBAR ── */
+#topbar{
+  background:rgba(3,3,16,0.98);border-bottom:1px solid var(--bd);
+  padding:0 16px;height:46px;display:flex;align-items:center;gap:10px;
+  position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);
+}
+.brand{display:flex;align-items:center;gap:8px}
+.brand-logo{width:26px;height:26px;background:linear-gradient(135deg,var(--gold),#d97706);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.brand-name{font-size:12px;font-weight:800;letter-spacing:0.05em}
+.brand-name em{color:var(--gold);font-style:normal}
+.tb-sep{width:1px;height:16px;background:var(--bd);flex-shrink:0}
+.tb-btn{display:flex;align-items:center;gap:5px;height:28px;padding:0 12px;border-radius:5px;border:1px solid var(--bd);background:transparent;color:var(--t2);font-size:10px;font-family:var(--f);cursor:pointer;transition:all 0.15s;text-decoration:none;white-space:nowrap}
+.tb-btn:hover{background:rgba(255,255,255,0.07);color:var(--t1)}
+.tb-btn.primary{background:var(--gold);border-color:var(--gold);color:#000;font-weight:700}
+.tb-btn.primary:hover{background:#d97706}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:6px}
+
+/* ── LAYOUT ── */
+#app{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 46px)}
+
+/* ── LEFT: Controls ── */
+#ctrl-panel{
+  background:var(--s1);border-right:1px solid var(--bd);
+  padding:16px;display:flex;flex-direction:column;gap:14px;
+  position:sticky;top:46px;height:calc(100vh - 46px);overflow-y:auto;
+}
+#ctrl-panel::-webkit-scrollbar{width:3px}
+#ctrl-panel::-webkit-scrollbar-thumb{background:var(--bd)}
+.ctrl-hdr{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--t3);margin-bottom:8px}
+.ctrl-group{border-bottom:1px solid var(--bd);padding-bottom:14px}
+.ctrl-group:last-child{border:none}
+
+/* Form elements */
+.ctrl-field{margin-bottom:8px}
+.ctrl-field label{display:block;font-size:9px;color:var(--t3);margin-bottom:3px}
+.ctrl-input{width:100%;height:30px;background:var(--s2);border:1px solid var(--bd);border-radius:5px;color:var(--t1);font-family:var(--f);font-size:10px;padding:0 8px;outline:none;transition:border-color 0.15s}
+.ctrl-input:focus{border-color:var(--gold)}
+textarea.ctrl-input{height:auto;padding:6px 8px;resize:vertical;line-height:1.5}
+.ctrl-btn{width:100%;height:32px;border-radius:6px;border:none;cursor:pointer;font-family:var(--f);font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:5px;transition:all 0.15s;margin-bottom:5px}
+.ctrl-btn.add{background:rgba(78,222,163,0.12);border:1px solid rgba(78,222,163,0.3);color:var(--green)}
+.ctrl-btn.add:hover{background:rgba(78,222,163,0.2)}
+.ctrl-btn.remove{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:var(--red)}
+.ctrl-btn.remove:hover{background:rgba(239,68,68,0.18)}
+select.ctrl-input{cursor:pointer}
+
+/* Item list */
+#item-list{display:flex;flex-direction:column;gap:3px;max-height:260px;overflow-y:auto}
+#item-list::-webkit-scrollbar{width:2px}
+#item-list::-webkit-scrollbar-thumb{background:var(--bd)}
+.item-row{display:flex;align-items:center;gap:5px;padding:5px 7px;border-radius:5px;border:1px solid var(--bd);cursor:grab;background:var(--s2);font-size:9px}
+.item-row:hover{border-color:rgba(255,255,255,0.12)}
+.item-row.drag-over{border-color:var(--gold);background:var(--gd)}
+.item-icon{font-size:11px;flex-shrink:0}
+.item-title{flex:1;color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item-del{width:16px;height:16px;border-radius:3px;border:none;background:transparent;color:var(--t4);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center}
+.item-del:hover{color:var(--red)}
+
+/* ── RIGHT: Preview / Print area ── */
+#preview-area{padding:24px 32px;background:var(--bg);overflow-y:auto}
+
+/* Print document */
+#print-doc{
+  max-width:680px;margin:0 auto;background:#fff;border-radius:10px;
+  box-shadow:0 4px 32px rgba(0,0,0,0.5);overflow:hidden;font-family:var(--fs);color:#111;
+}
+.doc-header{
+  background:linear-gradient(135deg,#1a1a3e,#2d2d6e);
+  padding:28px 32px;text-align:center;color:#fff;
+}
+.doc-church-name{font-size:22px;font-weight:700;letter-spacing:0.04em;font-family:var(--f)}
+.doc-subtitle{font-size:11px;opacity:0.6;margin-top:4px;font-family:var(--f);letter-spacing:0.08em}
+.doc-date{
+  display:inline-block;margin-top:14px;
+  background:rgba(245,158,11,0.2);border:1px solid rgba(245,158,11,0.4);
+  border-radius:99px;padding:4px 16px;
+  font-size:12px;font-family:var(--f);color:#f59e0b;font-weight:600;
+}
+.doc-body{padding:24px 32px}
+.doc-title-row{
+  margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #f0f0f0;
+  text-align:center;
+}
+.doc-main-title{font-size:20px;font-weight:700;color:#1a1a3e}
+.doc-theme{font-size:13px;color:#666;margin-top:4px;font-style:italic}
+
+/* Program items */
+.prog-table{width:100%;border-collapse:collapse}
+.prog-table tr:nth-child(even){background:#fafafa}
+.prog-table td{padding:9px 12px;border-bottom:1px solid #eee;vertical-align:top;font-size:12px;line-height:1.5}
+.prog-num{width:28px;font-weight:700;color:#1a1a3e;font-family:var(--f);font-size:11px}
+.prog-icon{width:24px;font-size:13px;text-align:center}
+.prog-name{font-weight:600;color:#1a1a3e}
+.prog-detail{color:#666;font-size:11px;font-style:italic}
+.prog-time{width:50px;text-align:right;font-family:var(--f);font-size:10px;color:#999;font-weight:600}
+.prog-separator{height:16px;background:transparent}
+.prog-separator td{padding:0;border:none}
+
+.doc-section-hdr td{
+  padding:6px 12px;background:linear-gradient(to right,#1a1a3e,#2d2d6e);
+  color:#fff;font-size:9px;font-weight:700;letter-spacing:0.1em;
+  text-transform:uppercase;font-family:var(--f);
+}
+
+/* Footer */
+.doc-footer{
+  background:#f8f8f8;border-top:2px solid #eee;
+  padding:16px 32px;display:flex;justify-content:space-between;align-items:center;
+}
+.doc-footer-note{font-size:10px;color:#999;font-family:var(--f)}
+.doc-footer-logo{font-size:10px;font-weight:700;color:#bbb;font-family:var(--f)}
+
+/* Toast */
+#toast-box{position:fixed;bottom:16px;right:16px;z-index:9999;pointer-events:none;display:flex;flex-direction:column;gap:4px}
+.toast{background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:7px 12px;font-size:10px;color:var(--t2);opacity:0;transform:translateY(6px);transition:all 0.2s}
+.toast.show{opacity:1;transform:none}
+.toast.ok{border-color:rgba(245,158,11,0.4);color:var(--gold)}
+.toast.err{border-color:rgba(239,68,68,0.4);color:var(--red)}
+
+/* ── PRINT STYLES ── */
+@media print {
+  body{background:#fff;color:#111}
+  #topbar,#ctrl-panel{display:none!important}
+  #app{display:block}
+  #preview-area{padding:0}
+  #print-doc{
+    max-width:none;margin:0;border-radius:0;
+    box-shadow:none;page-break-inside:avoid;
+  }
+  #toast-box{display:none}
+}
+</style>
+</head>
+<body>
+<div id="toast-box"></div>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div class="brand">
+    <div class="brand-logo">📋</div>
+    <div class="brand-name">IN <em>CHƯƠNG TRÌNH</em></div>
+  </div>
+  <div class="tb-sep"></div>
+  <div class="tb-right">
+    <button class="tb-btn" id="btn-load-scenes">⟳ Tải từ Server</button>
+    <button class="tb-btn primary" onclick="doPrint()">🖨 In PDF</button>
+    <div class="tb-sep"></div>
+    <a href="index.html" class="tb-btn">🏠 Dashboard</a>
+  </div>
+</div>
+
+<div id="app">
+  <!-- CONTROLS -->
+  <div id="ctrl-panel">
+    <!-- Church info -->
+    <div class="ctrl-group">
+      <div class="ctrl-hdr">📌 Thông Tin Nhà Thờ</div>
+      <div class="ctrl-field">
+        <label>Tên nhà thờ</label>
+        <input class="ctrl-input" id="church-name" value="Hội Thánh Tin Lành" placeholder="Tên nhà thờ">
+      </div>
+      <div class="ctrl-field">
+        <label>Chủ đề / Sê-ri</label>
+        <input class="ctrl-input" id="church-theme" value="" placeholder="Chủ đề buổi thờ phượng">
+      </div>
+      <div class="ctrl-field">
+        <label>Ngày / Giờ</label>
+        <input class="ctrl-input" id="service-date" type="date">
+      </div>
+      <div class="ctrl-field">
+        <label>Tiêu đề buổi lễ</label>
+        <input class="ctrl-input" id="service-title" value="Thờ Phượng Chúa Nhật" placeholder="Tiêu đề">
+      </div>
+      <div class="ctrl-field">
+        <label>Ghi chú footer</label>
+        <textarea class="ctrl-input" id="footer-note" rows="2" placeholder="Ghi chú, thông báo..."></textarea>
+      </div>
+    </div>
+
+    <!-- Add item -->
+    <div class="ctrl-group">
+      <div class="ctrl-hdr">➕ Thêm Mục</div>
+      <div class="ctrl-field">
+        <label>Loại</label>
+        <select class="ctrl-input" id="item-type">
+          <option value="worship">🎵 Hát Thờ Phượng</option>
+          <option value="prayer">🙏 Cầu Nguyện</option>
+          <option value="scripture">📖 Đọc Kinh Thánh</option>
+          <option value="sermon">📢 Giảng Luận</option>
+          <option value="offering">💝 Dâng Hiến</option>
+          <option value="announcement">📣 Thông Báo</option>
+          <option value="communion">🍞 Tiệc Thánh</option>
+          <option value="baptism">💧 Báp Têm</option>
+          <option value="other">▪ Khác</option>
+        </select>
+      </div>
+      <div class="ctrl-field">
+        <label>Tên mục</label>
+        <input class="ctrl-input" id="item-name" placeholder="VD: Thánh Ca 101 — Chúa Là Nơi Nương">
+      </div>
+      <div class="ctrl-field">
+        <label>Chi tiết (tùy chọn)</label>
+        <input class="ctrl-input" id="item-detail" placeholder="Người dẫn, tham chiếu...">
+      </div>
+      <div class="ctrl-field">
+        <label>Thời gian (phút)</label>
+        <input class="ctrl-input" id="item-time" type="number" min="1" max="90" placeholder="5" style="width:80px">
+      </div>
+      <button class="ctrl-btn add" id="btn-add-item">+ Thêm Vào Chương Trình</button>
+    </div>
+
+    <!-- Items list -->
+    <div class="ctrl-group">
+      <div class="ctrl-hdr">📋 Danh Sách <span id="item-count" style="color:var(--gold)">0 mục</span></div>
+      <div id="item-list"></div>
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div id="preview-area">
+    <div id="print-doc">
+      <div class="doc-header">
+        <div class="doc-church-name" id="prev-church">Hội Thánh Tin Lành</div>
+        <div class="doc-subtitle">CHƯƠNG TRÌNH THỜ PHƯỢNG</div>
+        <div class="doc-date" id="prev-date">—</div>
+      </div>
+      <div class="doc-body">
+        <div class="doc-title-row">
+          <div class="doc-main-title" id="prev-title">Thờ Phượng Chúa Nhật</div>
+          <div class="doc-theme" id="prev-theme"></div>
+        </div>
+        <table class="prog-table" id="prog-table">
+          <tbody id="prog-body">
+            <tr><td colspan="5" style="text-align:center;padding:32px;color:#bbb;font-style:italic">Thêm mục từ bảng bên trái để bắt đầu</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="doc-footer">
+        <div class="doc-footer-note" id="prev-footer-note"></div>
+        <div class="doc-footer-logo">OBSChurch ✦</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const API = 'http://localhost:3001/api';
+
+const ICONS = {
+  worship:      '🎵',
+  prayer:       '🙏',
+  scripture:    '📖',
+  sermon:       '📢',
+  offering:     '💝',
+  announcement: '📣',
+  communion:    '🍞',
+  baptism:      '💧',
+  other:        '▪',
+};
+
+let items = [];
+let dragIdx = null;
+
+/* ── Init ─────────────────────────────────────────────── */
+window.addEventListener('DOMContentLoaded', () => {
+  // Set today's date
+  const today = new Date().toISOString().split('T')[0];
+  $('service-date').value = today;
+
+  // Live preview bindings
+  ['church-name','church-theme','service-date','service-title','footer-note'].forEach(id => {
+    $(id)?.addEventListener('input', updatePreview);
+  });
+
+  $('btn-add-item')?.addEventListener('click', addItem);
+  $('item-name')?.addEventListener('keydown', e => { if (e.key === 'Enter') addItem(); });
+
+  $('btn-load-scenes')?.addEventListener('click', loadFromServer);
+
+  updatePreview();
+  toast('Sẵn sàng — thêm mục và bấm "In PDF"', 'ok');
+});
+
+/* ── Add Item ─────────────────────────────────────────── */
+function addItem() {
+  const type   = $('item-type').value;
+  const name   = $('item-name').value.trim();
+  const detail = $('item-detail').value.trim();
+  const mins   = parseInt($('item-time').value) || null;
+
+  if (!name) { toast('Nhập tên mục!', 'err'); return; }
+
+  items.push({ type, name, detail, mins, id: Date.now() });
+  $('item-name').value = '';
+  $('item-detail').value = '';
+  $('item-time').value = '';
+  $('item-name').focus();
+  renderItemList();
+  updatePreview();
+  toast(`✓ Thêm: ${name}`, 'ok');
+}
+
+/* ── Render Item List (drag-sortable) ─────────────────── */
+function renderItemList() {
+  const el = $('item-list');
+  $('item-count').textContent = `${items.length} mục`;
+
+  if (!items.length) {
+    el.innerHTML = '<div style="text-align:center;padding:12px;font-size:9px;color:var(--t4)">Chưa có mục nào</div>';
+    return;
+  }
+
+  el.innerHTML = items.map((it, i) => `
+    <div class="item-row" draggable="true" data-idx="${i}">
+      <span class="item-icon">${ICONS[it.type] || '▪'}</span>
+      <span class="item-title" title="${esc(it.name)}">${esc(it.name)}</span>
+      ${it.mins ? `<span style="font-size:8px;color:var(--t4);font-family:monospace;flex-shrink:0">${it.mins}'</span>` : ''}
+      <button class="item-del" data-del="${i}" title="Xóa">✕</button>
+    </div>`).join('');
+
+  // Delete buttons
+  el.querySelectorAll('[data-del]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const idx = +btn.dataset.del;
+      items.splice(idx, 1);
+      renderItemList();
+      updatePreview();
+    });
+  });
+
+  // Drag-and-drop reorder
+  el.querySelectorAll('.item-row').forEach(row => {
+    row.addEventListener('dragstart', () => { dragIdx = +row.dataset.idx; row.style.opacity = '0.5'; });
+    row.addEventListener('dragend',   () => { row.style.opacity = '1'; });
+    row.addEventListener('dragover',  e => { e.preventDefault(); row.classList.add('drag-over'); });
+    row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+    row.addEventListener('drop', e => {
+      e.preventDefault();
+      row.classList.remove('drag-over');
+      const targetIdx = +row.dataset.idx;
+      if (dragIdx === null || dragIdx === targetIdx) return;
+      const moved = items.splice(dragIdx, 1)[0];
+      items.splice(targetIdx, 0, moved);
+      dragIdx = null;
+      renderItemList();
+      updatePreview();
+    });
+  });
+}
+
+/* ── Update Print Preview ─────────────────────────────── */
+function updatePreview() {
+  const church  = $('church-name').value  || 'Hội Thánh Tin Lành';
+  const theme   = $('church-theme').value || '';
+  const dateVal = $('service-date').value;
+  const title   = $('service-title').value || 'Thờ Phượng Chúa Nhật';
+  const footerNote = $('footer-note').value || '';
+
+  $('prev-church').textContent = church;
+  $('prev-title').textContent  = title;
+  $('prev-theme').textContent  = theme;
+  $('prev-theme').style.display = theme ? '' : 'none';
+  $('prev-footer-note').textContent = footerNote;
+
+  if (dateVal) {
+    const d = new Date(dateVal);
+    const days = ['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
+    $('prev-date').textContent = `${days[d.getDay()]}, ${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+  } else {
+    $('prev-date').textContent = '—';
+  }
+
+  renderProgTable();
+}
+
+/* ── Render Program Table ─────────────────────────────── */
+function renderProgTable() {
+  const tbody = $('prog-body');
+
+  if (!items.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:32px;color:#bbb;font-style:italic">Thêm mục từ bảng bên trái để bắt đầu</td></tr>';
+    return;
+  }
+
+  let num = 0;
+  tbody.innerHTML = items.map(it => {
+    num++;
+    return `<tr>
+      <td class="prog-num">${num}</td>
+      <td class="prog-icon">${ICONS[it.type] || '▪'}</td>
+      <td>
+        <div class="prog-name">${esc(it.name)}</div>
+        ${it.detail ? `<div class="prog-detail">${esc(it.detail)}</div>` : ''}
+      </td>
+      <td class="prog-time">${it.mins ? it.mins + 'ph' : ''}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── Load scenes from OBSChurch server ─────────────────── */
+async function loadFromServer() {
+  try {
+    const r = await fetch(`${API}/scenes`);
+    const d = await r.json();
+    const scenes = d.scenes || d || [];
+    if (!scenes.length) { toast('Không có scene nào', 'err'); return; }
+
+    // Map scenes to program items
+    items = scenes.map(sc => ({
+      id:   sc.id || Date.now() + Math.random(),
+      type: guessType(sc.id || sc.label || ''),
+      name: sc.label || sc.id || '—',
+      detail: sc.type || '',
+      mins: null,
+    }));
+
+    renderItemList();
+    updatePreview();
+    toast(`✓ Tải ${items.length} scenes từ server`, 'ok');
+  } catch(e) {
+    toast('Lỗi kết nối server: ' + e.message, 'err');
+  }
+}
+
+function guessType(id) {
+  const lc = id.toLowerCase();
+  if (lc.includes('hat') || lc.includes('worship') || lc.includes('song')) return 'worship';
+  if (lc.includes('cau') || lc.includes('prayer')) return 'prayer';
+  if (lc.includes('kinh') || lc.includes('scripture')) return 'scripture';
+  if (lc.includes('giang') || lc.includes('sermon') || lc.includes('message')) return 'sermon';
+  if (lc.includes('dang') || lc.includes('offering')) return 'offering';
+  if (lc.includes('thong') || lc.includes('announce')) return 'announcement';
+  if (lc.includes('tiec') || lc.includes('communion')) return 'communion';
+  return 'other';
+}
+
+/* ── Print ─────────────────────────────────────────────── */
+function doPrint() {
+  updatePreview();
+  setTimeout(() => window.print(), 150);
+}
+
+/* ── Utils ─────────────────────────────────────────────── */
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function toast(msg, type = 'ok') {
+  const b = $('toast-box');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  b.appendChild(t);
+  requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('show')));
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 250); }, 2800);
+}
+</script>
+<script src="/OBSChurch/monitor-pip.js"></script>
+</body>
+</html>

@@ -45,7 +45,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--g)}
 .kbd{background:var(--b2);border:1px solid var(--bd);border-radius:3px;padding:1px 5px;font-size:8px;font-family:var(--fm);color:var(--t3)}
 
 /* ── WORKSPACE ── */
-#workspace{display:grid;grid-template-columns:220px 1fr 280px;overflow:hidden}
+#workspace{flex:1;display:grid;grid-template-columns:240px 1fr 380px;overflow:hidden}
 
 /* ═══ LEFT PANEL ═══ */
 #panel-lib{background:var(--b1);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
@@ -71,6 +71,16 @@ input:focus,textarea:focus,select:focus{border-color:var(--g)}
 .lib-btn .ms{font-size:12px}
 .lib-btn:disabled{opacity:0.35;cursor:default}
 .lib-btn:disabled:hover{background:transparent;color:var(--t2);border-color:var(--bd)}
+
+/* Source Tabs */
+.src-tabs{display:flex;border-bottom:1px solid var(--bd);flex-shrink:0}
+.src-tab{flex:1;height:30px;font-size:9px;font-weight:700;color:var(--t3);background:transparent;border:none;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.12s;letter-spacing:0.04em;text-transform:uppercase}
+.src-tab:hover{color:var(--t2)}
+.src-tab.active.lib{color:var(--g);border-bottom-color:var(--g)}
+.src-tab.active.httlvn{color:#f59e0b;border-bottom-color:#f59e0b}
+
+/* HTTLVN song item */
+.song-item.httlvn .s-meta{color:#b45309}
 
 /* ═══ CENTER ═══ */
 #panel-main{background:#020208;display:flex;flex-direction:column;overflow:hidden;position:relative}
@@ -127,10 +137,84 @@ input:focus,textarea:focus,select:focus{border-color:var(--g)}
 .line-item.live::after{content:'LIVE';position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:6px;font-family:var(--fm);color:var(--r);letter-spacing:0.12em;font-weight:800}
 .line-num{position:absolute;left:4px;top:50%;transform:translateY(-50%);font-size:7px;color:var(--t4);font-family:var(--fm);width:10px;text-align:center}
 
-/* ═══ RIGHT PANEL ═══ */
-#panel-ctrl{background:var(--b1);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow-y:auto}
-#panel-ctrl::-webkit-scrollbar{width:3px}
-#panel-ctrl::-webkit-scrollbar-thumb{background:var(--bd)}
+/* ═══ PROGRAM MONITOR ═══ */
+#program-monitor{
+  background:var(--b1);border-left:1px solid var(--bd);
+  display:flex;flex-direction:column;overflow:hidden;
+  min-width:320px;max-width:380px;
+}
+.pm-hdr{
+  padding:8px 12px;border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;gap:8px;flex-shrink:0;
+  background:var(--b2);
+}
+.pm-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--t3);flex:1}
+.pm-live-badge{
+  display:flex;align-items:center;gap:5px;
+  font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--t4);font-family:var(--fm);
+}
+.pm-live-badge.on{color:var(--r)}
+.pm-live-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--t4);flex-shrink:0;
+  transition:all 0.3s;
+}
+.pm-live-dot.on{
+  background:var(--r);box-shadow:0 0 8px rgba(239,68,68,0.7);
+  animation:live-pulse 1.2s ease-in-out infinite;
+}
+@keyframes live-pulse{0%,100%{box-shadow:0 0 6px rgba(239,68,68,0.5)}50%{box-shadow:0 0 16px rgba(239,68,68,0.9),0 0 28px rgba(239,68,68,0.3)}}
+
+/* iframe container with 16:9 aspect ratio */
+.pm-screen{
+  position:relative;background:#000;flex-shrink:0;
+  border-bottom:2px solid var(--r);
+}
+.pm-screen.offline{border-bottom-color:var(--bd)}
+.pm-iframe{
+  width:100%;display:block;border:none;
+  aspect-ratio:16/9;
+  background:#000;
+}
+.pm-overlay-label{
+  position:absolute;top:6px;left:8px;
+  background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.1);
+  border-radius:4px;padding:2px 6px;
+  font-size:7px;font-family:var(--fm);color:var(--t3);letter-spacing:0.06em;text-transform:uppercase;
+  pointer-events:none;
+}
+.pm-refresh-btn{
+  position:absolute;bottom:6px;right:6px;
+  background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.1);
+  border-radius:4px;padding:2px 6px;
+  font-size:8px;color:var(--t3);cursor:pointer;transition:all 0.15s;
+  font-family:var(--fm);
+}
+.pm-refresh-btn:hover{background:rgba(255,255,255,0.1);color:var(--t1)}
+
+/* NEXT display */
+.pm-next{
+  padding:10px 12px;background:rgba(255,255,255,0.02);
+  border-bottom:1px solid var(--bd);flex-shrink:0;
+}
+.pm-next-label{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--t4);margin-bottom:4px;font-family:var(--fm)}
+.pm-next-text{
+  font-size:13px;color:var(--t3);line-height:1.4;
+  overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  font-family:'Noto Serif',serif;
+}
+.pm-next-text.has-next{color:var(--t2)}
+.pm-next-text.empty{color:var(--t4);font-style:italic;font-size:11px}
+
+/* Controls section below monitor */
+#pm-controls{
+  flex:1;overflow-y:auto;padding:0;
+}
+#pm-controls::-webkit-scrollbar{width:2px}
+#pm-controls::-webkit-scrollbar-thumb{background:var(--bd)}
+
+/* ═══ RIGHT PANEL (controls, now inside pm-controls) ═══ */
+#panel-ctrl{display:flex;flex-direction:column}
 .ctrl-sec{padding:10px 12px;border-bottom:1px solid var(--bd)}
 .ctrl-hdr{font-size:7px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px}
 
@@ -171,6 +255,26 @@ input:focus,textarea:focus,select:focus{border-color:var(--g)}
   text-align:center;padding:6px;background:var(--b2);border-radius:6px;margin-top:6px;
   font-size:18px;font-weight:700;font-family:var(--fm);color:var(--g);display:none;
 }
+
+/* ── MODE BAR ── */
+#mode-bar{display:flex;gap:3px;padding:6px 8px;border-bottom:1px solid var(--bd);flex-shrink:0;background:var(--b2)}
+.mode-btn{
+  flex:1;height:36px;border-radius:6px;border:1px solid var(--bd);background:transparent;
+  color:var(--t3);font-size:8px;cursor:pointer;transition:all 0.15s;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  position:relative;
+}
+.mode-btn:hover{background:rgba(255,255,255,0.05);color:var(--t2)}
+.mode-btn.active{border-color:var(--g);color:var(--g);background:var(--gd);box-shadow:0 0 8px rgba(78,222,163,0.15)}
+.mode-icon{font-size:14px;line-height:1}
+.mode-label{font-size:7px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase}
+.mode-kbd{position:absolute;top:3px;right:4px;font-size:6px;font-family:var(--fm);color:var(--t4);background:var(--b3);padding:0 2px;border-radius:2px}
+.mode-btn.active .mode-kbd{color:rgba(78,222,163,0.5)}
+
+/* Dual-line toggle in mode bar */
+#dual-tgl{display:flex;align-items:center;gap:4px;padding:0 6px;border-left:1px solid var(--bd);flex-shrink:0;margin-left:2px}
+#dual-tgl label{font-size:7px;color:var(--t3);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px}
+#dual-tgl input[type=checkbox]{accent-color:var(--p);width:11px;height:11px}
 
 /* Template select */
 .tpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
@@ -284,6 +388,8 @@ Dòng bridge..."></textarea>
       <span class="kbd">↑↓</span><span style="font-size:8px;color:var(--t3)">Chọn</span>
       <span class="kbd">Enter</span><span style="font-size:8px;color:var(--t3)">Phát</span>
       <span class="kbd">Tab</span><span style="font-size:8px;color:var(--t3)">Phát+Tiếp</span>
+      <span class="kbd">F6</span><span style="font-size:8px;color:var(--t3)">Trước+Phát</span>
+      <span class="kbd">F7</span><span style="font-size:8px;color:var(--t3)">Tiếp+Phát</span>
       <span class="kbd">Esc</span><span style="font-size:8px;color:var(--t3)">Tắt</span>
       <span class="kbd">A</span><span style="font-size:8px;color:var(--t3)">Auto</span>
     </div>
@@ -293,8 +399,10 @@ Dòng bridge..."></textarea>
         <span id="ws-lbl" style="font-size:8px;color:var(--t3);font-family:var(--fm)">Đang kết nối...</span>
       </div>
       <div class="tb-sep"></div>
+      <a href="monitor.html" class="tb-btn" target="_blank" style="color:var(--r);border-color:rgba(239,68,68,0.25)"><span class="ms">desktop_windows</span>Monitor</a>
       <a href="index.html" class="tb-btn"><span class="ms">arrow_back</span>Broadcast</a>
       <a href="scene-types.html" class="tb-btn"><span class="ms">movie_creation</span>Scene</a>
+      <a href="theme-builder.html" class="tb-btn" style="color:var(--p);border-color:rgba(168,85,247,0.3)"><span class="ms">palette</span>Themes</a>
       <a href="widget-studio.html" class="tb-btn"><span class="ms">widgets</span>Widgets</a>
     </div>
   </div>
@@ -302,9 +410,15 @@ Dòng bridge..."></textarea>
   <div id="workspace">
     <!-- LEFT: Song Library -->
     <div id="panel-lib">
+      <!-- Source Tabs -->
+      <div class="src-tabs">
+        <button class="src-tab lib active" id="src-tab-lib" onclick="switchSource('lib')">📁 Thư viện</button>
+        <button class="src-tab httlvn" id="src-tab-httlvn" onclick="switchSource('httlvn')">🎵 Thánh Ca HTTLVN</button>
+      </div>
       <div class="lib-search-wrap">
         <input type="text" class="lib-search" id="lib-search" placeholder="Tìm bài hát...">
       </div>
+      <!-- Category filter — only for lib source -->
       <div class="lib-cats" id="lib-cats">
         <button class="lib-cat active" data-cat="">Tất cả</button>
         <button class="lib-cat" data-cat="tho-phuong">🎵 Thờ phượng</button>
@@ -333,6 +447,35 @@ Dòng bridge..."></textarea>
         <div id="live-next"></div>
       </div>
 
+      <!-- Mode Bar -->
+      <div id="mode-bar">
+        <button class="mode-btn active" data-mode="lower-third" title="Lower Third — góc dưới trái [1]">
+          <span class="mode-kbd">1</span>
+          <span class="mode-icon">⬇</span>
+          <span class="mode-label">Lower</span>
+        </button>
+        <button class="mode-btn" data-mode="fullscreen" title="Fullscreen — toàn màn hình [2]">
+          <span class="mode-kbd">2</span>
+          <span class="mode-icon">⛶</span>
+          <span class="mode-label">Full</span>
+        </button>
+        <button class="mode-btn" data-mode="subtitle" title="Subtitle Bar — thanh phụ đề dưới [3]">
+          <span class="mode-kbd">3</span>
+          <span class="mode-icon">▤</span>
+          <span class="mode-label">Subtitle</span>
+        </button>
+        <button class="mode-btn" data-mode="side-panel" title="Side Panel — cột phải [4]">
+          <span class="mode-kbd">4</span>
+          <span class="mode-icon">◧</span>
+          <span class="mode-label">Side</span>
+        </button>
+        <div id="dual-tgl">
+          <label title="Hiển thị 2 dòng cùng lúc — dòng hiện tại + dòng kế tiếp [D]">
+            <input type="checkbox" id="tgl-dual"> 2 Dòng
+          </label>
+        </div>
+      </div>
+
       <!-- Song lines -->
       <div id="song-content">
         <div class="empty-state" id="empty-state">
@@ -342,81 +485,139 @@ Dòng bridge..."></textarea>
       </div>
     </div>
 
-    <!-- RIGHT: Controls -->
-    <div id="panel-ctrl">
-      <!-- Push Controls -->
-      <div class="ctrl-sec">
-        <div class="ctrl-hdr">Điều Khiển Phát</div>
-        <button id="btn-push" disabled>
-          <span class="ms">send</span>Phát Dòng Này [Enter]
-        </button>
-        <div class="ctrl-row">
-          <button class="ctrl-btn" id="btn-prev"><span class="ms">arrow_upward</span>Trước [↑]</button>
-          <button class="ctrl-btn" id="btn-next-nav"><span class="ms">arrow_downward</span>Sau [↓]</button>
+    <!-- RIGHT: Program Monitor + Controls -->
+    <div id="program-monitor">
+      <!-- Monitor Header -->
+      <div class="pm-hdr">
+        <span class="pm-title">📺 Program Monitor</span>
+        <div class="pm-live-badge" id="pm-live-badge">
+          <div class="pm-live-dot" id="pm-live-dot"></div>
+          <span id="pm-live-txt">OFFLINE</span>
         </div>
-        <div class="ctrl-row">
-          <button class="ctrl-btn" id="btn-push-adv" disabled title="Phát dòng hiện tại rồi chuyển sang dòng tiếp [Tab]">
-            <span class="ms">skip_next</span>Phát + Tiếp [Tab]
-          </button>
-          <button class="ctrl-btn red" id="btn-clear"><span class="ms">visibility_off</span>Tắt [Esc]</button>
-        </div>
+        <button class="pm-refresh-btn" onclick="document.getElementById('pm-iframe').src=document.getElementById('pm-iframe').src" style="position:static;background:transparent;border:1px solid var(--bd);margin-left:4px" title="Reload overlay preview">⟳</button>
       </div>
 
-      <!-- Auto Advance -->
-      <div class="ctrl-sec">
-        <div class="ctrl-hdr">Tự Động Chuyển</div>
-        <div class="tgl-row">
-          <span class="tgl-lbl">Bật tự động chuyển dòng [A]</span>
-          <label class="tgl"><input type="checkbox" id="tgl-auto"><span class="tgl-sl"></span></label>
-        </div>
-        <div class="slider-row">
-          <span style="font-size:8px;color:var(--t3)">2s</span>
-          <input type="range" class="ctrl-range" id="auto-timer" min="2" max="30" value="5">
-          <span class="rv" id="auto-timer-val">5s</span>
-        </div>
-        <div id="auto-cd"></div>
+      <!-- 16:9 Overlay Preview -->
+      <div class="pm-screen offline" id="pm-screen">
+        <iframe id="pm-iframe"
+          src="http://localhost:8080/OBSChurch/overlay/index.html"
+          class="pm-iframe"
+          title="Overlay Preview"
+          scrolling="no"
+          sandbox="allow-scripts allow-same-origin"
+        ></iframe>
+        <div class="pm-overlay-label">OVERLAY PREVIEW</div>
       </div>
 
-      <!-- Overlay Template -->
-      <div class="ctrl-sec">
-        <div class="ctrl-hdr">Template Overlay</div>
-        <div class="tpl-grid" id="tpl-grid">
-          <button class="tpl-btn active" data-tpl="lyric-clean"><span class="tpl-dot" style="background:#4d8eff"></span>Clean</button>
-          <button class="tpl-btn" data-tpl="lyric-dark"><span class="tpl-dot" style="background:#4edea3"></span>Dark</button>
-          <button class="tpl-btn" data-tpl="lyric-minimal"><span class="tpl-dot" style="background:#a855f7"></span>Minimal</button>
-          <button class="tpl-btn" data-tpl="lyric-fullscreen"><span class="tpl-dot" style="background:#fbbf24"></span>Fullscreen</button>
-        </div>
+      <!-- Next line display -->
+      <div class="pm-next">
+        <div class="pm-next-label">▷ Tiếp Theo</div>
+        <div class="pm-next-text empty" id="pm-next-text">—</div>
       </div>
 
-      <!-- Position & Style -->
-      <div class="ctrl-sec">
-        <div class="ctrl-hdr">Vị Trí & Kiểu Chữ (%)</div>
-        <div class="pos-grid">
-          <div class="pos-f"><span class="pos-l">X (Ngang)</span><input type="number" class="pos-i" id="pos-x" value="5" min="0" max="90"></div>
-          <div class="pos-f"><span class="pos-l">Y (Dọc)</span><input type="number" class="pos-i" id="pos-y" value="78" min="0" max="90"></div>
-          <div class="pos-f"><span class="pos-l">Màu nhấn</span><input type="color" class="pos-i" id="lyric-color" value="#4edea3" style="height:26px;padding:2px 4px"></div>
-          <div class="pos-f"><span class="pos-l">Cỡ chữ (px)</span><input type="number" class="pos-i" id="lyric-fs" value="32" min="16" max="72"></div>
-        </div>
-      </div>
+      <!-- Controls scrollable section -->
+      <div id="pm-controls">
+        <div id="panel-ctrl">
+          <!-- Push Controls -->
+          <div class="ctrl-sec">
+            <div class="ctrl-hdr">Phát Âm Nhạc</div>
+            <button id="btn-push" disabled>
+              <span class="ms">send</span>Phát Dòng Này [Enter]
+            </button>
+            <div class="ctrl-row">
+              <button class="ctrl-btn" id="btn-prev"><span class="ms">arrow_upward</span>Trước [↑]</button>
+              <button class="ctrl-btn" id="btn-next-nav"><span class="ms">arrow_downward</span>Sau [↓]</button>
+            </div>
+            <div class="ctrl-row">
+              <button class="ctrl-btn" id="btn-push-adv" disabled title="Phát dòng hiện tại rồi chuyển sang dòng tiếp [Tab]">
+                <span class="ms">skip_next</span>Phát + Tiếp [Tab]
+              </button>
+              <button class="ctrl-btn red" id="btn-clear"><span class="ms">visibility_off</span>Tắt [Esc]</button>
+            </div>
+          </div>
 
-      <!-- Song Info -->
-      <div class="ctrl-sec" id="song-info-panel" style="display:none">
-        <div class="ctrl-hdr">Bài Đang Chọn</div>
-        <div class="info-row"><span class="info-lbl">Tên:</span><span class="info-val" id="si-title">—</span></div>
-        <div class="info-row"><span class="info-lbl">Tác giả:</span><span class="info-val" id="si-author">—</span></div>
-        <div class="info-row"><span class="info-lbl">Giọng:</span><span class="info-val" id="si-key">—</span></div>
-        <div class="info-row"><span class="info-lbl">Số câu:</span><span class="info-val" id="si-lines">—</span></div>
-      </div>
-    </div>
-  </div>
-</div>
+          <!-- Auto Advance -->
+          <div class="ctrl-sec">
+            <div class="ctrl-hdr">Tự Động Chuyển</div>
+            <div class="tgl-row">
+              <span class="tgl-lbl">Bật tự động chuyển dòng [A]</span>
+              <label class="tgl"><input type="checkbox" id="tgl-auto"><span class="tgl-sl"></span></label>
+            </div>
+            <div class="slider-row">
+              <span style="font-size:8px;color:var(--t3)">2s</span>
+              <input type="range" class="ctrl-range" id="auto-timer" min="2" max="30" value="5">
+              <span class="rv" id="auto-timer-val">5s</span>
+            </div>
+            <div id="auto-cd"></div>
+          </div>
+
+          <!-- Overlay Theme -->
+          <div class="ctrl-sec">
+            <div class="ctrl-hdr" style="display:flex;align-items:center;justify-content:space-between">
+              <span>Theme Overlay</span>
+              <a href="theme-builder.html" class="ctrl-btn" style="height:18px;padding:0 6px;font-size:7px;text-decoration:none;flex:0;border-radius:3px" title="Mở Theme Builder">
+                <span class="ms" style="font-size:11px">palette</span>
+              </a>
+            </div>
+            <div id="theme-select-list" style="display:flex;flex-direction:column;gap:3px">
+              <div style="font-size:8px;color:var(--t4);text-align:center;padding:8px;font-family:var(--fm)">Đang tải themes...</div>
+            </div>
+          </div>
+
+          <!-- OBS Scene Switcher -->
+          <div class="ctrl-sec" id="obs-scene-panel">
+            <div class="ctrl-hdr" style="display:flex;align-items:center;justify-content:space-between">
+              <span>OBS Scene</span>
+              <span id="obs-conn-badge" style="font-size:7px;font-family:var(--fm);color:var(--t4)">OFFLINE</span>
+            </div>
+            <div id="obs-scene-list" style="display:flex;flex-direction:column;gap:3px">
+              <div style="font-size:8px;color:var(--t4);text-align:center;padding:8px;font-family:var(--fm)">Kết nối OBS để xem scenes</div>
+            </div>
+          </div>
+
+          <!-- Song Info -->
+          <div class="ctrl-sec" id="song-info-panel" style="display:none">
+            <div class="ctrl-hdr">Bài Đang Chọn</div>
+            <div class="info-row"><span class="info-lbl">Tên:</span><span class="info-val" id="si-title">—</span></div>
+            <div class="info-row"><span class="info-lbl">Tác giả:</span><span class="info-val" id="si-author">—</span></div>
+            <div class="info-row"><span class="info-lbl">Giọng:</span><span class="info-val" id="si-key">—</span></div>
+            <div class="info-row"><span class="info-lbl">Số câu:</span><span class="info-val" id="si-lines">—</span></div>
+          </div>
+        </div><!-- end panel-ctrl -->
+      </div><!-- end pm-controls -->
+    </div><!-- end workspace -->
+  </div><!-- end app -->
 
 <script>
-const API    = 'http://localhost:3000';
-const WS_URL = 'ws://localhost:3000';
+const API    = 'http://localhost:3001';
+const WS_URL = 'ws://localhost:3001';
 const $      = id => document.getElementById(id);
 
 // ─── State ──────────────────────────────────────────
+// ── Display Mode Presets ───────────────────────────────
+const DISPLAY_MODES = {
+  'lower-third': {
+    label: 'Lower Third',
+    templateId: 'lyric-clean',
+    textX: 5, textY: 78, fontSize: 32,
+  },
+  'fullscreen': {
+    label: 'Fullscreen',
+    templateId: 'lyric-fullscreen',
+    textX: 5, textY: 50, fontSize: 48,
+  },
+  'subtitle': {
+    label: 'Subtitle',
+    templateId: 'lyric-dark',
+    textX: 5, textY: 88, fontSize: 28,
+  },
+  'side-panel': {
+    label: 'Side Panel',
+    templateId: 'lyric-minimal',
+    textX: 55, textY: 30, fontSize: 28,
+  },
+};
+
 const S = {
   songs:        [],
   activeSongId: null,
@@ -424,21 +625,162 @@ const S = {
   selIdx:       -1,  // selected line index
   liveIdx:      -1,  // on-air line index
   ws:           null,
-  tpl:          'lyric-clean',
+  tpl:          'lyric-clean',  // fallback templateId OR themeId
+  themeId:      null,           // null = use raw tpl; string = use theme from API
+  displayMode:  'lower-third',  // active display mode key
+  dualLine:     false,          // show 2 lines simultaneously
   autoOn:       false,
   autoMs:       5000,
   autoCdTimer:  null,
   searchQ:      '',
   activeCat:    '',
+  obsConnected: false,
+  obsScenes:    [],
+  obsCurrentScene: null,
+  // HTTLVN source
+  source:       'lib',   // 'lib' | 'httlvn'
+  httlvnSongs:  [],
+  httlvnLoaded: false,
+  httlvnSearch: '',
 };
 
 // ─── Boot ───────────────────────────────────────────
 (async function init() {
   await loadSongs();
+  await loadThemes();
   bindAll();
   connectWS();
   renderSongList();
+  // Poll OBS scenes every 5s
+  loadOBSScenes();
+  setInterval(loadOBSScenes, 5000);
 })();
+
+// ─── Source Switcher ─────────────────────────────────
+function switchSource(src) {
+  S.source = src;
+  // Update tab UI
+  document.getElementById('src-tab-lib').classList.toggle('active', src === 'lib');
+  document.getElementById('src-tab-lib').classList.toggle('lib', src === 'lib');
+  document.getElementById('src-tab-httlvn').classList.toggle('active', src === 'httlvn');
+  document.getElementById('src-tab-httlvn').classList.toggle('httlvn', src === 'httlvn');
+  // Show/hide category bar
+  document.getElementById('lib-cats').style.display = src === 'lib' ? 'flex' : 'none';
+  // Edit/Add buttons
+  document.getElementById('btn-add').style.display  = src === 'lib' ? '' : 'none';
+  document.getElementById('btn-edit').style.display = src === 'lib' ? '' : 'none';
+  document.getElementById('btn-del').style.display  = src === 'lib' ? '' : 'none';
+
+  if (src === 'httlvn') {
+    if (!S.httlvnLoaded) loadHTTLVN();
+    else renderHTTLVNList();
+  } else {
+    renderSongList();
+  }
+}
+
+// ─── HTTLVN Source ────────────────────────────────────
+async function loadHTTLVN() {
+  const list = document.getElementById('song-list');
+  list.innerHTML = '<div class="s-empty">⏳ Đang tải Thánh Ca HTTLVN...</div>';
+  try {
+    // Load from songs-db.php (SQLite DB from thanh-ca.html)
+    const r = await fetch('/OBSChurch/api/songs-db.php?action=list&source_id=httlvn&limit=1000');
+    const d = await r.json();
+    S.httlvnSongs = d.songs || [];
+    S.httlvnLoaded = true;
+    renderHTTLVNList();
+  } catch(e) {
+    list.innerHTML = `<div class="s-empty" style="color:var(--r)">❌ Chưa tải Thánh Ca.<br><small>Vào Thánh Ca Browser để tải về trước.</small></div>`;
+  }
+}
+
+function renderHTTLVNList() {
+  const list = document.getElementById('song-list');
+  const q = S.searchQ.toLowerCase();
+  let songs = S.httlvnSongs;
+  if (q) songs = songs.filter(s =>
+    (s.title||'').toLowerCase().includes(q) ||
+    String(s.number||'').includes(q)
+  );
+  if (!songs.length) {
+    list.innerHTML = '<div class="s-empty">Không tìm thấy</div>';
+    return;
+  }
+  list.innerHTML = songs.slice(0, 500).map(s => `
+    <div class="song-item httlvn" data-httlvn-slug="${esc(s.slug)}" data-httlvn-num="${s.number||''}"
+      data-httlvn-title="${esc(s.title||'')}">
+      <div class="s-title">${esc(s.title||'—')}</div>
+      <div class="s-meta">TC ${s.number||'?'} · ${esc(s.cat_top||'HTTLVN')}</div>
+    </div>`).join('');
+  if (songs.length > 500) {
+    list.innerHTML += `<div class="s-empty">Còn ${songs.length-500} bài — hãy tìm kiếm</div>`;
+  }
+  list.querySelectorAll('.song-item.httlvn').forEach(el => {
+    el.addEventListener('click', () => selectHTTLVNSong(
+      el.dataset.httlvnSlug, el.dataset.httlvnNum, el.dataset.httlvnTitle
+    ));
+  });
+}
+
+async function selectHTTLVNSong(slug, num, title) {
+  // Highlight
+  document.querySelectorAll('.song-item').forEach(e => e.classList.remove('active'));
+  const el = document.querySelector(`[data-httlvn-slug="${slug}"]`);
+  if (el) el.classList.add('active');
+
+  $('live-song-name').textContent = `🎵 TC${num} ${title}`;
+
+  // Load full song from songs-db.php
+  try {
+    const dbSlug = `httlvn-${num}`;
+    const r = await fetch(`/OBSChurch/api/songs-db.php?action=get&slug=${encodeURIComponent(dbSlug)}`);
+    const d = await r.json();
+
+    let sections = [];
+    if (d.sections_json) {
+      try { sections = JSON.parse(d.sections_json); } catch{}
+    }
+
+    // Build flatLines from sections
+    S.flatLines = [];
+    S.activeSongId = `httlvn-${num}`;
+    S.selIdx = -1;
+    S.liveIdx = -1;
+
+    if (sections.length) {
+      sections.forEach(sec => {
+        (sec.lines||[]).forEach(txt => {
+          S.flatLines.push({ text: txt, sectionLabel: sec.label||'', sectionType: 'verse' });
+        });
+      });
+    } else {
+      // Fallback: fetch from HTTLVN directly
+      try {
+        const r2 = await fetch(`/OBSChurch/api/httlvn.php?action=song&id=${num}&slug=${encodeURIComponent(slug)}`);
+        const d2 = await r2.json();
+        (d2.sections||[]).forEach(sec => {
+          (sec.lines||[]).forEach(txt => {
+            S.flatLines.push({ text: txt, sectionLabel: sec.label||'', sectionType: 'verse' });
+          });
+        });
+      } catch {}
+    }
+
+    renderSongContent();
+    // Update info panel
+    $('song-info-panel').style.display = 'block';
+    $('si-title').textContent  = `${num}. ${title}`;
+    $('si-author').textContent = 'HTTLVN';
+    $('si-key').textContent    = '—';
+    $('si-lines').textContent  = `${S.flatLines.length} câu`;
+    $('btn-edit').disabled = true;
+    $('btn-del').disabled  = true;
+
+  } catch(e) {
+    toast('Lỗi tải bài: ' + e.message, 'err');
+  }
+}
 
 // ─── Data ────────────────────────────────────────────
 async function loadSongs() {
@@ -459,8 +801,113 @@ async function saveSongs() {
   } catch { toast('Lỗi lưu dữ liệu!', 'err'); }
 }
 
+// ─── Themes ──────────────────────────────────────
+const FALLBACK_THEMES = [
+  { id: 'lyric-clean',      name: 'Clean',      color: '#4d8eff', isRaw: true },
+  { id: 'lyric-dark',       name: 'Dark',       color: '#4edea3', isRaw: true },
+  { id: 'lyric-minimal',    name: 'Minimal',    color: '#a855f7', isRaw: true },
+  { id: 'lyric-fullscreen', name: 'Fullscreen', color: '#fbbf24', isRaw: true },
+];
+
+async function loadThemes() {
+  try {
+    const r = await fetch(`${API}/api/themes`);
+    const d = await r.json();
+    const themes = d.themes?.length ? d.themes : null;
+    renderThemeButtons(themes);
+  } catch {
+    renderThemeButtons(null); // fallback
+  }
+}
+
+function renderThemeButtons(themes) {
+  const el = $('theme-select-list');
+  if (!themes || !themes.length) {
+    // Render fallback template buttons
+    el.innerHTML = FALLBACK_THEMES.map(t => `
+      <button class="tpl-btn ${S.tpl === t.id && !S.themeId ? 'active' : ''}" data-tpl="${t.id}" data-raw="1">
+        <span class="tpl-dot" style="background:${t.color}"></span>${t.name}
+      </button>`).join('');
+    el.querySelectorAll('.tpl-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        el.querySelectorAll('.tpl-btn').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        S.themeId = null;
+        S.tpl = b.dataset.tpl;
+        toast(`Template: ${b.textContent.trim()}`, 'inf');
+      });
+    });
+    return;
+  }
+
+  // Render API themes
+  el.innerHTML = themes.map(t => `
+    <button class="tpl-btn ${S.themeId === t.id ? 'active' : ''}" data-theme="${t.id}" style="justify-content:flex-start;gap:6px;padding:6px 10px">
+      <span class="tpl-dot" style="background:${t.accentColor || '#4edea3'}"></span>
+      <span style="flex:1;text-align:left">${esc(t.name)}</span>
+    </button>`).join('');
+
+  el.querySelectorAll('[data-theme]').forEach(b => {
+    b.addEventListener('click', () => {
+      el.querySelectorAll('[data-theme]').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      S.themeId = b.dataset.theme;
+      S.tpl = null;
+      toast(`Theme: ${b.textContent.trim()}`, 'ok');
+    });
+  });
+}
+
+// ─── OBS Scene Switcher ───────────────────────────
+async function loadOBSScenes() {
+  try {
+    const r = await fetch(`${API}/api/obs/scenes`);
+    const d = await r.json();
+    S.obsConnected    = d.connected || false;
+    S.obsScenes       = d.scenes   || [];
+    S.obsCurrentScene = d.currentScene || null;
+    renderOBSScenes();
+  } catch { /* server offline */ }
+}
+
+function renderOBSScenes() {
+  const badge = $('obs-conn-badge');
+  const list  = $('obs-scene-list');
+  if (!badge || !list) return;
+
+  if (!S.obsConnected || !S.obsScenes.length) {
+    badge.textContent = 'OFFLINE';
+    badge.style.color = 'var(--t4)';
+    list.innerHTML = `<div style="font-size:8px;color:var(--t4);text-align:center;padding:8px;font-family:var(--fm)">
+      Kết nối OBS tị Dashboard để xem scenes</div>`;
+    return;
+  }
+
+  badge.textContent = 'LIVE';
+  badge.style.color = 'var(--g)';
+
+  list.innerHTML = S.obsScenes.map(name => `
+    <button class="tpl-btn ${S.obsCurrentScene === name ? 'active' : ''}" data-obs-scene="${esc(name)}"
+      style="justify-content:flex-start;gap:5px;padding:5px 8px;font-size:8px">
+      <span class="ms" style="font-size:11px">${S.obsCurrentScene === name ? 'radio_button_checked' : 'radio_button_unchecked'}</span>
+      ${esc(name)}
+    </button>`).join('');
+
+  list.querySelectorAll('[data-obs-scene]').forEach(b => {
+    b.addEventListener('click', async () => {
+      const scene = b.dataset.obsScene;
+      sendWS({ type: 'OBS_SCENE_SWITCH', payload: { sceneName: scene } });
+      // Optimistic update
+      S.obsCurrentScene = scene;
+      renderOBSScenes();
+      toast(`OBS: ${scene}`, 'ok');
+    });
+  });
+}
+
 // ─── Song List Rendering ─────────────────────────────
 function renderSongList() {
+  if (S.source === 'httlvn') { renderHTTLVNList(); return; }
   let list = S.songs;
   if (S.activeCat)  list = list.filter(s => s.category === S.activeCat);
   if (S.searchQ) {
@@ -554,8 +1001,18 @@ function selectLine(idx) {
   $('live-next').textContent    = nx ? `▷ ${nx.text}` : '';
   $('live-next').className      = nx ? 'has-next' : '';
 
+  updateProgramMonitor(ln, nx);
+
   $('btn-push').disabled     = false;
   $('btn-push-adv').disabled = false;
+}
+
+function updateProgramMonitor(ln, nx) {
+  const pmNext = $('pm-next-text');
+  if (pmNext) {
+    if (nx) { pmNext.textContent = nx.text; pmNext.className = 'pm-next-text has-next'; }
+    else     { pmNext.textContent = '—';      pmNext.className = 'pm-next-text empty'; }
+  }
 }
 
 function updateSongInfo(song) {
@@ -573,16 +1030,25 @@ function pushLine(advanceToo = false) {
   const next = S.flatLines[S.selIdx + 1];
   const song = S.songs.find(s => s.id === S.activeSongId);
 
+  // Resolve display mode preset
+  const mode = DISPLAY_MODES[S.displayMode] || DISPLAY_MODES['lower-third'];
+
+  // Dual-line: primary = current, secondary = next (always shows next as preview)
+  const primaryText   = S.dualLine && next ? `${ln.text}` : ln.text;
+  const secondaryText = S.dualLine && next ? next.text : (next?.text || '');
+
   const payload = {
-    templateId:   S.tpl,
-    primary:      ln.text,
-    secondary:    next?.text || '',
+    templateId:   S.themeId ? undefined : (S.tpl || mode.templateId),
+    themeId:      S.themeId || undefined,
+    primary:      primaryText,
+    secondary:    secondaryText,
     songName:     song?.title || '',
     sectionLabel: ln.sectionLabel || '',
-    textX:        parseFloat($('pos-x').value)  || 5,
-    textY:        parseFloat($('pos-y').value)  || 78,
+    textX:        mode.textX,
+    textY:        mode.textY,
     accentColor:  $('lyric-color').value || '#4edea3',
-    fontSize:     parseInt($('lyric-fs').value)  || 32,
+    fontSize:     mode.fontSize,
+    dualLine:     S.dualLine,
     camW: 0, camH: 0,
   };
 
@@ -593,16 +1059,41 @@ function pushLine(advanceToo = false) {
   document.querySelectorAll('.line-item').forEach(e => e.classList.remove('live'));
   const liveEl = document.querySelector(`[data-li="${S.selIdx}"]`);
   if (liveEl) liveEl.classList.add('live');
+  // Also highlight the second line if dual-mode
+  if (S.dualLine && next) {
+    const nextEl = document.querySelector(`[data-li="${S.selIdx + 1}"]`);
+    if (nextEl) nextEl.style.opacity = '0.5';
+    setTimeout(() => { if (nextEl) nextEl.style.opacity = ''; }, 200);
+  }
 
   $('live-dot').classList.add('on');
   $('live-label').textContent = 'LIVE';
   $('live-label').className   = 'live-label on';
+
+  // ═ Program Monitor LIVE ═
+  const _d=$('pm-live-dot'),_b=$('pm-live-badge'),_t=$('pm-live-txt'),_s=$('pm-screen');
+  if(_d)_d.classList.add('on'); if(_b)_b.classList.add('on');
+  if(_t)_t.textContent='ON AIR'; if(_s)_s.classList.remove('offline');
+  if(window.ObsPip) window.ObsPip.onPush(ln.text, next?.text||'');
 
   toast(`▶ ${ln.text.substring(0,36)}${ln.text.length>36?'…':''}`, 'ok');
 
   if (advanceToo && S.selIdx < S.flatLines.length - 1) {
     selectLine(S.selIdx + 1);
   }
+}
+
+// ─── Display Mode ────────────────────────────────────
+function setDisplayMode(modeKey) {
+  if (!DISPLAY_MODES[modeKey]) return;
+  S.displayMode = modeKey;
+  // Update preset tpl to match mode (unless user overrode with theme)
+  if (!S.themeId) S.tpl = DISPLAY_MODES[modeKey].templateId;
+  // Update mode bar UI
+  document.querySelectorAll('.mode-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === modeKey);
+  });
+  toast(`Mode: ${DISPLAY_MODES[modeKey].label}`, 'inf');
 }
 
 function clearOverlay() {
@@ -614,6 +1105,12 @@ function clearOverlay() {
   $('live-label').className   = 'live-label';
   $('live-current').textContent = '—';
   $('live-next').textContent    = '';
+  // ═ Program Monitor OFFLINE ═
+  const _d=$('pm-live-dot'),_b=$('pm-live-badge'),_t=$('pm-live-txt'),_s=$('pm-screen'),_n=$('pm-next-text');
+  if(_d)_d.classList.remove('on'); if(_b)_b.classList.remove('on');
+  if(_t)_t.textContent='OFFLINE'; if(_s)_s.classList.add('offline');
+  if(_n){_n.textContent='—';_n.className='pm-next-text empty';}
+  if(window.ObsPip) window.ObsPip.onClear();
   if (S.autoOn) stopAuto();
   toast('Overlay đã tắt', 'inf');
 }
@@ -775,6 +1272,33 @@ function connectWS() {
     $('ws-dot').className = 'ws-dot ok';
     $('ws-lbl').textContent = 'Đã kết nối';
   });
+  S.ws.addEventListener('message', e => {
+    try {
+      const msg = JSON.parse(e.data);
+      if (msg.type === 'OBS_STATE') {
+        S.obsConnected    = msg.payload.connected;
+        S.obsScenes       = msg.payload.scenes       || S.obsScenes;
+        S.obsCurrentScene = msg.payload.currentScene || S.obsCurrentScene;
+        renderOBSScenes();
+      }
+      if (msg.type === 'OBS_SCENE_CHANGED') {
+        S.obsCurrentScene = msg.payload.scene;
+        renderOBSScenes();
+      }
+      // ── Monitor relay: Confidence Monitor điều khiển Lyric Station ──
+      if (msg.type === 'MONITOR_NAV') {
+        const dir = msg.payload?.dir ?? 1;
+        dir > 0 ? goDown() : goUp();
+      }
+      if (msg.type === 'MONITOR_PUSH') {
+        pushLine();
+      }
+      if (msg.type === 'MONITOR_SELECT') {
+        const idx = msg.payload?.lineIdx;
+        if (typeof idx === 'number') selectLine(idx);
+      }
+    } catch(_) {}
+  });
   S.ws.addEventListener('close', () => {
     $('ws-dot').className = 'ws-dot err';
     $('ws-lbl').textContent = 'Mất kết nối...';
@@ -804,6 +1328,17 @@ function bindAll() {
   $('auto-timer').addEventListener('input', () => {
     $('auto-timer-val').textContent = $('auto-timer').value + 's';
     S.autoMs = parseInt($('auto-timer').value) * 1000;
+  });
+
+  // Mode bar buttons
+  document.querySelectorAll('.mode-btn').forEach(b => {
+    b.addEventListener('click', () => setDisplayMode(b.dataset.mode));
+  });
+
+  // Dual-line toggle
+  $('tgl-dual').addEventListener('change', e => {
+    S.dualLine = e.target.checked;
+    toast(S.dualLine ? '2 Dòng: Bật' : '2 Dòng: Tắt', 'inf');
   });
 
   document.querySelectorAll('.tpl-btn').forEach(b => {
@@ -836,9 +1371,16 @@ function bindAll() {
     if (e.key === 'Tab')                         { e.preventDefault(); pushLine(true); }
     if (e.key === 'Escape')                      { e.preventDefault(); clearOverlay(); }
     if (e.key === 'a' || e.key === 'A')          { toggleAuto(); }
+    if (e.key === 'd' || e.key === 'D')          { $('tgl-dual').click(); }
     if ((e.ctrlKey||e.metaKey) && e.key==='n')   { e.preventDefault(); openAddModal(); }
     if (e.key === 'PageUp')   goUp();
     if (e.key === 'PageDown') goDown();
+    // 1/2/3/4 = switch display mode nhanh
+    const modeMap = { '1':'lower-third', '2':'fullscreen', '3':'subtitle', '4':'side-panel' };
+    if (modeMap[e.key] && !e.ctrlKey && !e.metaKey && !e.altKey) setDisplayMode(modeMap[e.key]);
+    // F6 = trước + phát | F7 = tiếp + phát (cho bàn phím presenter)
+    if (e.key === 'F6') { e.preventDefault(); goUp();   pushLine(); }
+    if (e.key === 'F7') { e.preventDefault(); goDown(); pushLine(); }
   });
 }
 
@@ -857,5 +1399,6 @@ function toast(msg, type = 'inf') {
   setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 250); }, 2400);
 }
 </script>
+<script src="/OBSChurch/monitor-pip.js"></script>
 </body>
 </html>

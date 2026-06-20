@@ -111,7 +111,7 @@ export class ServiceRunnerController {
     if (item.type !== 'camera') {
       this._triggerPush();
     } else {
-      WSClient.clearOverlay();
+      WSClient.clearAll();
       StateManager.setOverlayVisible(false);
     }
 
@@ -132,26 +132,27 @@ export class ServiceRunnerController {
 
   _checkAutoAdvance(item) {
     clearTimeout(this._timerId);
-    
-    // Nếu là Đầu giờ (mở đầu) và đang bật tự động chạy
-    if (item.sceneId === 'dau-gio' && this._autoPilot) {
-      let seconds = 8;
-      this._statusEl.textContent = `Tự chuyển cảnh sau ${seconds}s...`;
-      this._statusEl.style.color = '#ffa040';
-      
-      const tick = () => {
-        seconds--;
-        if (seconds > 0) {
-          if (this._currentIndex === this._flatItems.indexOf(item)) {
-            this._statusEl.textContent = `Tự chuyển cảnh sau ${seconds}s...`;
-            this._timerId = setTimeout(tick, 1000);
-          }
-        } else {
-          this._selectTimelineIndex(this._currentIndex + 1);
-        }
-      };
-      this._timerId = setTimeout(tick, 1000);
-    }
+    if (!this._autoPilot) return;
+
+    // Dùng autoDurationSec từ item data nếu có, mặc định 8 giây
+    const duration = Number(item.autoDurationSec) > 0 ? Number(item.autoDurationSec) : 8;
+    let seconds = duration;
+    this._statusEl.textContent = `Tự chuyển sau ${seconds}s...`;
+    this._statusEl.style.color = '#ffa040';
+
+    const savedIndex = this._currentIndex;
+    const tick = () => {
+      // Dừng nếu user đã chuyển item thủ công
+      if (this._currentIndex !== savedIndex) return;
+      seconds--;
+      if (seconds > 0) {
+        this._statusEl.textContent = `Tự chuyển sau ${seconds}s...`;
+        this._timerId = setTimeout(tick, 1000);
+      } else {
+        this._selectTimelineIndex(this._currentIndex + 1);
+      }
+    };
+    this._timerId = setTimeout(tick, 1000);
   }
 
   _handleNextClick() {
@@ -209,15 +210,16 @@ export class ServiceRunnerController {
     } else {
       const isLast = this._currentIndex === this._flatItems.length - 1;
       const nextItem = this._flatItems[this._currentIndex + 1];
-      
+
       this._btnNext.innerHTML = `<span class="material-symbols-outlined">navigate_next</span> ${isLast ? 'KẾT THÚC LỄ ✓' : 'KÍCH HOẠT TIẾP THEO'}`;
       this._btnNext.className = isLast ? 'btn-action btn-clear' : 'btn-action btn-push';
-      
-      if (!this._timerId || !this._autoPilot || this._flatItems[this._currentIndex].sceneId !== 'dau-gio') {
+
+      // Chỉ cập nhật label status nếu không đang đếm ngược auto-advance
+      if (!this._timerId) {
         this._statusEl.textContent = 'Đang On-Air';
         this._statusEl.style.color = '#ff4444';
       }
-      
+
       this._nextLblEl.textContent = nextItem ? nextItem.label : 'Hết lễ';
     }
   }

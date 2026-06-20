@@ -1117,6 +1117,11 @@
         <span class="material-symbols-outlined">settings_input_hdmi</span>
         OBS Studio
       </button>
+      <a href="live.html" class="tb-btn" style="background:linear-gradient(135deg,#047857,#4edea3);border-color:transparent;color:#000;font-weight:800;letter-spacing:.03em;box-shadow:0 0 16px rgba(78,222,163,0.3)">
+        <span class="material-symbols-outlined">live_tv</span>
+        🔴 Live Control
+      </a>
+      <div class="topbar-divider"></div>
       <a href="scene-types.html" target="_blank" class="tb-btn">
         <span class="material-symbols-outlined">movie_creation</span>
         Scene Types
@@ -1133,6 +1138,14 @@
         <span class="material-symbols-outlined">music_note</span>
         Lyric Station
       </a>
+      <a href="lyric-controller.html" target="_blank" class="tb-btn" style="border-color:rgba(78,222,163,0.2);color:#4edea3">
+        <span class="material-symbols-outlined">queue_music</span>
+        Lyric Controller
+      </a>
+      <a href="kinh-thanh.html" target="_blank" class="tb-btn" style="border-color:rgba(245,158,11,0.35);color:#f59e0b">
+        <span class="material-symbols-outlined">auto_stories</span>
+        KT Đối Đáp
+      </a>
       <a href="thanh-ca.html" target="_blank" class="tb-btn" style="border-color:rgba(168,85,247,0.3);color:#a855f7">
         <span class="material-symbols-outlined">library_music</span>
         Thánh Ca Online
@@ -1140,6 +1153,15 @@
       <a href="overlay/index.html" target="_blank" class="tb-btn">
         <span class="material-symbols-outlined">open_in_new</span>
         Overlay Preview
+      </a>
+      <div class="topbar-divider"></div>
+      <a href="monitor.html" target="_blank" class="tb-btn" style="border-color:rgba(239,68,68,0.3);color:#ef4444">
+        <span class="material-symbols-outlined">desktop_windows</span>
+        Monitor
+      </a>
+      <a href="print-plan.html" target="_blank" class="tb-btn" style="border-color:rgba(251,191,36,0.3);color:#fbbf24">
+        <span class="material-symbols-outlined">print</span>
+        In Chương Trình
       </a>
     </div>
   </div>
@@ -1411,6 +1433,58 @@
             </button>
           </div>
         </div>
+
+        <!-- Quick Timer -->
+        <div class="sw-divider" style="margin-top:6px"></div>
+        <div style="margin-top:6px" id="quick-timer-panel">
+          <div class="col-hdr-title" style="font-size:7px;color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;font-family:var(--font-mono);display:flex;align-items:center;justify-content:space-between">
+            <span>⏱️ Timer Nhanh</span>
+            <span id="timer-display" style="color:var(--amber);font-size:11px;font-weight:700;display:none">00:00</span>
+          </div>
+          <!-- Preset buttons -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-bottom:4px">
+            <button class="timer-preset" data-min="5" style="height:24px;border-radius:4px;border:1px solid var(--border);background:var(--bg-elevated);color:var(--text-3);font-size:9px;cursor:pointer;font-family:var(--font-mono);transition:all 0.12s">5'</button>
+            <button class="timer-preset" data-min="10" style="height:24px;border-radius:4px;border:1px solid var(--border);background:var(--bg-elevated);color:var(--text-3);font-size:9px;cursor:pointer;font-family:var(--font-mono);transition:all 0.12s">10'</button>
+            <button class="timer-preset" data-min="15" style="height:24px;border-radius:4px;border:1px solid var(--border);background:var(--bg-elevated);color:var(--text-3);font-size:9px;cursor:pointer;font-family:var(--font-mono);transition:all 0.12s">15'</button>
+            <button class="timer-preset" data-min="30" style="height:24px;border-radius:4px;border:1px solid var(--border);background:var(--bg-elevated);color:var(--text-3);font-size:9px;cursor:pointer;font-family:var(--font-mono);transition:all 0.12s">30'</button>
+          </div>
+          <!-- Custom + controls -->
+          <div style="display:flex;gap:3px">
+            <input id="timer-custom" type="number" min="1" max="120" placeholder="phút" value=""
+              style="flex:1;height:24px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:4px;color:var(--text-1);font-family:var(--font-mono);font-size:9px;padding:0 6px;outline:none;text-align:center">
+            <button id="btn-timer-start"
+              style="height:24px;padding:0 8px;border-radius:4px;border:1px solid rgba(251,191,36,0.4);background:rgba(251,191,36,0.1);color:#fbbf24;font-size:9px;cursor:pointer;font-family:var(--font-sans);display:flex;align-items:center;gap:3px;transition:all 0.12s">
+              <span class="material-symbols-outlined" style="font-size:12px">play_arrow</span>Start
+            </button>
+            <button id="btn-timer-stop" disabled
+              style="height:24px;padding:0 8px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text-3);font-size:9px;cursor:pointer;font-family:var(--font-sans);display:flex;align-items:center;gap:3px;opacity:0.4">
+              <span class="material-symbols-outlined" style="font-size:12px">stop</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- OBS Direct Connect -->
+        <div class="sw-divider" style="margin-top:6px"></div>
+        <div style="margin-top:6px">
+          <div class="col-hdr-title" style="font-size:7px;color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;font-family:var(--font-mono);display:flex;align-items:center;gap:5px">
+            <span id="obs-bridge-dot" style="width:5px;height:5px;border-radius:50%;background:var(--text-4);flex-shrink:0"></span>
+            🖥️ OBS Direct
+          </div>
+          <div style="display:grid;grid-template-columns:1fr auto;gap:4px;margin-bottom:4px">
+            <input id="obs-host-inp" placeholder="localhost:4455" value="localhost:4455"
+              style="height:24px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:4px;color:var(--text-1);font-family:var(--font-mono);font-size:9px;padding:0 6px;outline:none;width:100%">
+            <input id="obs-pass-inp" type="password" placeholder="Password"
+              style="height:24px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:4px;color:var(--text-1);font-family:var(--font-mono);font-size:9px;padding:0 6px;outline:none;width:80px">
+          </div>
+          <button id="btn-obs-connect"
+            style="width:100%;height:26px;border-radius:5px;border:1px solid rgba(77,142,255,0.4);background:rgba(77,142,255,0.1);color:#4d8eff;font-size:9px;font-family:var(--font-sans);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px">
+            <span class="material-symbols-outlined" style="font-size:13px">link</span>
+            <span id="obs-connect-label">Kết nối OBS Studio</span>
+          </button>
+          <div id="obs-scene-switcher" style="margin-top:5px;display:flex;flex-direction:column;gap:3px">
+            <div style="font-size:8px;color:var(--text-4);text-align:center;font-family:var(--font-mono)">Chưa kết nối</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1424,8 +1498,8 @@
    Kiến trúc: Single-page vanilla JS, không dependencies
    ═════════════════════════════════════════════════════════════════════ */
 
-const WS_URL        = 'ws://localhost:3000';
-const API_BASE      = 'http://localhost:3000/api';
+const WS_URL        = 'ws://localhost:3001';
+const API_BASE      = 'http://localhost:3001/api';
 const API_SCENES    = API_BASE + '/scenes';
 const API_LAYOUTS   = API_BASE + '/layouts';
 const API_STYPES    = API_BASE + '/scene-types';
@@ -1520,6 +1594,16 @@ function connectWS() {
           if (msg.payload.overlayVisible) {
             updatePreviewFromPayload(msg.payload.currentPayload);
           }
+          // Sync OBS state
+          if (msg.payload.obsConnected !== undefined) {
+            updateOBSBridgeUI(msg.payload.obsConnected, msg.payload.obsScenes || [], msg.payload.obsCurrentScene);
+          }
+        }
+        if (msg.type === 'OBS_STATE') {
+          updateOBSBridgeUI(msg.payload.connected, msg.payload.scenes || [], msg.payload.currentScene);
+        }
+        if (msg.type === 'OBS_SCENE_CHANGED') {
+          updateCurrentOBSScene(msg.payload.scene);
         }
       } catch(_) {}
     };
@@ -2191,6 +2275,214 @@ function initTickerControls() {
 document.addEventListener('DOMContentLoaded', () => initTickerControls());
 // Also init immediately if DOM is already ready
 if (document.readyState !== 'loading') initTickerControls();
+
+// ── OBS Direct Bridge ──────────────────────────────────────────────
+let _obsConnected = false;
+let _obsScenes    = [];
+let _obsCurrentScene = null;
+
+async function obsConnectFromDashboard() {
+  const host     = ($('obs-host-inp')?.value || 'localhost:4455').trim();
+  const password = $('obs-pass-inp')?.value || '';
+  const btn      = $('btn-obs-connect');
+  const lbl      = $('obs-connect-label');
+
+  if (_obsConnected) {
+    // Disconnect
+    try {
+      await fetch(`${WS_URL.replace('ws://','http://').replace(':3000',':3000')}/api/obs/disconnect`, { method: 'POST' });
+    } catch(_) {}
+    return;
+  }
+
+  lbl.textContent = 'Đang kết nối...';
+  btn.style.opacity = '0.6';
+
+  try {
+    const r = await fetch('http://localhost:3001/api/obs/connect', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ host, password }),
+    });
+    const d = await r.json();
+    if (d.success) {
+      toast(`✓ OBS kết nối: ${d.scenes?.length || 0} scenes`, 'success');
+      updateOBSBridgeUI(true, d.scenes || [], d.currentScene);
+    } else {
+      toast(`✗ OBS lỗi: ${d.error || 'Unknown'}`, 'danger');
+      lbl.textContent = 'Kết nối OBS Studio';
+      btn.style.opacity = '1';
+    }
+  } catch(e) {
+    toast('Không kết nối được OBS!', 'danger');
+    lbl.textContent = 'Kết nối OBS Studio';
+    btn.style.opacity = '1';
+  }
+}
+
+function updateOBSBridgeUI(connected, scenes, currentScene) {
+  _obsConnected    = connected;
+  _obsScenes       = scenes || [];
+  _obsCurrentScene = currentScene;
+
+  const dot = $('obs-bridge-dot');
+  const btn = $('btn-obs-connect');
+  const lbl = $('obs-connect-label');
+
+  if (dot) {
+    dot.style.background   = connected ? 'var(--green)' : 'var(--text-4)';
+    dot.style.boxShadow    = connected ? '0 0 6px var(--green)' : 'none';
+  }
+  if (lbl) lbl.textContent = connected ? 'Ngắt kết nối OBS' : 'Kết nối OBS Studio';
+  if (btn) {
+    btn.style.opacity     = '1';
+    btn.style.borderColor = connected ? 'rgba(78,222,163,0.4)' : 'rgba(77,142,255,0.4)';
+    btn.style.background  = connected ? 'rgba(78,222,163,0.1)'  : 'rgba(77,142,255,0.1)';
+    btn.style.color       = connected ? 'var(--green)' : '#4d8eff';
+  }
+
+  renderOBSScenes_Dashboard();
+}
+
+function updateCurrentOBSScene(sceneName) {
+  _obsCurrentScene = sceneName;
+  renderOBSScenes_Dashboard();
+}
+
+function renderOBSScenes_Dashboard() {
+  const el = $('obs-scene-switcher');
+  if (!el) return;
+
+  if (!_obsConnected || !_obsScenes.length) {
+    el.innerHTML = `<div style="font-size:8px;color:var(--text-4);text-align:center;font-family:var(--font-mono)">Chưa kết nối</div>`;
+    return;
+  }
+
+  el.innerHTML = _obsScenes.map(name => `
+    <button class="obs-scene-btn ${_obsCurrentScene === name ? 'cur' : ''}"
+      data-scene="${esc2(name)}"
+      style="width:100%;height:22px;border-radius:4px;border:1px solid ${_obsCurrentScene===name?'rgba(78,222,163,0.4)':'var(--border)'};
+             background:${_obsCurrentScene===name?'rgba(78,222,163,0.1)':'transparent'};
+             color:${_obsCurrentScene===name?'var(--green)':'var(--text-2)'};
+             font-size:8px;font-family:var(--font-mono);cursor:pointer;
+             display:flex;align-items:center;gap:4px;padding:0 8px;
+             transition:all .12s;">
+      <span class="material-symbols-outlined" style="font-size:11px">${_obsCurrentScene===name?'radio_button_checked':'radio_button_unchecked'}</span>
+      ${esc2(name)}
+    </button>`).join('');
+
+  el.querySelectorAll('[data-scene]').forEach(b => {
+    b.addEventListener('click', () => {
+      const sceneName = b.dataset.scene;
+      send({ type: 'OBS_SCENE_SWITCH', payload: { sceneName } });
+      _obsCurrentScene = sceneName;
+      renderOBSScenes_Dashboard();
+      toast(`OBS → ${sceneName}`, 'success');
+    });
+  });
+}
+
+function esc2(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// Bind OBS connect button
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = $('btn-obs-connect');
+  if (btn) btn.addEventListener('click', obsConnectFromDashboard);
+
+  // ── Quick Timer ──────────────────────────────────────────
+  const timerDisplay  = $('timer-display');
+  const btnStart      = $('btn-timer-start');
+  const btnStop       = $('btn-timer-stop');
+  const customInput   = $('timer-custom');
+  let timerInterval   = null;
+  let timerRemaining  = 0;
+  let timerTotal      = 0;
+
+  function formatTimerTime(secs) {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+
+  function startTimer(minutes) {
+    clearInterval(timerInterval);
+    timerTotal = timerRemaining = minutes * 60;
+    timerDisplay.style.display = '';
+    timerDisplay.textContent   = formatTimerTime(timerRemaining);
+    timerDisplay.style.color   = 'var(--amber)';
+    btnStop.disabled = false;
+    btnStop.style.opacity = '1';
+
+    // Broadcast overlay countdown widget
+    send({ type: 'WIDGET_BINDING', payload: {
+      widgetId: 'countdown',
+      minutes,
+      label: `${minutes} phút`,
+    }});
+
+    // Highlight active preset
+    document.querySelectorAll('.timer-preset').forEach(b => {
+      b.style.borderColor = +b.dataset.min === minutes ? 'rgba(251,191,36,0.5)' : 'var(--border)';
+      b.style.color       = +b.dataset.min === minutes ? '#fbbf24' : 'var(--text-3)';
+      b.style.background  = +b.dataset.min === minutes ? 'rgba(251,191,36,0.1)' : 'var(--bg-elevated)';
+    });
+
+    timerInterval = setInterval(() => {
+      timerRemaining--;
+      timerDisplay.textContent = formatTimerTime(timerRemaining);
+      // Chuyển đỏ khi còn < 60s
+      timerDisplay.style.color = timerRemaining < 60 ? 'var(--red)' : 'var(--amber)';
+      if (timerRemaining <= 0) {
+        clearInterval(timerInterval);
+        timerDisplay.textContent = '00:00';
+        timerDisplay.style.color = 'var(--red)';
+        btnStop.disabled = true;
+        btnStop.style.opacity = '0.4';
+        // Hide overlay timer
+        send({ type: 'WIDGET_BINDING', payload: { widgetId: 'countdown', minutes: 0 } });
+        toast('⏱ Timer đã hết!', 'warning');
+        document.querySelectorAll('.timer-preset').forEach(b => {
+          b.style.borderColor = 'var(--border)';
+          b.style.color = 'var(--text-3)';
+          b.style.background = 'var(--bg-elevated)';
+        });
+      }
+    }, 1000);
+
+    toast(`⏱ Timer ${minutes} phút bắt đầu`, 'success');
+  }
+
+  function stopTimer() {
+    clearInterval(timerInterval);
+    timerRemaining = 0;
+    timerDisplay.textContent = '00:00';
+    timerDisplay.style.display = 'none';
+    btnStop.disabled = true;
+    btnStop.style.opacity = '0.4';
+    send({ type: 'WIDGET_BINDING', payload: { widgetId: 'countdown', minutes: 0 } });
+    document.querySelectorAll('.timer-preset').forEach(b => {
+      b.style.borderColor = 'var(--border)';
+      b.style.color = 'var(--text-3)';
+      b.style.background = 'var(--bg-elevated)';
+    });
+    toast('⏱ Timer dừng', 'info');
+  }
+
+  document.querySelectorAll('.timer-preset').forEach(b => {
+    b.addEventListener('click', () => startTimer(+b.dataset.min));
+  });
+  if (btnStart) btnStart.addEventListener('click', () => {
+    const m = parseInt(customInput?.value) || 0;
+    if (m > 0 && m <= 120) startTimer(m);
+    else toast('Nhập số phút hợp lệ (1-120)', 'warning');
+  });
+  if (btnStop) btnStop.addEventListener('click', stopTimer);
+});
+if (document.readyState !== 'loading') {
+  const btn = $('btn-obs-connect');
+  if (btn) btn.addEventListener('click', obsConnectFromDashboard);
+}
 </script>
+<script src="/OBSChurch/monitor-pip.js"></script>
 </body>
 </html>

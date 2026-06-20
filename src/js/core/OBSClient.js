@@ -82,17 +82,25 @@ const OBSClient = (() => {
   }
 
   async function _generateAuthSecret(password, salt, challenge) {
-    const pwHash = await _sha256(password + salt);
-    const secret = await _sha256(pwHash + challenge);
+    // OBS WebSocket v5: base64(sha256(base64(sha256(password + salt)) + challenge))
+    const pwHash  = await _sha256b64(password + salt);
+    const secret  = await _sha256b64(pwHash + challenge);
     return secret;
   }
 
-  async function _sha256(message) {
-    const msgBuffer = new TextEncoder().encode(message);
+  /** SHA-256 → Base64 string (đúng chuẩn OBS WebSocket v5 auth) */
+  async function _sha256b64(message) {
+    const msgBuffer  = new TextEncoder().encode(message);
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-    return Array.from(new Uint8Array(hashBuffer))
-      .map((b) => b.toString(16).padStart(2, '0'))
-      .join('');
+    return _bufToBase64(hashBuffer);
+  }
+
+  /** ArrayBuffer → Base64 string */
+  function _bufToBase64(buffer) {
+    const bytes = new Uint8Array(buffer);
+    let bin = '';
+    bytes.forEach((b) => { bin += String.fromCharCode(b); });
+    return btoa(bin);
   }
 
   function _handleIdentified() {
